@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Panoramic (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Panoramic (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
