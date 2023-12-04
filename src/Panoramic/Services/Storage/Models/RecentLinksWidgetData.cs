@@ -1,19 +1,35 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Panoramic.Models;
 
 namespace Panoramic.Services.Storage.Models;
 
 public class RecentLinksWidgetData : WidgetData
 {
+    public RecentLinksWidgetData()
+        : base(WidgetType.RecentLinks)
+    {
+    }
+
+    [JsonPropertyName("capacity")]
+    public int Capacity { get; set; }
+
+    [JsonPropertyName("resetEveryDay")]
+    public bool ResetEveryDay { get; set; }
+
     [JsonPropertyName("links")]
-    public required List<RecentLink> Links { get; set; }
+    public List<RecentLink> Links { get; set; } = new();
 }
 
 public class RecentLink
 {
     [JsonPropertyName("title")]
-    public required string Title { get; set; }
+    public string Title { get; set; } = null!;
 
     [JsonPropertyName("url")]
-    public required string Url { get; set; }
+    public string Url { get; set; } = null!;
+
+    [JsonPropertyName("clicked")]
+    public DateTime Clicked { get; set; }
 }

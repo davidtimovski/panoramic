@@ -1,4 +1,4 @@
-﻿namespace Panoramic.Services.Storage.Models;
+﻿namespace Panoramic.Models;
 
 public enum WidgetType
 {

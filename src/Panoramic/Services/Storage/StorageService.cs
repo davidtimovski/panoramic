@@ -5,11 +5,25 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Panoramic.Models;
 using Panoramic.Services.Storage.Models;
 
 namespace Panoramic.Services.Storage;
 
-public class StorageService
+public interface IStorageService
+{
+    event EventHandler<WidgetUpdatedEventArgs>? WidgetUpdated;
+    event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
+
+    Dictionary<string, WidgetData> Sections { get; }
+
+    Task ReadAsync();
+    Task WriteAsync();
+    void DeleteWidget(string section);
+    Task AddRecentLinksWidgetAsync(string section, string title, int capacity, bool resetEveryDay);
+}
+
+public class StorageService : IStorageService
 {
     private static readonly string BasePath = "C:\\Users\\david\\Desktop\\overview";
     private static readonly IReadOnlyDictionary<string, string> DataPaths = new Dictionary<string, string>
@@ -32,9 +46,12 @@ public class StorageService
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public static readonly Dictionary<string, WidgetData> Frames = new();
+    public event EventHandler<WidgetUpdatedEventArgs>? WidgetUpdated;
+    public event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
 
-    public static async Task ReadAsync()
+    public Dictionary<string, WidgetData> Sections { get; } = new();
+
+    public async Task ReadAsync()
     {
         var dataFiles = Directory.GetFiles(BasePath, "*.json");
 
@@ -43,15 +60,15 @@ public class StorageService
         await Task.WhenAll(tasks).ConfigureAwait(false);
     }
 
-    public static async Task WriteAsync()
+    public async Task WriteAsync()
     {
-        var usedFrames = Frames.Where(x => x.Value is not null).ToList();
+        var usedSections = Sections.Where(x => x.Value is not null).ToList();
 
-        var writeTasks = new List<Task>(usedFrames.Count);
-        foreach (var frame in usedFrames)
+        var writeTasks = new List<Task>(usedSections.Count);
+        foreach (var section in usedSections)
         {
-            var value = Frames[frame.Key]!;
-            var path = DataPaths[frame.Key];
+            var value = Sections[section.Key]!;
+            var path = DataPaths[section.Key];
 
             var json = value.Type switch
             {
@@ -66,10 +83,42 @@ public class StorageService
         await Task.WhenAll(writeTasks).ConfigureAwait(false);
     }
 
-    private static async Task ReadWidgetDataAsync(string filePath)
+    public void DeleteWidget(string section)
+    {
+        Sections.Remove(section);
+        File.Delete(DataPaths[section]);
+
+        WidgetRemoved?.Invoke(this, new WidgetRemovedEventArgs(section));
+    }
+
+    public async Task AddRecentLinksWidgetAsync(string section, string title, int capacity, bool resetEveryDay)
+    {
+        var data = new RecentLinksWidgetData
+        {
+            Title = title,
+            Capacity = capacity,
+            ResetEveryDay = resetEveryDay
+        };
+
+        if (Sections.ContainsKey(section))
+        {
+            Sections[section] = data;
+        }
+        else
+        {
+            Sections.Add(section, data);
+        }
+
+        var json = JsonSerializer.Serialize(data, SerializerOptions);
+        await File.WriteAllTextAsync(DataPaths[section], json);
+
+        WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(section));
+    }
+
+    private async Task ReadWidgetDataAsync(string filePath)
     {
         var json = await File.ReadAllTextAsync(filePath);
-        var frame = Path.GetFileNameWithoutExtension(filePath);
+        var section = Path.GetFileNameWithoutExtension(filePath);
 
         using var jsonDoc = JsonDocument.Parse(json);
         var typeProperty = jsonDoc.RootElement.GetProperty("type");
@@ -82,6 +131,26 @@ public class StorageService
             _ => throw new InvalidOperationException("Unsupported widget type")
         };
 
-        Frames.Add(frame, data);
+        Sections.Add(section, data);
     }
+}
+
+public class WidgetUpdatedEventArgs : EventArgs
+{
+    public WidgetUpdatedEventArgs(string section)
+    {
+        Section = section;
+    }
+
+    public string Section { get; }
+}
+
+public class WidgetRemovedEventArgs : EventArgs
+{
+    public WidgetRemovedEventArgs(string section)
+    {
+        Section = section;
+    }
+
+    public string Section { get; }
 }

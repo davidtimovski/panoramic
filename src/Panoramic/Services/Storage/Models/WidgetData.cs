@@ -1,12 +1,18 @@
 ﻿using System.Text.Json.Serialization;
+using Panoramic.Models;
 
 namespace Panoramic.Services.Storage.Models;
 
 public abstract class WidgetData
 {
+    public WidgetData(WidgetType type)
+    {
+        Type = type;
+    }
+
     [JsonPropertyName("type")]
-    public required WidgetType Type { get; init; }
+    public WidgetType Type { get; init; }
 
     [JsonPropertyName("title")]
-    public required string Title { get; set; }
+    public string Title { get; set; } = null!;
 }

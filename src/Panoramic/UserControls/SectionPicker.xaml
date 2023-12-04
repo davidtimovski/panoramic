@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Panoramic.UserControls.SectionPicker"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Width="400" Height="200" ColumnSpacing="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0" ColumnSpacing="10" RowSpacing="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Button x:Name="A1Button" Grid.Row="0" Grid.Column="0" Command="{x:Bind SectionClicked}" CommandParameter="A1" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">A1</Button>
+            <Button x:Name="B1Button" Grid.Row="0" Grid.Column="1" Command="{x:Bind SectionClicked}" CommandParameter="B1" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">B1</Button>
+            <Button x:Name="C1Button" Grid.Row="0" Grid.Column="2" Command="{x:Bind SectionClicked}" CommandParameter="C1" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">C1</Button>
+
+            <Button x:Name="A2Button" Grid.Row="1" Grid.Column="0" Command="{x:Bind SectionClicked}" CommandParameter="A2" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">A2</Button>
+            <Button x:Name="B2Button" Grid.Row="1" Grid.Column="1" Command="{x:Bind SectionClicked}" CommandParameter="B2" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">B2</Button>
+            <Button x:Name="C2Button" Grid.Row="1" Grid.Column="2" Command="{x:Bind SectionClicked}" CommandParameter="C2" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">C2</Button>
+
+            <Button x:Name="A3Button" Grid.Row="2" Grid.Column="0" Command="{x:Bind SectionClicked}" CommandParameter="A3" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">A3</Button>
+            <Button x:Name="B3Button" Grid.Row="2" Grid.Column="1" Command="{x:Bind SectionClicked}" CommandParameter="B3" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">B3</Button>
+            <Button x:Name="C3Button" Grid.Row="2" Grid.Column="2" Command="{x:Bind SectionClicked}" CommandParameter="C3" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">C3</Button>
+        </Grid>
+
+        <Grid Grid.Column="1" RowSpacing="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Button x:Name="D1Button" Grid.Row="0" CornerRadius="5" Command="{x:Bind SectionClicked}" CommandParameter="D1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">D1</Button>
+            <Button x:Name="D2Button" Grid.Row="1" CornerRadius="5" Command="{x:Bind SectionClicked}" CommandParameter="D2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">D2</Button>
+        </Grid>
+    </Grid>
+</UserControl>

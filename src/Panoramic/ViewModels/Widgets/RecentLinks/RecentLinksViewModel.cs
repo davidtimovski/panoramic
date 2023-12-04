@@ -11,20 +11,21 @@ namespace Panoramic.ViewModels.Widgets.RecentLinks;
 public partial class RecentLinksViewModel : ObservableObject
 {
     private readonly IEventHub _eventHub;
-    private readonly RecentLinksWidgetData _data;
+    private readonly int _capacity;
+    private readonly bool _resetEveryDay; // TODO
 
     public RecentLinksViewModel(IEventHub eventHub, RecentLinksWidgetData data)
     {
         _eventHub = eventHub;
-        _data = data;
-
         _eventHub.HyperlinkClicked += HyperlinkClicked;
 
+        _capacity = data.Capacity;
+        _resetEveryDay = data.ResetEveryDay;
         Title = data.Title;
 
         foreach (var recentLink in data.Links)
         {
-            Recent.Add(new RecentLinkViewModel(eventHub, recentLink.Title, new Uri(recentLink.Url, UriKind.Absolute)));
+            Recent.Add(new RecentLinkViewModel(eventHub, recentLink.Title, new Uri(recentLink.Url, UriKind.Absolute), recentLink.Clicked));
         }
     }
 
@@ -36,8 +37,6 @@ public partial class RecentLinksViewModel : ObservableObject
     public void ClearRecent()
     {
         Recent.Clear();
-
-        _data.Links.Clear();
     }
 
     private void HyperlinkClicked(object? _, HyperlinkClickedEventArgs e)
@@ -48,14 +47,14 @@ public partial class RecentLinksViewModel : ObservableObject
         if (recent is null)
         {
             var viewModels = Recent.ToList();
-            viewModels.Add(new RecentLinkViewModel(_eventHub, e.Title, e.Uri));
+            viewModels.Add(new RecentLinkViewModel(_eventHub, e.Title, e.Uri, e.Clicked));
 
-            recentLinks = viewModels.OrderByDescending(x => x.LastClick).ToList();
+            recentLinks = viewModels.OrderByDescending(x => x.Clicked).Take(_capacity).ToList();
         }
         else
         {
-            recent.LastClick = DateTime.Now;
-            recentLinks = Recent.OrderByDescending(x => x.LastClick).ToList();
+            recent.Clicked = DateTime.Now;
+            recentLinks = Recent.OrderByDescending(x => x.Clicked).Take(_capacity).ToList();
         }
 
         Recent.Clear();
@@ -64,7 +63,5 @@ public partial class RecentLinksViewModel : ObservableObject
         {
             Recent.Add(recentLink);
         }
-
-        _data.Links = Recent.Select(x => new RecentLink { Title = x.Title, Url = x.Uri.ToString() }).ToList();
     }
 }

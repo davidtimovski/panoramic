@@ -1,13 +1,17 @@
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.ViewModels.Widgets;
 
-namespace Panoramic.Pages.Widgets;
+namespace Panoramic.Pages.Widgets.Sample;
 
 public sealed partial class SampleWidget : Page
 {
-    public SampleWidget(SampleViewModel viewModel)
+    private readonly string _section;
+
+    public SampleWidget(string section, SampleViewModel viewModel)
     {
         InitializeComponent();
+
+        _section = section;
 
         ViewModel = viewModel;
     }

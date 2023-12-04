@@ -38,7 +38,7 @@ public class BookmarkViewModel
         Clicks.Add(LastClick);
         CalculateWeight();
 
-        _eventHub.RaiseHyperlinkClicked(Id, Title, Uri);
+        _eventHub.RaiseHyperlinkClicked(Id, Title, Uri, LastClick);
     }
 
     private void CalculateWeight()

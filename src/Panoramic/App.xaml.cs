@@ -28,6 +28,7 @@ public partial class App : Application
 
     private static void ConfigureServices(ServiceCollection services)
     {
+        services.AddSingleton<IStorageService, StorageService>();
         services.AddSingleton(new HttpClient());
 
         services.AddSingleton<MainWindow>();
@@ -47,8 +48,9 @@ public partial class App : Application
             Process.GetCurrentProcess().Kill();
             return;
         }
-
-        await StorageService.ReadAsync();
+        
+        var storageService = _serviceProvider.GetRequiredService<IStorageService>();
+        await storageService.ReadAsync();
 
         var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
         mainWindow.Activate();
