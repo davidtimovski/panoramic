@@ -4,17 +4,18 @@ using HtmlAgilityPack;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Windows.ApplicationModel.DataTransfer;
 using Panoramic.ViewModels;
+using Windows.ApplicationModel.DataTransfer;
 
-namespace Panoramic.Pages;
+namespace Panoramic.Pages.Widgets.LinkCollection;
 
-public sealed partial class AddBookmarkDialog : Page
+// TODO: Missing validation
+public sealed partial class AddLinkDialog : Page
 {
     private readonly HttpClient _httpClient;
     private readonly DispatcherQueue _dispatcherQueue;
 
-    public AddBookmarkDialog(HttpClient httpClient, DispatcherQueue dispatcherQueue, AddBookmarkViewModel viewModel)
+    public AddLinkDialog(HttpClient httpClient, DispatcherQueue dispatcherQueue, AddLinkViewModel viewModel)
     {
         InitializeComponent();
 
@@ -23,12 +24,12 @@ public sealed partial class AddBookmarkDialog : Page
 
         ViewModel = viewModel;
 
-        Loaded += AddBookmarkDialog_Loaded;
+        Loaded += PageLoaded;
     }
 
-    public AddBookmarkViewModel ViewModel { get; }
+    public AddLinkViewModel ViewModel { get; }
 
-    private async void AddBookmarkDialog_Loaded(object sender, RoutedEventArgs e)
+    private async void PageLoaded(object _, RoutedEventArgs e)
     {
         var package = Clipboard.GetContent();
         if (!package.Contains(StandardDataFormats.Text))

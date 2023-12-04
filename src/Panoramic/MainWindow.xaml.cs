@@ -5,15 +5,14 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
-using Panoramic.Pages;
 using Panoramic.Pages.Widgets;
+using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.RecentLinks;
-using Panoramic.Pages.Widgets.Sample;
 using Panoramic.Services;
 using Panoramic.Services.Storage;
 using Panoramic.Services.Storage.Models;
 using Panoramic.ViewModels;
-using Panoramic.ViewModels.Widgets;
+using Panoramic.ViewModels.Widgets.LinkCollection;
 using Panoramic.ViewModels.Widgets.RecentLinks;
 
 namespace Panoramic;
@@ -25,9 +24,19 @@ public sealed partial class MainWindow : Window
     private readonly HttpClient _httpClient;
     private readonly DispatcherQueue _dispatcherQueue;
 
-    public MainWindow(IStorageService storageService, IEventHub eventHub, HttpClient httpClient, DispatcherQueue dispatcherQueue, MainViewModel viewModel)
+    // TODO: Redo widget initialization so that MainWindow does not have to know all dependencies
+    public MainWindow(
+        IStorageService storageService,
+        IEventHub eventHub,
+        HttpClient httpClient,
+        DispatcherQueue dispatcherQueue,
+        MainViewModel viewModel)
     {
         InitializeComponent();
+
+        Title = "Panoramic";
+        ExtendsContentIntoTitleBar = true;
+        SetTitleBar(AppTitleBar);
 
         Closed += WindowClosed;
 
@@ -45,22 +54,6 @@ public sealed partial class MainWindow : Window
     }
 
     public MainViewModel ViewModel { get; }
-
-    private async void AddBookmarkButton_Click(object _, RoutedEventArgs e)
-    {
-        var content = new AddBookmarkDialog(_httpClient, _dispatcherQueue, new AddBookmarkViewModel());
-        var dialog = new ContentDialog
-        {
-            XamlRoot = Content.XamlRoot,
-            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-            Title = "Add bookmark",
-            Content = content,
-            PrimaryButtonText = "Add",
-            CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => ViewModel.AddBookmark(content.ViewModel.Title, content.ViewModel.Uri))
-        };
-        await dialog.ShowAsync();
-    }
 
     private async void WindowClosed(object _, WindowEventArgs args)
     {
@@ -130,8 +123,8 @@ public sealed partial class MainWindow : Window
     {
         return data.Type switch
         {
-            WidgetType.Sample => new SampleWidget(section, new SampleViewModel((SampleWidgetData)data)),
             WidgetType.RecentLinks => new RecentLinksWidget(section, _storageService, new RecentLinksViewModel(_eventHub, (RecentLinksWidgetData)data)),
+            WidgetType.LinkCollection => new LinkCollectionWidget(section, _storageService, _httpClient, _dispatcherQueue, new LinkCollectionViewModel(_storageService, _eventHub, _dispatcherQueue, (LinkCollectionWidgetData)data)),
             _ => throw new InvalidOperationException("Unsupported widget type")
         };
     }

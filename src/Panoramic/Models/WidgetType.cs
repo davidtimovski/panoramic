@@ -2,6 +2,6 @@
 
 public enum WidgetType
 {
-    Sample,
-    RecentLinks
+    RecentLinks,
+    LinkCollection
 }

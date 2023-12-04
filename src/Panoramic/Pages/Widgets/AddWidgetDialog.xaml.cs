@@ -3,10 +3,12 @@ using System.Threading.Tasks;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
 using Panoramic.Models.Events;
+using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.RecentLinks;
 using Panoramic.Services.Storage;
 using Panoramic.UserControls;
-using Panoramic.ViewModels.RecentLinks;
+using Panoramic.ViewModels.Widgets.LinkCollection;
+using Panoramic.ViewModels.Widgets.RecentLinks;
 
 namespace Panoramic.Pages.Widgets;
 
@@ -70,13 +72,17 @@ public sealed partial class AddWidgetDialog : Page
     {
         switch (e.Type)
         {
-            case WidgetType.Sample:
-                break;
             case WidgetType.RecentLinks:
                 StepChanged?.Invoke(this, new StepChangedEventArgs("Add Recent links widget"));
-                var form = new RecentLinksSettingsForm(e.Section, new RecentLinksSettingsViewModel(_storageService, null));
-                widgetForm = form;
-                ContentFrame.Content = form;
+                var recentLinksForm = new RecentLinksSettingsForm(e.Section, new RecentLinksSettingsViewModel(_storageService, null));
+                widgetForm = recentLinksForm;
+                ContentFrame.Content = recentLinksForm;
+                break;
+            case WidgetType.LinkCollection:
+                StepChanged?.Invoke(this, new StepChangedEventArgs("Add Link collection widget"));
+                var linkCollectionForm = new LinkCollectionSettingsForm(e.Section, new LinkCollectionSettingsViewModel(_storageService, null));
+                widgetForm = linkCollectionForm;
+                ContentFrame.Content = linkCollectionForm;
                 break;
             default:
                 throw new InvalidOperationException("Unsupported widget type");

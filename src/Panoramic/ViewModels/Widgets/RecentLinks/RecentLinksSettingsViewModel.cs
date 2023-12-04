@@ -3,8 +3,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Panoramic.Services.Storage;
 using Panoramic.Services.Storage.Models;
 
-namespace Panoramic.ViewModels.RecentLinks;
+namespace Panoramic.ViewModels.Widgets.RecentLinks;
 
+// TODO: Validate title non empty,
+// find way to fire event to toggle save button
 public partial class RecentLinksSettingsViewModel : ObservableObject
 {
     private readonly IStorageService _storageService;

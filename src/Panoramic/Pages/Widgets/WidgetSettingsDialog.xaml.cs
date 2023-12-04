@@ -3,10 +3,12 @@ using System.Threading.Tasks;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
 using Panoramic.Models.Events;
+using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.RecentLinks;
 using Panoramic.Services.Storage;
 using Panoramic.Services.Storage.Models;
-using Panoramic.ViewModels.RecentLinks;
+using Panoramic.ViewModels.Widgets.LinkCollection;
+using Panoramic.ViewModels.Widgets.RecentLinks;
 
 namespace Panoramic.Pages.Widgets;
 
@@ -45,18 +47,21 @@ public sealed partial class WidgetSettingsDialog : Page
     {
         switch (_data.Type)
         {
-            case WidgetType.Sample:
-                break;
             case WidgetType.RecentLinks:
-                var data = (RecentLinksWidgetData)_data;
-                var form = new RecentLinksSettingsForm(_section, new RecentLinksSettingsViewModel(_storageService, data));
-                widgetForm = form;
-                ContentFrame.Content = form;
+                var recentLinksForm = new RecentLinksSettingsForm(_section, new RecentLinksSettingsViewModel(_storageService, (RecentLinksWidgetData)_data));
+                widgetForm = recentLinksForm;
+                ContentFrame.Content = recentLinksForm;
+                break;
+            case WidgetType.LinkCollection:
+                var linkCollectionForm = new LinkCollectionSettingsForm(_section, new LinkCollectionSettingsViewModel(_storageService, (LinkCollectionWidgetData)_data));
+                widgetForm = linkCollectionForm;
+                ContentFrame.Content = linkCollectionForm;
                 break;
             default:
                 throw new InvalidOperationException("Unsupported widget type");
         }
 
-        SubmitEnabledChanged?.Invoke(this, new SubmitEnabledChangedEventArgs(true));
+        // TODO: maybe use to signal validation changes
+        //SubmitEnabledChanged?.Invoke(this, new SubmitEnabledChangedEventArgs(true));
     }
 }

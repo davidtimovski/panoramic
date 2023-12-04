@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
-using Panoramic.ViewModels.RecentLinks;
+using Panoramic.ViewModels.Widgets.RecentLinks;
 
 namespace Panoramic.Pages.Widgets.RecentLinks;
 

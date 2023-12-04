@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -11,22 +10,22 @@ namespace Panoramic.ViewModels.Widgets.RecentLinks;
 public partial class RecentLinksViewModel : ObservableObject
 {
     private readonly IEventHub _eventHub;
+    private readonly RecentLinksWidgetData _data;
     private readonly int _capacity;
-    private readonly bool _resetEveryDay; // TODO
+    private readonly bool _resetEveryDay; // TODO: Implement
 
     public RecentLinksViewModel(IEventHub eventHub, RecentLinksWidgetData data)
     {
         _eventHub = eventHub;
         _eventHub.HyperlinkClicked += HyperlinkClicked;
 
+        _data = data;
+
         _capacity = data.Capacity;
         _resetEveryDay = data.ResetEveryDay;
         Title = data.Title;
 
-        foreach (var recentLink in data.Links)
-        {
-            Recent.Add(new RecentLinkViewModel(eventHub, recentLink.Title, new Uri(recentLink.Url, UriKind.Absolute), recentLink.Clicked));
-        }
+        SetViewModel();
     }
 
     [ObservableProperty]
@@ -39,29 +38,37 @@ public partial class RecentLinksViewModel : ObservableObject
         Recent.Clear();
     }
 
+    // TODO: Is ordering guaranteed?
     private void HyperlinkClicked(object? _, HyperlinkClickedEventArgs e)
     {
-        List<RecentLinkViewModel> recentLinks;
+        var url = e.Uri.ToString();
 
-        var recent = Recent.FirstOrDefault(x => x.Id == e.Id);
-        if (recent is null)
+        var link = _data.Links.FirstOrDefault(x => string.Equals(x.Url, url, StringComparison.OrdinalIgnoreCase));
+        if (link is null)
         {
-            var viewModels = Recent.ToList();
-            viewModels.Add(new RecentLinkViewModel(_eventHub, e.Title, e.Uri, e.Clicked));
+            _data.Links.Add(new RecentLink { Title = e.Title, Url = e.Uri.ToString(), Clicked = e.Clicked });
 
-            recentLinks = viewModels.OrderByDescending(x => x.Clicked).Take(_capacity).ToList();
+            if (_data.Links.Count > _capacity)
+            {
+                _data.Links.RemoveAt(0);
+            }
         }
         else
         {
-            recent.Clicked = DateTime.Now;
-            recentLinks = Recent.OrderByDescending(x => x.Clicked).Take(_capacity).ToList();
+            link.Clicked = e.Clicked;
         }
 
+        SetViewModel();
+    }
+
+    private void SetViewModel()
+    {
         Recent.Clear();
 
-        foreach (var recentLink in recentLinks)
+        var ordered = _data.Links.OrderByDescending(x => x.Clicked).Take(_capacity).ToList();
+        foreach (var recentLink in ordered)
         {
-            Recent.Add(recentLink);
+            Recent.Add(new RecentLinkViewModel(_eventHub, recentLink.Title, new Uri(recentLink.Url, UriKind.Absolute), recentLink.Clicked));
         }
     }
 }

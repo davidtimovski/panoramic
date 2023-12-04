@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Panoramic.Pages.Widgets.LinkCollection.LinkCollectionSettingsForm"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid RowSpacing="15">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <TextBox Grid.Row="0"
+                 Text="{x:Bind ViewModel.Title, Mode=TwoWay}"
+                 Header="Title"
+                 MaxLength="60" />
+
+    </Grid>
+
+</Page>

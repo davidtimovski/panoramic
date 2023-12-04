@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Page
-    x:Class="Panoramic.Pages.Widgets.RecentLinks.RecentLinksWidget"
+    x:Class="Panoramic.Pages.Widgets.LinkCollection.LinkCollectionWidget"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:vm="using:Panoramic.ViewModels.Widgets.RecentLinks">
+    xmlns:vm="using:Panoramic.ViewModels.Widgets.LinkCollection">
 
     <Border Padding="20" Background="#151515">
         <Grid>
@@ -27,7 +27,7 @@
                         </DropDownButton.Content>
                         <DropDownButton.Flyout>
                             <MenuFlyout Placement="Bottom">
-                                <MenuFlyoutItem Click="{x:Bind ViewModel.ClearRecent}">Clear</MenuFlyoutItem>
+                                <MenuFlyoutItem Click="AddButton_Click">Add</MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
                                 <MenuFlyoutItem Click="SettingsButton_Click">Settings</MenuFlyoutItem>
                                 <MenuFlyoutItem Click="RemoveButton_Click">Remove</MenuFlyoutItem>
@@ -40,18 +40,18 @@
             <Border Grid.Row="1" Margin="0 20 0 0">
 
                 <Border.Resources>
-                    <DataTemplate x:Key="RecentLinksViewTemplate" x:DataType="vm:RecentLinkViewModel">
+                    <DataTemplate x:Key="LinkCollectionViewTemplate" x:DataType="vm:LinkViewModel">
                         <HyperlinkButton Content="{x:Bind Title}"
-                                     NavigateUri="{x:Bind Uri}"
-                                     HorizontalAlignment="Stretch"
-                                     HorizontalContentAlignment="Left"
-                                     Click="{x:Bind Click}" />
+                                         NavigateUri="{x:Bind Uri}"
+                                         HorizontalAlignment="Stretch"
+                                         HorizontalContentAlignment="Left"
+                                         Click="{x:Bind Clicked}" />
                     </DataTemplate>
                 </Border.Resources>
 
                 <ListView
-                    ItemsSource="{x:Bind ViewModel.Recent}"
-                    ItemTemplate="{StaticResource RecentLinksViewTemplate}"
+                    ItemsSource="{x:Bind ViewModel.Links}"
+                    ItemTemplate="{StaticResource LinkCollectionViewTemplate}"
                     SelectionMode="None">
 
                     <ListView.ItemContainerStyle>

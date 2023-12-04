@@ -21,6 +21,7 @@ public interface IStorageService
     Task WriteAsync();
     void DeleteWidget(string section);
     Task AddRecentLinksWidgetAsync(string section, string title, int capacity, bool resetEveryDay);
+    Task AddLinkCollectionWidgetAsync(string section, string title);
 }
 
 public class StorageService : IStorageService
@@ -72,8 +73,8 @@ public class StorageService : IStorageService
 
             var json = value.Type switch
             {
-                WidgetType.Sample => JsonSerializer.Serialize((SampleWidgetData)value, SerializerOptions),
                 WidgetType.RecentLinks => JsonSerializer.Serialize((RecentLinksWidgetData)value, SerializerOptions),
+                WidgetType.LinkCollection => JsonSerializer.Serialize((LinkCollectionWidgetData)value, SerializerOptions),
                 _ => throw new InvalidOperationException("Unsupported widget type")
             };
 
@@ -91,6 +92,7 @@ public class StorageService : IStorageService
         WidgetRemoved?.Invoke(this, new WidgetRemovedEventArgs(section));
     }
 
+    // TODO: Bug. Will reset data on update.
     public async Task AddRecentLinksWidgetAsync(string section, string title, int capacity, bool resetEveryDay)
     {
         var data = new RecentLinksWidgetData
@@ -98,6 +100,29 @@ public class StorageService : IStorageService
             Title = title,
             Capacity = capacity,
             ResetEveryDay = resetEveryDay
+        };
+
+        if (Sections.ContainsKey(section))
+        {
+            Sections[section] = data;
+        }
+        else
+        {
+            Sections.Add(section, data);
+        }
+
+        var json = JsonSerializer.Serialize(data, SerializerOptions);
+        await File.WriteAllTextAsync(DataPaths[section], json);
+
+        WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(section));
+    }
+
+    // TODO: Bug. Will reset data on update.
+    public async Task AddLinkCollectionWidgetAsync(string section, string title)
+    {
+        var data = new LinkCollectionWidgetData
+        {
+            Title = title
         };
 
         if (Sections.ContainsKey(section))
@@ -126,8 +151,8 @@ public class StorageService : IStorageService
 
         WidgetData data = type switch
         {
-            WidgetType.Sample => JsonSerializer.Deserialize<SampleWidgetData>(json, SerializerOptions)!,
             WidgetType.RecentLinks => JsonSerializer.Deserialize<RecentLinksWidgetData>(json, SerializerOptions)!,
+            WidgetType.LinkCollection => JsonSerializer.Deserialize<LinkCollectionWidgetData>(json, SerializerOptions)!,
             _ => throw new InvalidOperationException("Unsupported widget type")
         };
 

@@ -13,7 +13,8 @@
 
         <TextBox Grid.Row="0"
                  Text="{x:Bind ViewModel.Title, Mode=TwoWay}"
-                 Header="Title" />
+                 Header="Title"
+                 MaxLength="60" />
 
         <NumberBox Grid.Row="1"
                    Value="{x:Bind ViewModel.Capacity, Mode=TwoWay}"

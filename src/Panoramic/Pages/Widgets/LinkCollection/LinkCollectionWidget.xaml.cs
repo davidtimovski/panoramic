@@ -1,28 +1,56 @@
 using System;
+using System.Net.Http;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Services.Storage;
-using Panoramic.ViewModels.Widgets.RecentLinks;
+using Panoramic.ViewModels;
+using Panoramic.ViewModels.Widgets.LinkCollection;
 
-namespace Panoramic.Pages.Widgets.RecentLinks;
+namespace Panoramic.Pages.Widgets.LinkCollection;
 
-public sealed partial class RecentLinksWidget : Page
+public sealed partial class LinkCollectionWidget : Page
 {
     private readonly string _section;
     private readonly IStorageService _storageService;
+    private readonly HttpClient _httpClient;
+    private readonly DispatcherQueue _dispatcherQueue;
 
-    public RecentLinksWidget(string section, IStorageService storageService, RecentLinksViewModel viewModel)
+    public LinkCollectionWidget(
+        string section,
+        IStorageService storageService,
+        HttpClient httpClient,
+        DispatcherQueue dispatcherQueue,
+        LinkCollectionViewModel viewModel)
     {
         InitializeComponent();
 
         _section = section;
         _storageService = storageService;
+        _httpClient = httpClient;
+        _dispatcherQueue = dispatcherQueue;
 
         ViewModel = viewModel;
     }
 
-    public RecentLinksViewModel ViewModel { get; }
+    public LinkCollectionViewModel ViewModel { get; }
+
+    private async void AddButton_Click(object _, RoutedEventArgs e)
+    {
+        var content = new AddLinkDialog(_httpClient, _dispatcherQueue, new AddLinkViewModel());
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+            Title = "Add link",
+            Content = content,
+            PrimaryButtonText = "Add",
+            CloseButtonText = "Cancel",
+            PrimaryButtonCommand = new RelayCommand(() => ViewModel.AddLink(content.ViewModel.Title, content.ViewModel.Uri))
+        };
+        await dialog.ShowAsync();
+    }
 
     private async void SettingsButton_Click(object _, RoutedEventArgs e)
     {

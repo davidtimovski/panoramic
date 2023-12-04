@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Panoramic.Services;
 
-namespace Panoramic.ViewModels;
+namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
-public class BookmarkViewModel
+public class LinkViewModel
 {
     private const int TodayWeightMultiplier = 4;
     private const int PastWeekWeightMultiplier = 2;
 
     private readonly IEventHub _eventHub;
 
-    public BookmarkViewModel(IEventHub eventHub, string title, Uri uri, List<DateTime> clicks)
+    public LinkViewModel(IEventHub eventHub, string title, Uri uri, List<DateTime> clicks)
     {
         _eventHub = eventHub;
 
@@ -21,7 +21,7 @@ public class BookmarkViewModel
         Uri = uri;
         Clicks = clicks;
         LastClick = clicks.Last();
-        
+
         CalculateWeight();
     }
 
