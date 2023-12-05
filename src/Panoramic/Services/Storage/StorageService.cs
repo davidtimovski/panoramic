@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Microsoft.UI.Dispatching;
 using Panoramic.Models;
 using Panoramic.Services.Storage.Models;
 
@@ -19,9 +20,18 @@ public interface IStorageService
 
     Task ReadAsync();
     Task WriteAsync();
+
+    /// <summary>
+    /// Schedules a section write to disk.
+    /// Will reset the timer if other changes have been scheduled.
+    /// </summary>
+    void EnqueueSectionWrite(string section);
+
     void DeleteWidget(string section);
-    Task AddRecentLinksWidgetAsync(string section, string title, int capacity, bool resetEveryDay);
-    Task AddLinkCollectionWidgetAsync(string section, string title);
+    Task AddNewWidgetAsync<T>(string section, T data)
+        where T : WidgetData;
+    Task SaveWidgetAsync<T>(string section)
+        where T : WidgetData;
 }
 
 public class StorageService : IStorageService
@@ -41,11 +51,42 @@ public class StorageService : IStorageService
         { "D1", Path.Combine(BasePath, "D1.json") },
         { "D2", Path.Combine(BasePath, "D2.json") }
     };
-
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         Converters = { new JsonStringEnumConverter() }
     };
+
+    /// <summary>
+    /// Used to write changed sections widget data to disk.
+    /// </summary>
+    private readonly DispatcherQueueTimer _timer;
+
+    /// <summary>
+    /// Stores the sections that have been changed and need to be written to disk.
+    /// </summary>
+    private readonly HashSet<string> _sectionsToWrite = new();
+
+    public StorageService()
+    {
+        var queueController = DispatcherQueueController.CreateOnDedicatedThread();
+        var queue = queueController.DispatcherQueue;
+
+        _timer = queue.CreateTimer();
+        _timer.Interval = TimeSpan.FromSeconds(15);
+        _timer.Tick += async (timer, _) =>
+        {
+            var tasks = new List<Task>(_sectionsToWrite.Count);
+
+            foreach (var section in _sectionsToWrite)
+            {
+                tasks.Add(WriteSectionAsync(section));
+            }
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            _timer.Stop();
+        };
+    }
 
     public event EventHandler<WidgetUpdatedEventArgs>? WidgetUpdated;
     public event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
@@ -68,20 +109,22 @@ public class StorageService : IStorageService
         var writeTasks = new List<Task>(usedSections.Count);
         foreach (var section in usedSections)
         {
-            var value = Sections[section.Key]!;
-            var path = DataPaths[section.Key];
-
-            var json = value.Type switch
-            {
-                WidgetType.RecentLinks => JsonSerializer.Serialize((RecentLinksWidgetData)value, SerializerOptions),
-                WidgetType.LinkCollection => JsonSerializer.Serialize((LinkCollectionWidgetData)value, SerializerOptions),
-                _ => throw new InvalidOperationException("Unsupported widget type")
-            };
-
-            writeTasks.Add(File.WriteAllTextAsync(path, json));
+            writeTasks.Add(WriteSectionAsync(section.Key));
         }
 
         await Task.WhenAll(writeTasks).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public void EnqueueSectionWrite(string section)
+    {
+        if (!_sectionsToWrite.Contains(section))
+        {
+            _sectionsToWrite.Add(section);
+        }
+
+        _timer.Stop();
+        _timer.Start();
     }
 
     public void DeleteWidget(string section)
@@ -92,16 +135,9 @@ public class StorageService : IStorageService
         WidgetRemoved?.Invoke(this, new WidgetRemovedEventArgs(section));
     }
 
-    // TODO: Bug. Will reset data on update.
-    public async Task AddRecentLinksWidgetAsync(string section, string title, int capacity, bool resetEveryDay)
+    public async Task AddNewWidgetAsync<T>(string section, T data)
+        where T : WidgetData
     {
-        var data = new RecentLinksWidgetData
-        {
-            Title = title,
-            Capacity = capacity,
-            ResetEveryDay = resetEveryDay
-        };
-
         if (Sections.ContainsKey(section))
         {
             Sections[section] = data;
@@ -117,24 +153,10 @@ public class StorageService : IStorageService
         WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(section));
     }
 
-    // TODO: Bug. Will reset data on update.
-    public async Task AddLinkCollectionWidgetAsync(string section, string title)
+    public async Task SaveWidgetAsync<T>(string section)
+        where T : WidgetData
     {
-        var data = new LinkCollectionWidgetData
-        {
-            Title = title
-        };
-
-        if (Sections.ContainsKey(section))
-        {
-            Sections[section] = data;
-        }
-        else
-        {
-            Sections.Add(section, data);
-        }
-
-        var json = JsonSerializer.Serialize(data, SerializerOptions);
+        var json = JsonSerializer.Serialize((T)Sections[section], SerializerOptions);
         await File.WriteAllTextAsync(DataPaths[section], json);
 
         WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(section));
@@ -157,6 +179,21 @@ public class StorageService : IStorageService
         };
 
         Sections.Add(section, data);
+    }
+
+    private Task WriteSectionAsync(string section)
+    {
+        var value = Sections[section]!;
+        var path = DataPaths[section];
+
+        var json = value.Type switch
+        {
+            WidgetType.RecentLinks => JsonSerializer.Serialize((RecentLinksWidgetData)value, SerializerOptions),
+            WidgetType.LinkCollection => JsonSerializer.Serialize((LinkCollectionWidgetData)value, SerializerOptions),
+            _ => throw new InvalidOperationException("Unsupported widget type")
+        };
+
+        return File.WriteAllTextAsync(path, json);
     }
 }
 

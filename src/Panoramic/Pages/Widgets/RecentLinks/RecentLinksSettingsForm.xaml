@@ -9,14 +9,18 @@
             <RowDefinition />
             <RowDefinition />
             <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0"
-                 Text="{x:Bind ViewModel.Title, Mode=TwoWay}"
+        <TextBlock Grid.Row="0">Type: Recent links</TextBlock>
+
+        <TextBox Grid.Row="1"
+                 Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 TextChanged="{x:Bind ViewModel.ValidateAndEmit}"
                  Header="Title"
                  MaxLength="60" />
 
-        <NumberBox Grid.Row="1"
+        <NumberBox Grid.Row="2"
                    Value="{x:Bind ViewModel.Capacity, Mode=TwoWay}"
                    Header="Capacity"
                    Description="The maximum amount of links it will hold."
@@ -24,11 +28,11 @@
                    Minimum="5"
                    Maximum="100" />
 
-        <ToggleSwitch Grid.Row="2"
-                      IsOn="{x:Bind ViewModel.ResetEveryDay, Mode=TwoWay}"
-                      Header="Reset every day"
-                      OffContent="Links will persist"
-                      OnContent="Links will be cleared every day" />
+        <ToggleSwitch Grid.Row="3"
+                      IsOn="{x:Bind ViewModel.OnlyFromToday, Mode=TwoWay}"
+                      Header="Only from today"
+                      OffContent="Show all links"
+                      OnContent="Show only today's clicked links" />
     </Grid>
 
 </Page>

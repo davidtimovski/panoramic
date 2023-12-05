@@ -38,7 +38,8 @@ public sealed partial class LinkCollectionWidget : Page
 
     private async void AddButton_Click(object _, RoutedEventArgs e)
     {
-        var content = new AddLinkDialog(_httpClient, _dispatcherQueue, new AddLinkViewModel());
+        var vm = new AddLinkViewModel();
+        var content = new AddLinkDialog(_httpClient, _dispatcherQueue, vm);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -47,8 +48,12 @@ public sealed partial class LinkCollectionWidget : Page
             Content = content,
             PrimaryButtonText = "Add",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => ViewModel.AddLink(content.ViewModel.Title, content.ViewModel.Uri))
+            PrimaryButtonCommand = new RelayCommand(() => ViewModel.AddLink(content.ViewModel.Title, content.ViewModel.Uri)),
+            IsPrimaryButtonEnabled = false
         };
+
+        vm.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+
         await dialog.ShowAsync();
     }
 
@@ -68,7 +73,7 @@ public sealed partial class LinkCollectionWidget : Page
             PrimaryButtonCommand = new AsyncRelayCommand(content.SubmitAsync)
         };
 
-        content.SubmitEnabledChanged += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Enabled; };
+        content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
 
         await dialog.ShowAsync();
     }

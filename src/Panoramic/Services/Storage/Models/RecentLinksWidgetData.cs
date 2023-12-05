@@ -15,8 +15,8 @@ public class RecentLinksWidgetData : WidgetData
     [JsonPropertyName("capacity")]
     public int Capacity { get; set; }
 
-    [JsonPropertyName("resetEveryDay")]
-    public bool ResetEveryDay { get; set; }
+    [JsonPropertyName("onlyFromToday")]
+    public bool OnlyFromToday { get; set; }
 
     [JsonPropertyName("links")]
     public List<RecentLink> Links { get; set; } = new();

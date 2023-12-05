@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
 using Panoramic.Models.Events;
@@ -28,10 +29,10 @@ public sealed partial class WidgetSettingsDialog : Page
         _section = section;
         _storageService = storageService;
 
-        LoadWidgetSettingsForm();
+        Loaded += PageLoaded;
     }
 
-    public event EventHandler<SubmitEnabledChangedEventArgs>? SubmitEnabledChanged;
+    public event EventHandler<ValidationEventArgs>? Validated;
 
     public async Task SubmitAsync()
     {
@@ -43,25 +44,28 @@ public sealed partial class WidgetSettingsDialog : Page
         await widgetForm.SubmitAsync();
     }
 
-    private void LoadWidgetSettingsForm()
+    private void PageLoaded(object _, RoutedEventArgs e)
     {
         switch (_data.Type)
         {
             case WidgetType.RecentLinks:
-                var recentLinksForm = new RecentLinksSettingsForm(_section, new RecentLinksSettingsViewModel(_storageService, (RecentLinksWidgetData)_data));
+                var recentLinksVm = new RecentLinksSettingsViewModel(_storageService, (RecentLinksWidgetData)_data);
+                recentLinksVm.Validated += Validated;
+
+                var recentLinksForm = new RecentLinksSettingsForm(_section, recentLinksVm);
                 widgetForm = recentLinksForm;
                 ContentFrame.Content = recentLinksForm;
                 break;
             case WidgetType.LinkCollection:
-                var linkCollectionForm = new LinkCollectionSettingsForm(_section, new LinkCollectionSettingsViewModel(_storageService, (LinkCollectionWidgetData)_data));
+                var linkCollectionVm = new LinkCollectionSettingsViewModel(_storageService, (LinkCollectionWidgetData)_data);
+                linkCollectionVm.Validated += Validated;
+
+                var linkCollectionForm = new LinkCollectionSettingsForm(_section, linkCollectionVm);
                 widgetForm = linkCollectionForm;
                 ContentFrame.Content = linkCollectionForm;
                 break;
             default:
                 throw new InvalidOperationException("Unsupported widget type");
         }
-
-        // TODO: maybe use to signal validation changes
-        //SubmitEnabledChanged?.Invoke(this, new SubmitEnabledChangedEventArgs(true));
     }
 }

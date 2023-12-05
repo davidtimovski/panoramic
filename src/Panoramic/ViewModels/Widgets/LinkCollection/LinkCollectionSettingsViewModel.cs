@@ -1,35 +1,41 @@
-﻿using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System;
+using System.Threading.Tasks;
+using Panoramic.Models.Events;
 using Panoramic.Services.Storage;
 using Panoramic.Services.Storage.Models;
 
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
-// TODO: Validate title non empty,
-// find way to fire event to toggle save button
-public partial class LinkCollectionSettingsViewModel : ObservableObject
+public partial class LinkCollectionSettingsViewModel : SettingsViewModel
 {
     private readonly IStorageService _storageService;
+    private readonly LinkCollectionWidgetData? _data;
 
     public LinkCollectionSettingsViewModel(IStorageService storageService, LinkCollectionWidgetData? data)
+        : base("My links", data)
     {
         _storageService = storageService;
-
-        if (data is null)
-        {
-            title = "My links";
-        }
-        else
-        {
-            Title = data.Title;
-        }
+        _data = data;
     }
 
-    [ObservableProperty]
-    private string title;
+    public event EventHandler<ValidationEventArgs>? Validated;
+
+    public void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs(TitleIsValid()));
 
     public async Task SubmitAsync(string section)
     {
-        await _storageService.AddLinkCollectionWidgetAsync(section, Title).ConfigureAwait(false);
+        if (_data is null)
+        {
+            var data = new LinkCollectionWidgetData
+            {
+                Title = Title.Trim()
+            };
+            await _storageService.AddNewWidgetAsync(section, data);
+        }
+        else
+        {
+            _data.Title = Title.Trim();
+            await _storageService.SaveWidgetAsync<LinkCollectionWidgetData>(section);
+        }
     }
 }

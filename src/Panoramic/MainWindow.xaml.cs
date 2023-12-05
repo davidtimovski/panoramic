@@ -123,8 +123,8 @@ public sealed partial class MainWindow : Window
     {
         return data.Type switch
         {
-            WidgetType.RecentLinks => new RecentLinksWidget(section, _storageService, new RecentLinksViewModel(_eventHub, (RecentLinksWidgetData)data)),
-            WidgetType.LinkCollection => new LinkCollectionWidget(section, _storageService, _httpClient, _dispatcherQueue, new LinkCollectionViewModel(_storageService, _eventHub, _dispatcherQueue, (LinkCollectionWidgetData)data)),
+            WidgetType.RecentLinks => new RecentLinksWidget(section, _storageService, new RecentLinksViewModel(section, _storageService, _eventHub, (RecentLinksWidgetData)data)),
+            WidgetType.LinkCollection => new LinkCollectionWidget(section, _storageService, _httpClient, _dispatcherQueue, new LinkCollectionViewModel(section, _storageService, _eventHub, _dispatcherQueue, (LinkCollectionWidgetData)data)),
             _ => throw new InvalidOperationException("Unsupported widget type")
         };
     }
@@ -145,7 +145,7 @@ public sealed partial class MainWindow : Window
         };
 
         content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
-        content.SubmitEnabledChanged += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Enabled; };
+        content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
 
         await dialog.ShowAsync();
     }

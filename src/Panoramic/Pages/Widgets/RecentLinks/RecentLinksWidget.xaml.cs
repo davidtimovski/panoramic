@@ -40,7 +40,7 @@ public sealed partial class RecentLinksWidget : Page
             PrimaryButtonCommand = new AsyncRelayCommand(content.SubmitAsync)
         };
 
-        content.SubmitEnabledChanged += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Enabled; };
+        content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
 
         await dialog.ShowAsync();
     }

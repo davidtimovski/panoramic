@@ -15,6 +15,7 @@ namespace Panoramic.Pages.Widgets;
 public sealed partial class AddWidgetDialog : Page
 {
     private const string WidgetPickerTitle = "Choose a widget";
+    private const string WidgetSettingsTitle = "Widget settings";
 
     private readonly IStorageService _storageService;
     private readonly SectionPicker _sectionPicker;
@@ -36,7 +37,7 @@ public sealed partial class AddWidgetDialog : Page
     public const string SectionPickerTitle = "Select a section";
 
     public event EventHandler<StepChangedEventArgs>? StepChanged;
-    public event EventHandler<SubmitEnabledChangedEventArgs>? SubmitEnabledChanged;
+    public event EventHandler<ValidationEventArgs>? Validated;
 
     public async Task SubmitAsync()
     {
@@ -70,25 +71,29 @@ public sealed partial class AddWidgetDialog : Page
 
     private void WidgetPicked(object? sender, WidgetPickedEventArgs e)
     {
+        StepChanged?.Invoke(this, new StepChangedEventArgs(WidgetSettingsTitle));
+
         switch (e.Type)
         {
             case WidgetType.RecentLinks:
-                StepChanged?.Invoke(this, new StepChangedEventArgs("Add Recent links widget"));
-                var recentLinksForm = new RecentLinksSettingsForm(e.Section, new RecentLinksSettingsViewModel(_storageService, null));
+                var recentLinksVm = new RecentLinksSettingsViewModel(_storageService, null);
+                recentLinksVm.Validated += Validated;
+
+                var recentLinksForm = new RecentLinksSettingsForm(e.Section, recentLinksVm);
                 widgetForm = recentLinksForm;
                 ContentFrame.Content = recentLinksForm;
                 break;
             case WidgetType.LinkCollection:
-                StepChanged?.Invoke(this, new StepChangedEventArgs("Add Link collection widget"));
-                var linkCollectionForm = new LinkCollectionSettingsForm(e.Section, new LinkCollectionSettingsViewModel(_storageService, null));
+                var linkCollectionVm = new LinkCollectionSettingsViewModel(_storageService, null);
+                linkCollectionVm.Validated += Validated;
+
+                var linkCollectionForm = new LinkCollectionSettingsForm(e.Section, linkCollectionVm);
                 widgetForm = linkCollectionForm;
                 ContentFrame.Content = linkCollectionForm;
                 break;
             default:
                 throw new InvalidOperationException("Unsupported widget type");
         }
-
-        SubmitEnabledChanged?.Invoke(this, new SubmitEnabledChangedEventArgs(true));
     }
 }
 

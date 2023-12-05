@@ -9,7 +9,6 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace Panoramic.Pages.Widgets.LinkCollection;
 
-// TODO: Missing validation
 public sealed partial class AddLinkDialog : Page
 {
     private readonly HttpClient _httpClient;

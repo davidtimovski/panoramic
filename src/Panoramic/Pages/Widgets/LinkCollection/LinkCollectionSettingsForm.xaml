@@ -7,13 +7,16 @@
     <Grid RowSpacing="15">
         <Grid.RowDefinitions>
             <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0"
-                 Text="{x:Bind ViewModel.Title, Mode=TwoWay}"
+        <TextBlock Grid.Row="0">Type: Link collection</TextBlock>
+
+        <TextBox Grid.Row="1"
+                 Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 TextChanged="{x:Bind ViewModel.ValidateAndEmit}"
                  Header="Title"
                  MaxLength="60" />
-
     </Grid>
 
 </Page>
