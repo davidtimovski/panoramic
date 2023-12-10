@@ -10,19 +10,16 @@ namespace Panoramic.ViewModels.Widgets.RecentLinks;
 
 public partial class RecentLinksViewModel : ObservableObject
 {
-    private readonly string _section;
     private readonly IStorageService _storageService;
     private readonly IEventHub _eventHub;
     private readonly RecentLinksWidgetData _data;
 
     public RecentLinksViewModel(
-        string section,
         IStorageService storageService,
         IEventHub eventHub,
         RecentLinksWidgetData data)
     {
         _storageService = storageService;
-        _section = section;
 
         _eventHub = eventHub;
         _eventHub.HyperlinkClicked += HyperlinkClicked;
@@ -42,7 +39,7 @@ public partial class RecentLinksViewModel : ObservableObject
     public void ClearRecent()
     {
         _data.Links.Clear();
-        _storageService.EnqueueSectionWrite(_section);
+        _storageService.EnqueueWidgetWrite(_data.Id);
 
         Recent.Clear();        
     }
@@ -72,8 +69,10 @@ public partial class RecentLinksViewModel : ObservableObject
             query = query.Where(x => x.Clicked >= DateTime.Today);
         }
 
-        _data.Links = query.OrderByDescending(x => x.Clicked).Take(_data.Capacity).ToList();
-        _storageService.EnqueueSectionWrite(_section);
+        _data.Links.Clear();
+        _data.Links.AddRange(query.OrderByDescending(x => x.Clicked).Take(_data.Capacity));
+
+        _storageService.EnqueueWidgetWrite(_data.Id);
 
         SetViewModel();
     }

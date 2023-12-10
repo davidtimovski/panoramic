@@ -10,7 +10,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="{x:Bind Section}" />
+        <TextBlock Grid.Row="0" Text="{x:Bind AreaLabel}" />
 
         <ScrollView Grid.Row="1" Margin="0 10 0 0">
             <Grid RowSpacing="10">
@@ -22,40 +22,40 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
 
-                <Button Grid.Row="1" Command="{x:Bind WidgetClicked}" CommandParameter="RecentLinks" HorizontalAlignment="Stretch">
+                <ToggleButton Grid.Row="0" x:Name="RecentLinksToggle" Command="{x:Bind WidgetClicked}" CommandParameter="RecentLinks" HorizontalAlignment="Stretch">
                     <StackPanel>
                         <TextBlock HorizontalAlignment="Center" FontWeight="Bold">Recent links</TextBlock>
                         <TextBlock Margin="0 5 0 0">Lists links that you have recently clicked in Panoramic</TextBlock>
                     </StackPanel>
-                </Button>
+                </ToggleButton>
 
-                <Button Grid.Row="2" Command="{x:Bind WidgetClicked}" CommandParameter="LinkCollection" HorizontalAlignment="Stretch">
+                <ToggleButton Grid.Row="1" x:Name="LinkCollectionToggle" Command="{x:Bind WidgetClicked}" CommandParameter="LinkCollection" HorizontalAlignment="Stretch">
                     <StackPanel>
                         <TextBlock HorizontalAlignment="Center" FontWeight="Bold">Link collection</TextBlock>
                         <TextBlock Margin="0 5 0 0">A list of links</TextBlock>
                     </StackPanel>
-                </Button>
+                </ToggleButton>
 
-                <Button Grid.Row="3" Command="{x:Bind WidgetClicked}" CommandParameter="RecentLinks" HorizontalAlignment="Stretch">
+                <ToggleButton Grid.Row="2" x:Name="RecentLinksToggle2" Command="{x:Bind WidgetClicked}" CommandParameter="RecentLinks" HorizontalAlignment="Stretch">
                     <StackPanel>
                         <TextBlock HorizontalAlignment="Center" FontWeight="Bold">Recent links</TextBlock>
                         <TextBlock Margin="0 5 0 0">Lists links that you have recently clicked in Panoramic</TextBlock>
                     </StackPanel>
-                </Button>
+                </ToggleButton>
 
-                <Button Grid.Row="4" Command="{x:Bind WidgetClicked}" CommandParameter="RecentLinks" HorizontalAlignment="Stretch">
+                <ToggleButton Grid.Row="3" x:Name="RecentLinksToggle3" Command="{x:Bind WidgetClicked}" CommandParameter="RecentLinks" HorizontalAlignment="Stretch">
                     <StackPanel>
                         <TextBlock HorizontalAlignment="Center" FontWeight="Bold">Recent links</TextBlock>
                         <TextBlock Margin="0 5 0 0">Lists links that you have recently clicked in Panoramic</TextBlock>
                     </StackPanel>
-                </Button>
+                </ToggleButton>
 
-                <Button Grid.Row="5" Command="{x:Bind WidgetClicked}" CommandParameter="RecentLinks" HorizontalAlignment="Stretch">
+                <ToggleButton Grid.Row="4" x:Name="RecentLinksToggle4" Command="{x:Bind WidgetClicked}" CommandParameter="RecentLinks" HorizontalAlignment="Stretch">
                     <StackPanel>
                         <TextBlock HorizontalAlignment="Center" FontWeight="Bold">Recent links</TextBlock>
                         <TextBlock Margin="0 5 0 0">Lists links that you have recently clicked in Panoramic</TextBlock>
                     </StackPanel>
-                </Button>
+                </ToggleButton>
             </Grid>
         </ScrollView>
 

@@ -10,9 +10,9 @@ namespace Panoramic.ViewModels.Widgets.RecentLinks;
 public partial class RecentLinksSettingsViewModel : SettingsViewModel
 {
     private readonly IStorageService _storageService;
-    private readonly RecentLinksWidgetData? _data;
+    private readonly RecentLinksWidgetData _data;
 
-    public RecentLinksSettingsViewModel(IStorageService storageService, RecentLinksWidgetData? data)
+    public RecentLinksSettingsViewModel(IStorageService storageService, RecentLinksWidgetData data)
         : base("Recent", data)
     {
         _storageService = storageService;
@@ -40,24 +40,28 @@ public partial class RecentLinksSettingsViewModel : SettingsViewModel
 
     public void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs(TitleIsValid()));
 
-    public async Task SubmitAsync(string section)
+    public async Task SubmitAsync()
     {
-        if (_data is null)
+        if (_data.Id == Guid.Empty)
         {
             var data = new RecentLinksWidgetData
             {
+                Id = Guid.NewGuid(),
+                Area = Area,
                 Title = Title.Trim(),
                 Capacity = Capacity,
-                OnlyFromToday = OnlyFromToday
+                OnlyFromToday = OnlyFromToday,
+                Links = new()
             };
-            await _storageService.AddNewWidgetAsync(section, data);
+            await _storageService.AddNewWidgetAsync(data);
         }
         else
         {
+            _data.Area = Area;
             _data.Title = Title.Trim();
             _data.Capacity = Capacity;
             _data.OnlyFromToday = OnlyFromToday;
-            await _storageService.SaveWidgetAsync<RecentLinksWidgetData>(section);
+            await _storageService.SaveWidgetAsync<RecentLinksWidgetData>(_data.Id);
         }
     }
 }

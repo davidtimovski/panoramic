@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Page
-    x:Class="Panoramic.Pages.Widgets.AddWidgetDialog"
+    x:Class="Panoramic.Pages.Widgets.EditWidgetDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
@@ -19,9 +19,9 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" x:Name="PreviousButton" Click="PreviousButton_Click" Visibility="Collapsed">Previous</Button>
+                <Button Grid.Column="0" x:Name="EditSettingsButton" Click="EditSettingsButton_Click" Visibility="Collapsed">Edit settings</Button>
 
-                <Button Grid.Column="1" x:Name="NextButton" Click="NextButton_Click" IsEnabled="False" HorizontalAlignment="Right">Next</Button>
+                <Button Grid.Column="1" x:Name="EditAreaButton" Click="EditAreaButton_Click" HorizontalAlignment="Right">Edit area</Button>
             </Grid>
         </Grid>
     </Border>

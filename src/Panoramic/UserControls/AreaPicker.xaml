@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Panoramic.UserControls.AreaPicker"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Height="220">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   TextWrapping="Wrap"
+                   Margin="0 0 0 15">Select the area that you want the widget to occupy.</TextBlock>
+
+        <Grid x:Name="Grid" Grid.Row="1" RowSpacing="4" ColumnSpacing="4">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <ToggleButton x:Name="Toggle00" Grid.Row="0" Grid.Column="0" Command="{x:Bind SectionToggled}" CommandParameter="00" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle01" Grid.Row="0" Grid.Column="1" Command="{x:Bind SectionToggled}" CommandParameter="01" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle02" Grid.Row="0" Grid.Column="2" Command="{x:Bind SectionToggled}" CommandParameter="02" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle03" Grid.Row="0" Grid.Column="3" Command="{x:Bind SectionToggled}" CommandParameter="03" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle04" Grid.Row="0" Grid.Column="4" Command="{x:Bind SectionToggled}" CommandParameter="04" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle05" Grid.Row="0" Grid.Column="5" Command="{x:Bind SectionToggled}" CommandParameter="05" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle06" Grid.Row="0" Grid.Column="6" Command="{x:Bind SectionToggled}" CommandParameter="06" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle07" Grid.Row="0" Grid.Column="7" Command="{x:Bind SectionToggled}" CommandParameter="07" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle08" Grid.Row="0" Grid.Column="8" Command="{x:Bind SectionToggled}" CommandParameter="08" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle09" Grid.Row="0" Grid.Column="9" Command="{x:Bind SectionToggled}" CommandParameter="09" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle10" Grid.Row="1" Grid.Column="0" Command="{x:Bind SectionToggled}" CommandParameter="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle11" Grid.Row="1" Grid.Column="1" Command="{x:Bind SectionToggled}" CommandParameter="11" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle12" Grid.Row="1" Grid.Column="2" Command="{x:Bind SectionToggled}" CommandParameter="12" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle13" Grid.Row="1" Grid.Column="3" Command="{x:Bind SectionToggled}" CommandParameter="13" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle14" Grid.Row="1" Grid.Column="4" Command="{x:Bind SectionToggled}" CommandParameter="14" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle15" Grid.Row="1" Grid.Column="5" Command="{x:Bind SectionToggled}" CommandParameter="15" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle16" Grid.Row="1" Grid.Column="6" Command="{x:Bind SectionToggled}" CommandParameter="16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle17" Grid.Row="1" Grid.Column="7" Command="{x:Bind SectionToggled}" CommandParameter="17" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle18" Grid.Row="1" Grid.Column="8" Command="{x:Bind SectionToggled}" CommandParameter="18" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle19" Grid.Row="1" Grid.Column="9" Command="{x:Bind SectionToggled}" CommandParameter="19" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle20" Grid.Row="2" Grid.Column="0" Command="{x:Bind SectionToggled}" CommandParameter="20" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle21" Grid.Row="2" Grid.Column="1" Command="{x:Bind SectionToggled}" CommandParameter="21" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle22" Grid.Row="2" Grid.Column="2" Command="{x:Bind SectionToggled}" CommandParameter="22" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle23" Grid.Row="2" Grid.Column="3" Command="{x:Bind SectionToggled}" CommandParameter="23" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle24" Grid.Row="2" Grid.Column="4" Command="{x:Bind SectionToggled}" CommandParameter="24" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle25" Grid.Row="2" Grid.Column="5" Command="{x:Bind SectionToggled}" CommandParameter="25" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle26" Grid.Row="2" Grid.Column="6" Command="{x:Bind SectionToggled}" CommandParameter="26" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle27" Grid.Row="2" Grid.Column="7" Command="{x:Bind SectionToggled}" CommandParameter="27" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle28" Grid.Row="2" Grid.Column="8" Command="{x:Bind SectionToggled}" CommandParameter="28" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle29" Grid.Row="2" Grid.Column="9" Command="{x:Bind SectionToggled}" CommandParameter="29" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle30" Grid.Row="3" Grid.Column="0" Command="{x:Bind SectionToggled}" CommandParameter="30" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle31" Grid.Row="3" Grid.Column="1" Command="{x:Bind SectionToggled}" CommandParameter="31" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle32" Grid.Row="3" Grid.Column="2" Command="{x:Bind SectionToggled}" CommandParameter="32" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle33" Grid.Row="3" Grid.Column="3" Command="{x:Bind SectionToggled}" CommandParameter="33" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle34" Grid.Row="3" Grid.Column="4" Command="{x:Bind SectionToggled}" CommandParameter="34" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle35" Grid.Row="3" Grid.Column="5" Command="{x:Bind SectionToggled}" CommandParameter="35" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle36" Grid.Row="3" Grid.Column="6" Command="{x:Bind SectionToggled}" CommandParameter="36" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle37" Grid.Row="3" Grid.Column="7" Command="{x:Bind SectionToggled}" CommandParameter="37" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle38" Grid.Row="3" Grid.Column="8" Command="{x:Bind SectionToggled}" CommandParameter="38" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle39" Grid.Row="3" Grid.Column="9" Command="{x:Bind SectionToggled}" CommandParameter="39" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle40" Grid.Row="4" Grid.Column="0" Command="{x:Bind SectionToggled}" CommandParameter="40" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle41" Grid.Row="4" Grid.Column="1" Command="{x:Bind SectionToggled}" CommandParameter="41" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle42" Grid.Row="4" Grid.Column="2" Command="{x:Bind SectionToggled}" CommandParameter="42" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle43" Grid.Row="4" Grid.Column="3" Command="{x:Bind SectionToggled}" CommandParameter="43" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle44" Grid.Row="4" Grid.Column="4" Command="{x:Bind SectionToggled}" CommandParameter="44" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle45" Grid.Row="4" Grid.Column="5" Command="{x:Bind SectionToggled}" CommandParameter="45" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle46" Grid.Row="4" Grid.Column="6" Command="{x:Bind SectionToggled}" CommandParameter="46" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle47" Grid.Row="4" Grid.Column="7" Command="{x:Bind SectionToggled}" CommandParameter="47" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle48" Grid.Row="4" Grid.Column="8" Command="{x:Bind SectionToggled}" CommandParameter="48" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle49" Grid.Row="4" Grid.Column="9" Command="{x:Bind SectionToggled}" CommandParameter="49" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle50" Grid.Row="5" Grid.Column="0" Command="{x:Bind SectionToggled}" CommandParameter="50" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle51" Grid.Row="5" Grid.Column="1" Command="{x:Bind SectionToggled}" CommandParameter="51" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle52" Grid.Row="5" Grid.Column="2" Command="{x:Bind SectionToggled}" CommandParameter="52" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle53" Grid.Row="5" Grid.Column="3" Command="{x:Bind SectionToggled}" CommandParameter="53" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle54" Grid.Row="5" Grid.Column="4" Command="{x:Bind SectionToggled}" CommandParameter="54" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle55" Grid.Row="5" Grid.Column="5" Command="{x:Bind SectionToggled}" CommandParameter="55" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle56" Grid.Row="5" Grid.Column="6" Command="{x:Bind SectionToggled}" CommandParameter="56" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle57" Grid.Row="5" Grid.Column="7" Command="{x:Bind SectionToggled}" CommandParameter="57" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle58" Grid.Row="5" Grid.Column="8" Command="{x:Bind SectionToggled}" CommandParameter="58" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+            <ToggleButton x:Name="Toggle59" Grid.Row="5" Grid.Column="9" Command="{x:Bind SectionToggled}" CommandParameter="59" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3" />
+        </Grid>
+    </Grid>
+
+</UserControl>

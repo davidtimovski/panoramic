@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:Panoramic.ViewModels.Widgets.LinkCollection">
 
-    <Border Padding="20" Background="#151515">
+    <Border Padding="20" Background="{StaticResource PanoramicWidgetBackgroundBrush}" CornerRadius="{StaticResource PanoramicWidgetCornerRadius}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />

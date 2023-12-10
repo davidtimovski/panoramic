@@ -13,23 +13,33 @@ public class RecentLinksWidgetData : WidgetData
     }
 
     [JsonPropertyName("capacity")]
-    public int Capacity { get; set; }
+    public required int Capacity { get; set; }
 
     [JsonPropertyName("onlyFromToday")]
-    public bool OnlyFromToday { get; set; }
+    public required bool OnlyFromToday { get; set; }
 
     [JsonPropertyName("links")]
-    public List<RecentLink> Links { get; set; } = new();
+    public required List<RecentLink> Links { get; init; }
+
+    public static RecentLinksWidgetData New(Area area) => new()
+    {
+        Id = Guid.Empty,
+        Area = area,
+        Title = "Recent",
+        Capacity = 15,
+        OnlyFromToday = false,
+        Links = new()
+    };
 }
 
 public class RecentLink
 {
     [JsonPropertyName("title")]
-    public string Title { get; set; } = null!;
+    public required string Title { get; init; }
 
     [JsonPropertyName("url")]
-    public string Url { get; set; } = null!;
+    public required string Url { get; init; }
 
     [JsonPropertyName("clicked")]
-    public DateTime Clicked { get; set; }
+    public required DateTime Clicked { get; set; }
 }

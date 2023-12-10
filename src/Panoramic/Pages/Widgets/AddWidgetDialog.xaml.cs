@@ -1,11 +1,13 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
 using Panoramic.Models.Events;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.RecentLinks;
 using Panoramic.Services.Storage;
+using Panoramic.Services.Storage.Models;
 using Panoramic.UserControls;
 using Panoramic.ViewModels.Widgets.LinkCollection;
 using Panoramic.ViewModels.Widgets.RecentLinks;
@@ -18,8 +20,11 @@ public sealed partial class AddWidgetDialog : Page
     private const string WidgetSettingsTitle = "Widget settings";
 
     private readonly IStorageService _storageService;
-    private readonly SectionPicker _sectionPicker;
+    private readonly AreaPicker _areaPicker;
 
+    private short step = 0;
+    private Area? selectedArea;
+    private WidgetType? selectedWidgetType;
     private IWidgetForm? widgetForm;
 
     public AddWidgetDialog(IStorageService storageService)
@@ -28,15 +33,16 @@ public sealed partial class AddWidgetDialog : Page
 
         _storageService = storageService;
 
-        _sectionPicker = new(_storageService);
-        _sectionPicker.SectionPicked += SectionPicked;
+        _areaPicker = new(_storageService, null);
+        _areaPicker.AreaReset += AreaReset;
+        _areaPicker.AreaPicked += AreaPicked;
 
-        ShowSectionPicker();
+        ShowAreaPicker();
     }
 
-    public const string SectionPickerTitle = "Select a section";
+    public const string AreaPickerTitle = "Choose an area";
 
-    public event EventHandler<StepChangedEventArgs>? StepChanged;
+    public event EventHandler<DialogStepChangedEventArgs>? StepChanged;
     public event EventHandler<ValidationEventArgs>? Validated;
 
     public async Task SubmitAsync()
@@ -49,60 +55,112 @@ public sealed partial class AddWidgetDialog : Page
         await widgetForm.SubmitAsync();
     }
 
-    private void ShowSectionPicker()
+    private void ShowAreaPicker()
     {
-        StepChanged?.Invoke(this, new StepChangedEventArgs(SectionPickerTitle));
-        ContentFrame.Content = _sectionPicker;
+        StepChanged?.Invoke(this, new DialogStepChangedEventArgs(AreaPickerTitle));
+        ContentFrame.Content = _areaPicker;
+
+        PreviousButton.Visibility = Visibility.Collapsed;
+        NextButton.Visibility = Visibility.Visible;
+        NextButton.IsEnabled = selectedArea is not null;
     }
 
-    private void SectionPicked(object? _, SectionPickedEventArgs e)
+    private void ShowWidgetPicker()
     {
-        StepChanged?.Invoke(this, new StepChangedEventArgs(WidgetPickerTitle));
-        ShowWidgetPicker(e.Section);
-    }
+        StepChanged?.Invoke(this, new DialogStepChangedEventArgs(WidgetPickerTitle));
 
-    private void ShowWidgetPicker(string section)
-    {
-        var widgetPicker = new WidgetPicker(section);
+        var widgetPicker = new WidgetPicker(selectedArea!, selectedWidgetType);
         widgetPicker.WidgetPicked += WidgetPicked;
+        widgetPicker.WidgetDeselected += WidgetDeselected;
 
         ContentFrame.Content = widgetPicker;
+
+        PreviousButton.Visibility = Visibility.Visible;
+        NextButton.Visibility = Visibility.Visible;
+        NextButton.IsEnabled = selectedWidgetType is not null;
+        Validated?.Invoke(this, new ValidationEventArgs(false));
     }
 
-    private void WidgetPicked(object? sender, WidgetPickedEventArgs e)
+    private void ShowSettingsForm()
     {
-        StepChanged?.Invoke(this, new StepChangedEventArgs(WidgetSettingsTitle));
+        StepChanged?.Invoke(this, new DialogStepChangedEventArgs(WidgetSettingsTitle));
 
-        switch (e.Type)
+        switch (selectedWidgetType)
         {
             case WidgetType.RecentLinks:
-                var recentLinksVm = new RecentLinksSettingsViewModel(_storageService, null);
+                var recentLinksVm = new RecentLinksSettingsViewModel(_storageService, RecentLinksWidgetData.New(selectedArea!));
                 recentLinksVm.Validated += Validated;
 
-                var recentLinksForm = new RecentLinksSettingsForm(e.Section, recentLinksVm);
+                var recentLinksForm = new RecentLinksSettingsForm(recentLinksVm);
                 widgetForm = recentLinksForm;
                 ContentFrame.Content = recentLinksForm;
                 break;
             case WidgetType.LinkCollection:
-                var linkCollectionVm = new LinkCollectionSettingsViewModel(_storageService, null);
+                var linkCollectionVm = new LinkCollectionSettingsViewModel(_storageService, LinkCollectionWidgetData.New(selectedArea!));
                 linkCollectionVm.Validated += Validated;
 
-                var linkCollectionForm = new LinkCollectionSettingsForm(e.Section, linkCollectionVm);
+                var linkCollectionForm = new LinkCollectionSettingsForm(linkCollectionVm);
                 widgetForm = linkCollectionForm;
                 ContentFrame.Content = linkCollectionForm;
                 break;
             default:
                 throw new InvalidOperationException("Unsupported widget type");
         }
-    }
-}
 
-public class StepChangedEventArgs : EventArgs
-{
-    public StepChangedEventArgs(string dialogTitle)
+        NextButton.Visibility = Visibility.Collapsed;
+    }
+
+    private void AreaPicked(object? _, AreaPickedEventArgs e)
     {
-        DialogTitle = dialogTitle;
+        selectedArea = e.Area;
+        NextButton.IsEnabled = true;
     }
 
-    public string DialogTitle { get; }
+    private void AreaReset(object? _, EventArgs e)
+    {
+        selectedArea = null;
+        NextButton.IsEnabled = false;
+    }
+
+    private void WidgetPicked(object? _, WidgetPickedEventArgs e)
+    {
+        selectedWidgetType = e.Type;
+        NextButton.IsEnabled = true;
+    }
+
+    private void WidgetDeselected(object? _, EventArgs e)
+    {
+        selectedWidgetType = null;
+        NextButton.IsEnabled = false;
+    }
+
+    private void PreviousButton_Click(object _, RoutedEventArgs e)
+    {
+        switch (step)
+        {
+            case 1:
+                ShowAreaPicker();
+                break;
+            case 2:
+                ShowWidgetPicker();
+                break;
+        }
+
+        step--;
+    }
+
+    private void NextButton_Click(object _, RoutedEventArgs e)
+    {
+        switch (step)
+        {
+            case 0:
+                ShowWidgetPicker();
+                break;
+            case 1:
+                ShowSettingsForm();
+                break;
+        }
+
+        step++;
+    }
 }

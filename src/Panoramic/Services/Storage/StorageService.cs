@@ -16,41 +16,27 @@ public interface IStorageService
     event EventHandler<WidgetUpdatedEventArgs>? WidgetUpdated;
     event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
 
-    Dictionary<string, WidgetData> Sections { get; }
+    Dictionary<Guid, WidgetData> Widgets { get; }
 
     Task ReadAsync();
     Task WriteAsync();
 
     /// <summary>
-    /// Schedules a section write to disk.
+    /// Schedules a widget save to disk.
     /// Will reset the timer if other changes have been scheduled.
     /// </summary>
-    void EnqueueSectionWrite(string section);
+    void EnqueueWidgetWrite(Guid id);
 
-    void DeleteWidget(string section);
-    Task AddNewWidgetAsync<T>(string section, T data)
+    void DeleteWidget(Guid id);
+    Task AddNewWidgetAsync<T>(T data)
         where T : WidgetData;
-    Task SaveWidgetAsync<T>(string section)
+    Task SaveWidgetAsync<T>(Guid id)
         where T : WidgetData;
 }
 
 public class StorageService : IStorageService
 {
-    private static readonly string BasePath = "C:\\Users\\david\\Desktop\\overview";
-    private static readonly IReadOnlyDictionary<string, string> DataPaths = new Dictionary<string, string>
-    {
-        { "A1", Path.Combine(BasePath, "A1.json") },
-        { "A2", Path.Combine(BasePath, "A2.json") },
-        { "A3", Path.Combine(BasePath, "A3.json") },
-        { "B1", Path.Combine(BasePath, "B1.json") },
-        { "B2", Path.Combine(BasePath, "B2.json") },
-        { "B3", Path.Combine(BasePath, "B3.json") },
-        { "C1", Path.Combine(BasePath, "C1.json") },
-        { "C2", Path.Combine(BasePath, "C2.json") },
-        { "C3", Path.Combine(BasePath, "C3.json") },
-        { "D1", Path.Combine(BasePath, "D1.json") },
-        { "D2", Path.Combine(BasePath, "D2.json") }
-    };
+    private static readonly string BasePath = "C:\\Users\\david\\Desktop\\panoramic";
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         Converters = { new JsonStringEnumConverter() }
@@ -64,7 +50,7 @@ public class StorageService : IStorageService
     /// <summary>
     /// Stores the sections that have been changed and need to be written to disk.
     /// </summary>
-    private readonly HashSet<string> _sectionsToWrite = new();
+    private readonly HashSet<Guid> _unsavedWidgets = new();
 
     public StorageService()
     {
@@ -75,11 +61,11 @@ public class StorageService : IStorageService
         _timer.Interval = TimeSpan.FromSeconds(15);
         _timer.Tick += async (timer, _) =>
         {
-            var tasks = new List<Task>(_sectionsToWrite.Count);
+            var tasks = new List<Task>(_unsavedWidgets.Count);
 
-            foreach (var section in _sectionsToWrite)
+            foreach (var id in _unsavedWidgets)
             {
-                tasks.Add(WriteSectionAsync(section));
+                tasks.Add(WriteWidgetAsync(id));
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
@@ -91,7 +77,7 @@ public class StorageService : IStorageService
     public event EventHandler<WidgetUpdatedEventArgs>? WidgetUpdated;
     public event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
 
-    public Dictionary<string, WidgetData> Sections { get; } = new();
+    public Dictionary<Guid, WidgetData> Widgets { get; } = new();
 
     public async Task ReadAsync()
     {
@@ -104,68 +90,67 @@ public class StorageService : IStorageService
 
     public async Task WriteAsync()
     {
-        var usedSections = Sections.Where(x => x.Value is not null).ToList();
+        var usedAreas = Widgets.Where(x => x.Value is not null).ToList();
 
-        var writeTasks = new List<Task>(usedSections.Count);
-        foreach (var section in usedSections)
+        var writeTasks = new List<Task>(usedAreas.Count);
+        foreach (var area in usedAreas)
         {
-            writeTasks.Add(WriteSectionAsync(section.Key));
+            writeTasks.Add(WriteWidgetAsync(area.Key));
         }
 
         await Task.WhenAll(writeTasks).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public void EnqueueSectionWrite(string section)
+    public void EnqueueWidgetWrite(Guid id)
     {
-        if (!_sectionsToWrite.Contains(section))
+        if (!_unsavedWidgets.Contains(id))
         {
-            _sectionsToWrite.Add(section);
+            _unsavedWidgets.Add(id);
         }
 
         _timer.Stop();
         _timer.Start();
     }
 
-    public void DeleteWidget(string section)
+    public void DeleteWidget(Guid id)
     {
-        Sections.Remove(section);
-        File.Delete(DataPaths[section]);
+        Widgets.Remove(id);
+        File.Delete(GetWritePath(id));
 
-        WidgetRemoved?.Invoke(this, new WidgetRemovedEventArgs(section));
+        WidgetRemoved?.Invoke(this, new WidgetRemovedEventArgs(id));
     }
 
-    public async Task AddNewWidgetAsync<T>(string section, T data)
+    public async Task AddNewWidgetAsync<T>(T data)
         where T : WidgetData
     {
-        if (Sections.ContainsKey(section))
+        if (Widgets.ContainsKey(data.Id))
         {
-            Sections[section] = data;
+            Widgets[data.Id] = data;
         }
         else
         {
-            Sections.Add(section, data);
+            Widgets.Add(data.Id, data);
         }
 
         var json = JsonSerializer.Serialize(data, SerializerOptions);
-        await File.WriteAllTextAsync(DataPaths[section], json);
+        await File.WriteAllTextAsync(GetWritePath(data.Id), json);
 
-        WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(section));
+        WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(data.Id));
     }
 
-    public async Task SaveWidgetAsync<T>(string section)
+    public async Task SaveWidgetAsync<T>(Guid id)
         where T : WidgetData
     {
-        var json = JsonSerializer.Serialize((T)Sections[section], SerializerOptions);
-        await File.WriteAllTextAsync(DataPaths[section], json);
+        var json = JsonSerializer.Serialize((T)Widgets[id], SerializerOptions);
+        await File.WriteAllTextAsync(GetWritePath(id), json);
 
-        WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(section));
+        WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(id));
     }
 
     private async Task ReadWidgetDataAsync(string filePath)
     {
         var json = await File.ReadAllTextAsync(filePath);
-        var section = Path.GetFileNameWithoutExtension(filePath);
 
         using var jsonDoc = JsonDocument.Parse(json);
         var typeProperty = jsonDoc.RootElement.GetProperty("type");
@@ -178,13 +163,13 @@ public class StorageService : IStorageService
             _ => throw new InvalidOperationException("Unsupported widget type")
         };
 
-        Sections.Add(section, data);
+        Widgets.Add(data.Id, data);
     }
 
-    private Task WriteSectionAsync(string section)
+    private Task WriteWidgetAsync(Guid id)
     {
-        var value = Sections[section]!;
-        var path = DataPaths[section];
+        var value = Widgets[id]!;
+        var path = GetWritePath(id);
 
         var json = value.Type switch
         {
@@ -195,24 +180,26 @@ public class StorageService : IStorageService
 
         return File.WriteAllTextAsync(path, json);
     }
+
+    private static string GetWritePath(Guid id) => Path.Combine(BasePath, $"{id}.json");
 }
 
 public class WidgetUpdatedEventArgs : EventArgs
 {
-    public WidgetUpdatedEventArgs(string section)
+    public WidgetUpdatedEventArgs(Guid id)
     {
-        Section = section;
+        Id = id;
     }
 
-    public string Section { get; }
+    public Guid Id { get; }
 }
 
 public class WidgetRemovedEventArgs : EventArgs
 {
-    public WidgetRemovedEventArgs(string section)
+    public WidgetRemovedEventArgs(Guid id)
     {
-        Section = section;
+        Id = id;
     }
 
-    public string Section { get; }
+    public Guid Id { get; }
 }

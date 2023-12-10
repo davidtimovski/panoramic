@@ -6,13 +6,16 @@
 
     <Grid RowSpacing="15">
         <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0">Type: Link collection</TextBlock>
+        <TextBlock Grid.Row="0" Text="{x:Bind ViewModel.AreaLabel, Mode=OneWay}" />
 
-        <TextBox Grid.Row="1"
+        <TextBlock Grid.Row="1">Type: Link collection</TextBlock>
+
+        <TextBox Grid.Row="2"
                  Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  TextChanged="{x:Bind ViewModel.ValidateAndEmit}"
                  Header="Title"

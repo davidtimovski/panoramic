@@ -1,35 +1,26 @@
 using System;
-using System.Net.Http;
+using System.Linq;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
 using Panoramic.Pages.Widgets;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.RecentLinks;
-using Panoramic.Services;
 using Panoramic.Services.Storage;
 using Panoramic.Services.Storage.Models;
 using Panoramic.ViewModels;
-using Panoramic.ViewModels.Widgets.LinkCollection;
-using Panoramic.ViewModels.Widgets.RecentLinks;
 
 namespace Panoramic;
 
 public sealed partial class MainWindow : Window
 {
     private readonly IStorageService _storageService;
-    private readonly IEventHub _eventHub;
-    private readonly HttpClient _httpClient;
-    private readonly DispatcherQueue _dispatcherQueue;
+    private readonly IServiceProvider _serviceProvider;
 
-    // TODO: Redo widget initialization so that MainWindow does not have to know all dependencies
     public MainWindow(
         IStorageService storageService,
-        IEventHub eventHub,
-        HttpClient httpClient,
-        DispatcherQueue dispatcherQueue,
+        IServiceProvider serviceProvider,
         MainViewModel viewModel)
     {
         InitializeComponent();
@@ -44,13 +35,11 @@ public sealed partial class MainWindow : Window
         _storageService.WidgetUpdated += WidgetUpdated;
         _storageService.WidgetRemoved += WidgetRemoved;
 
-        _eventHub = eventHub;
-        _httpClient = httpClient;
-        _dispatcherQueue = dispatcherQueue;
+        _serviceProvider = serviceProvider;
 
         ViewModel = viewModel;
 
-        SetFrames();
+        LoadWidgets();
     }
 
     public MainViewModel ViewModel { get; }
@@ -60,73 +49,12 @@ public sealed partial class MainWindow : Window
         await _storageService.WriteAsync();
     }
 
-    // TODO: Ugly, find way to make generic
-    private void SetFrames()
+    private void LoadWidgets()
     {
-        if (_storageService.Sections.TryGetValue("A1", out var a1Data))
+        foreach (var id in _storageService.Widgets.Keys)
         {
-            FrameA1.Content = GetFrameContent("A1", a1Data!);
+            LoadWidget(id);
         }
-
-        if (_storageService.Sections.TryGetValue("A2", out var a2Data))
-        {
-            FrameA2.Content = GetFrameContent("A2", a2Data!);
-        }
-
-        if (_storageService.Sections.TryGetValue("A3", out var a3Data))
-        {
-            FrameA3.Content = GetFrameContent("A3", a3Data!);
-        }
-
-        if (_storageService.Sections.TryGetValue("B1", out var b1Data))
-        {
-            FrameB1.Content = GetFrameContent("B1", b1Data!);
-        }
-
-        if (_storageService.Sections.TryGetValue("B2", out var b2Data))
-        {
-            FrameB2.Content = GetFrameContent("B2", b2Data!);
-        }
-
-        if (_storageService.Sections.TryGetValue("B3", out var b3Data))
-        {
-            FrameB3.Content = GetFrameContent("B3", b3Data!);
-        }
-
-        if (_storageService.Sections.TryGetValue("C1", out var c1Data))
-        {
-            FrameC1.Content = GetFrameContent("C1", c1Data!);
-        }
-
-        if (_storageService.Sections.TryGetValue("C2", out var c2Data))
-        {
-            FrameC2.Content = GetFrameContent("C2", c2Data!);
-        }
-
-        if (_storageService.Sections.TryGetValue("C3", out var c3Data))
-        {
-            FrameC3.Content = GetFrameContent("C3", c3Data!);
-        }
-
-        if (_storageService.Sections.TryGetValue("D1", out var d1Data))
-        {
-            FrameD1.Content = GetFrameContent("D1", d1Data!);
-        }
-
-        if (_storageService.Sections.TryGetValue("D2", out var d2Data))
-        {
-            FrameD2.Content = GetFrameContent("D2", d2Data!);
-        }
-    }
-
-    private object GetFrameContent(string section, WidgetData data)
-    {
-        return data.Type switch
-        {
-            WidgetType.RecentLinks => new RecentLinksWidget(section, _storageService, new RecentLinksViewModel(section, _storageService, _eventHub, (RecentLinksWidgetData)data)),
-            WidgetType.LinkCollection => new LinkCollectionWidget(section, _storageService, _httpClient, _dispatcherQueue, new LinkCollectionViewModel(section, _storageService, _eventHub, _dispatcherQueue, (LinkCollectionWidgetData)data)),
-            _ => throw new InvalidOperationException("Unsupported widget type")
-        };
     }
 
     private async void AddWidgetButton_Click(object _, RoutedEventArgs e)
@@ -135,8 +63,7 @@ public sealed partial class MainWindow : Window
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
-            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-            Title = AddWidgetDialog.SectionPickerTitle,
+            Title = AddWidgetDialog.AreaPickerTitle,
             Content = content,
             PrimaryButtonText = "Add",
             CloseButtonText = "Cancel",
@@ -150,87 +77,38 @@ public sealed partial class MainWindow : Window
         await dialog.ShowAsync();
     }
 
-    // TODO: Ugly, find way to make generic
-    private void WidgetUpdated(object? _, WidgetUpdatedEventArgs e)
-    {
-        var data = _storageService.Sections[e.Section];
+    private void WidgetUpdated(object? _, WidgetUpdatedEventArgs e) => LoadWidget(e.Id);
 
-        switch (e.Section)
-        {
-            case "A1":
-                FrameA1.Content = GetFrameContent("A1", data!);
-                break;
-            case "B1":
-                FrameB1.Content = GetFrameContent("B1", data!);
-                break;
-            case "C1":
-                FrameC1.Content = GetFrameContent("C1", data!);
-                break;
-            case "A2":
-                FrameA2.Content = GetFrameContent("A2", data!);
-                break;
-            case "B2":
-                FrameB2.Content = GetFrameContent("B2", data!);
-                break;
-            case "C2":
-                FrameC2.Content = GetFrameContent("C2", data!);
-                break;
-            case "A3":
-                FrameA3.Content = GetFrameContent("A3", data!);
-                break;
-            case "B3":
-                FrameB3.Content = GetFrameContent("B3", data!);
-                break;
-            case "C3":
-                FrameC3.Content = GetFrameContent("C3", data!);
-                break;
-            case "D1":
-                FrameD1.Content = GetFrameContent("D1", data!);
-                break;
-            case "D2":
-                FrameD2.Content = GetFrameContent("D2", data!);
-                break;
-        }
-    }
-    
-    // TODO: Ugly, find way to make generic
     private void WidgetRemoved(object? _, WidgetRemovedEventArgs e)
     {
-        switch (e.Section)
+        var widget = Grid.Children.OfType<Page>().FirstOrDefault(x => x.Name == e.Id.ToString("N"));
+        Grid.Children.Remove(widget);
+    }
+
+    private void LoadWidget(Guid id)
+    {
+        var data = _storageService.Widgets[id];
+        Page content = data.Type switch
         {
-            case "A1":
-                FrameA1.Content = null;
-                break;
-            case "B1":
-                FrameB1.Content = null;
-                break;
-            case "C1":
-                FrameC1.Content = null;
-                break;
-            case "A2":
-                FrameA2.Content = null;
-                break;
-            case "B2":
-                FrameB2.Content = null;
-                break;
-            case "C2":
-                FrameC2.Content = null;
-                break;
-            case "A3":
-                FrameA3.Content = null;
-                break;
-            case "B3":
-                FrameB3.Content = null;
-                break;
-            case "C3":
-                FrameC3.Content = null;
-                break;
-            case "D1":
-                FrameD1.Content = null;
-                break;
-            case "D2":
-                FrameD2.Content = null;
-                break;
+            WidgetType.RecentLinks => new RecentLinksWidget(_serviceProvider, (RecentLinksWidgetData)data),
+            WidgetType.LinkCollection => new LinkCollectionWidget(_serviceProvider, (LinkCollectionWidgetData)data),
+            _ => throw new InvalidOperationException("Unsupported widget type")
+        };
+
+        Area area = (Area)data.Area;
+
+        content.SetValue(Page.NameProperty, data.Id.ToString("N"));
+        content.SetValue(Grid.RowProperty, area.Row);
+        content.SetValue(Grid.ColumnProperty, area.Column);
+        content.SetValue(Grid.RowSpanProperty, area.RowSpan);
+        content.SetValue(Grid.ColumnSpanProperty, area.ColumnSpan);
+
+        var widget = Grid.Children.OfType<Page>().FirstOrDefault(x => x.Name == data.Id.ToString("N"));
+        if (widget is not null)
+        {
+            Grid.Children.Remove(widget);
         }
+
+        Grid.Children.Add(content);
     }
 }

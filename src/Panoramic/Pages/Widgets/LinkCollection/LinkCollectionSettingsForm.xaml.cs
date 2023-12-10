@@ -7,13 +7,10 @@ namespace Panoramic.Pages.Widgets.LinkCollection;
 
 public sealed partial class LinkCollectionSettingsForm : Page, IWidgetForm
 {
-    private readonly string _section;
-
-    public LinkCollectionSettingsForm(string section, LinkCollectionSettingsViewModel viewModel)
+    public LinkCollectionSettingsForm(LinkCollectionSettingsViewModel viewModel)
     {
         InitializeComponent();
 
-        _section = section;
         ViewModel = viewModel;
     }
 
@@ -21,6 +18,6 @@ public sealed partial class LinkCollectionSettingsForm : Page, IWidgetForm
 
     public Task SubmitAsync()
     {
-        return ViewModel.SubmitAsync(_section);
+        return ViewModel.SubmitAsync();
     }
 }

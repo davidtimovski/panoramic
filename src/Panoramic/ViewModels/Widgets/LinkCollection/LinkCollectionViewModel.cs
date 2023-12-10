@@ -12,24 +12,21 @@ namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
 // TODO: Add possibility of removing links
 // Ordering links
-// Or have a setting for ordered or auto-ordered links
+// Have a setting for ordered or auto-ordered links
 public partial class LinkCollectionViewModel : ObservableObject
 {
-    private readonly string _section;
     private readonly IStorageService _storageService;
     private readonly IEventHub _eventHub;
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly LinkCollectionWidgetData _data;
 
     public LinkCollectionViewModel(
-        string section,
         IStorageService storageService,
         IEventHub eventHub,
         DispatcherQueue dispatcherQueue,
         LinkCollectionWidgetData data)
     {
         _storageService = storageService;
-        _section = section;
 
         _eventHub = eventHub;
         _eventHub.HyperlinkClicked += HyperlinkClicked;
@@ -55,7 +52,7 @@ public partial class LinkCollectionViewModel : ObservableObject
         var now = DateTime.Now;
 
         _data.Links.Add(new LinkCollectionItem { Title = title, Url = url, Clicks = new List<DateTime> { now } });
-        _storageService.EnqueueSectionWrite(_section);
+        _storageService.EnqueueWidgetWrite(_data.Id);
 
         ReorderBookmarks(new LinkViewModel(_eventHub, title, new Uri(url, UriKind.Absolute), new List<DateTime> { now }));
     }

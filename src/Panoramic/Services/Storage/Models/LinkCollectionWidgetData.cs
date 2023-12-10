@@ -13,17 +13,25 @@ public class LinkCollectionWidgetData : WidgetData
     }
 
     [JsonPropertyName("links")]
-    public List<LinkCollectionItem> Links { get; set; } = new();
+    public required List<LinkCollectionItem> Links { get; init; }
+
+    public static LinkCollectionWidgetData New(Area area) => new()
+    {
+        Id = Guid.Empty,
+        Area = area,
+        Title = "Links",
+        Links = new()
+    };
 }
 
 public class LinkCollectionItem
 {
     [JsonPropertyName("title")]
-    public string Title { get; set; } = null!;
+    public required string Title { get; init; }
 
     [JsonPropertyName("url")]
-    public string Url { get; set; } = null!;
+    public required string Url { get; init; }
 
     [JsonPropertyName("clicked")]
-    public List<DateTime> Clicks { get; set; } = new();
+    public required List<DateTime> Clicks { get; init; } = new();
 }

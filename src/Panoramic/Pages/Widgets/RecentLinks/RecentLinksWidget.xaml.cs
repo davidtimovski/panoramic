@@ -1,45 +1,49 @@
 using System;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Panoramic.Services;
 using Panoramic.Services.Storage;
+using Panoramic.Services.Storage.Models;
 using Panoramic.ViewModels.Widgets.RecentLinks;
 
 namespace Panoramic.Pages.Widgets.RecentLinks;
 
 public sealed partial class RecentLinksWidget : Page
 {
-    private readonly string _section;
     private readonly IStorageService _storageService;
+    private readonly Guid _id;
 
-    public RecentLinksWidget(string section, IStorageService storageService, RecentLinksViewModel viewModel)
+    public RecentLinksWidget(IServiceProvider serviceProvider, RecentLinksWidgetData data)
     {
         InitializeComponent();
 
-        _section = section;
-        _storageService = storageService;
+        _storageService = serviceProvider.GetRequiredService<IStorageService>();
+        _id = data.Id;
 
-        ViewModel = viewModel;
+        var eventHub = serviceProvider.GetRequiredService<IEventHub>();
+        ViewModel = new RecentLinksViewModel(_storageService, eventHub, data);
     }
 
     public RecentLinksViewModel ViewModel { get; }
 
     private async void SettingsButton_Click(object _, RoutedEventArgs e)
     {
-        var widgetData = _storageService.Sections[_section];
+        var widgetData = _storageService.Widgets[_id];
 
-        var content = new WidgetSettingsDialog(_section, widgetData, _storageService);
+        var content = new EditWidgetDialog(widgetData, _storageService);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
-            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-            Title = $"{widgetData.Title} ({_section}) - settings",
+            Title = $"{widgetData.Title} - settings",
             Content = content,
             PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
             PrimaryButtonCommand = new AsyncRelayCommand(content.SubmitAsync)
         };
 
+        content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
         content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
 
         await dialog.ShowAsync();
@@ -47,17 +51,16 @@ public sealed partial class RecentLinksWidget : Page
 
     private async void RemoveButton_Click(object _, RoutedEventArgs e)
     {
-        var widgetData = _storageService.Sections[_section];
+        var widgetData = _storageService.Widgets[_id];
 
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
-            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
             Title = "Remove widget",
             Content = $"Are you sure want to remove {widgetData.Title}?\n\nAny data that it holds will also be deleted permanently.",
             PrimaryButtonText = "Yes, remove",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_section); })
+            PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_id); })
         };
         await dialog.ShowAsync();
     }

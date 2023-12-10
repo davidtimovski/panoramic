@@ -6,21 +6,24 @@
 
     <Grid RowSpacing="15">
         <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
-            <RowDefinition />
-            <RowDefinition />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0">Type: Recent links</TextBlock>
+        <TextBlock Grid.Row="0" Text="{x:Bind ViewModel.AreaLabel, Mode=OneWay}" />
 
-        <TextBox Grid.Row="1"
+        <TextBlock Grid.Row="1">Type: Recent links</TextBlock>
+
+        <TextBox Grid.Row="2"
                  Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  TextChanged="{x:Bind ViewModel.ValidateAndEmit}"
                  Header="Title"
                  MaxLength="60" />
 
-        <NumberBox Grid.Row="2"
+        <NumberBox Grid.Row="3"
                    Value="{x:Bind ViewModel.Capacity, Mode=TwoWay}"
                    Header="Capacity"
                    Description="The maximum amount of links it will hold."
@@ -28,7 +31,7 @@
                    Minimum="5"
                    Maximum="100" />
 
-        <ToggleSwitch Grid.Row="3"
+        <ToggleSwitch Grid.Row="4"
                       IsOn="{x:Bind ViewModel.OnlyFromToday, Mode=TwoWay}"
                       Header="Only from today"
                       OffContent="Show all links"

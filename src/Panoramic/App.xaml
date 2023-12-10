@@ -2,8 +2,7 @@
 <Application
     x:Class="Panoramic.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Panoramic">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -11,6 +10,9 @@
                 <!-- Other merged dictionaries here -->
             </ResourceDictionary.MergedDictionaries>
             <!-- Other app resources here -->
+
+            <SolidColorBrush x:Key="PanoramicWidgetBackgroundBrush" Color="#151515" />
+            <CornerRadius x:Key="PanoramicWidgetCornerRadius">5</CornerRadius>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

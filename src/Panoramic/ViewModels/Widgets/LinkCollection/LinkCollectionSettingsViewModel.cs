@@ -9,9 +9,9 @@ namespace Panoramic.ViewModels.Widgets.LinkCollection;
 public partial class LinkCollectionSettingsViewModel : SettingsViewModel
 {
     private readonly IStorageService _storageService;
-    private readonly LinkCollectionWidgetData? _data;
+    private readonly LinkCollectionWidgetData _data;
 
-    public LinkCollectionSettingsViewModel(IStorageService storageService, LinkCollectionWidgetData? data)
+    public LinkCollectionSettingsViewModel(IStorageService storageService, LinkCollectionWidgetData data)
         : base("My links", data)
     {
         _storageService = storageService;
@@ -22,20 +22,24 @@ public partial class LinkCollectionSettingsViewModel : SettingsViewModel
 
     public void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs(TitleIsValid()));
 
-    public async Task SubmitAsync(string section)
+    public async Task SubmitAsync()
     {
-        if (_data is null)
+        if (_data.Id == Guid.Empty)
         {
             var data = new LinkCollectionWidgetData
             {
-                Title = Title.Trim()
+                Id = Guid.NewGuid(),
+                Area = Area,
+                Title = Title.Trim(),
+                Links = new()
             };
-            await _storageService.AddNewWidgetAsync(section, data);
+            await _storageService.AddNewWidgetAsync(data);
         }
         else
         {
+            _data.Area = Area;
             _data.Title = Title.Trim();
-            await _storageService.SaveWidgetAsync<LinkCollectionWidgetData>(section);
+            await _storageService.SaveWidgetAsync<LinkCollectionWidgetData>(_data.Id);
         }
     }
 }

@@ -1,10 +1,13 @@
 using System;
 using System.Net.Http;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Panoramic.Services;
 using Panoramic.Services.Storage;
+using Panoramic.Services.Storage.Models;
 using Panoramic.ViewModels;
 using Panoramic.ViewModels.Widgets.LinkCollection;
 
@@ -12,26 +15,22 @@ namespace Panoramic.Pages.Widgets.LinkCollection;
 
 public sealed partial class LinkCollectionWidget : Page
 {
-    private readonly string _section;
     private readonly IStorageService _storageService;
     private readonly HttpClient _httpClient;
     private readonly DispatcherQueue _dispatcherQueue;
+    private readonly Guid _id;
 
-    public LinkCollectionWidget(
-        string section,
-        IStorageService storageService,
-        HttpClient httpClient,
-        DispatcherQueue dispatcherQueue,
-        LinkCollectionViewModel viewModel)
+    public LinkCollectionWidget(IServiceProvider serviceProvider, LinkCollectionWidgetData data)
     {
         InitializeComponent();
 
-        _section = section;
-        _storageService = storageService;
-        _httpClient = httpClient;
-        _dispatcherQueue = dispatcherQueue;
+        _storageService = serviceProvider.GetRequiredService<IStorageService>();
+        _httpClient = serviceProvider.GetRequiredService<HttpClient>();
+        _dispatcherQueue = serviceProvider.GetRequiredService<DispatcherQueue>();
+        _id = data.Id;
 
-        ViewModel = viewModel;
+        var eventHub = serviceProvider.GetRequiredService<IEventHub>();
+        ViewModel = new LinkCollectionViewModel(_storageService, eventHub, _dispatcherQueue, data);
     }
 
     public LinkCollectionViewModel ViewModel { get; }
@@ -43,7 +42,6 @@ public sealed partial class LinkCollectionWidget : Page
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
-            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
             Title = "Add link",
             Content = content,
             PrimaryButtonText = "Add",
@@ -59,20 +57,20 @@ public sealed partial class LinkCollectionWidget : Page
 
     private async void SettingsButton_Click(object _, RoutedEventArgs e)
     {
-        var widgetData = _storageService.Sections[_section];
+        var widgetData = _storageService.Widgets[_id];
 
-        var content = new WidgetSettingsDialog(_section, widgetData, _storageService);
+        var content = new EditWidgetDialog(widgetData, _storageService);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
-            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-            Title = $"{widgetData.Title} ({_section}) - settings",
+            Title = $"{widgetData.Title} - settings",
             Content = content,
             PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
             PrimaryButtonCommand = new AsyncRelayCommand(content.SubmitAsync)
         };
 
+        content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
         content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
 
         await dialog.ShowAsync();
@@ -80,17 +78,16 @@ public sealed partial class LinkCollectionWidget : Page
 
     private async void RemoveButton_Click(object _, RoutedEventArgs e)
     {
-        var widgetData = _storageService.Sections[_section];
+        var widgetData = _storageService.Widgets[_id];
 
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
-            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
             Title = "Remove widget",
             Content = $"Are you sure want to remove {widgetData.Title}?\n\nAny data that it holds will also be deleted permanently.",
             PrimaryButtonText = "Yes, remove",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_section); })
+            PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_id); })
         };
         await dialog.ShowAsync();
     }
