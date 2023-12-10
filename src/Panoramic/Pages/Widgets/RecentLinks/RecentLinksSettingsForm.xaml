@@ -15,7 +15,7 @@
 
         <TextBlock Grid.Row="0" Text="{x:Bind ViewModel.AreaLabel, Mode=OneWay}" />
 
-        <TextBlock Grid.Row="1">Type: Recent links</TextBlock>
+        <TextBlock Grid.Row="1">Widget: Recent links</TextBlock>
 
         <TextBox Grid.Row="2"
                  Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

@@ -16,8 +16,8 @@ namespace Panoramic.Pages.Widgets;
 
 public sealed partial class AddWidgetDialog : Page
 {
-    private const string WidgetPickerTitle = "Choose a widget";
-    private const string WidgetSettingsTitle = "Widget settings";
+    private const string WidgetPickerTitle = "Add widget: widget type";
+    private const string WidgetSettingsTitle = "Add widget: settings";
 
     private readonly IStorageService _storageService;
     private readonly AreaPicker _areaPicker;
@@ -40,7 +40,7 @@ public sealed partial class AddWidgetDialog : Page
         ShowAreaPicker();
     }
 
-    public const string AreaPickerTitle = "Choose an area";
+    public const string AreaPickerTitle = "Add widget: choose an area";
 
     public event EventHandler<DialogStepChangedEventArgs>? StepChanged;
     public event EventHandler<ValidationEventArgs>? Validated;

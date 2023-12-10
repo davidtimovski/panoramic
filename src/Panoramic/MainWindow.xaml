@@ -5,8 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:uc="using:Panoramic.UserControls">
 
-    <Grid>
-
+    <Grid Background="#151515">
         <Grid.RowDefinitions>
             <RowDefinition Height="28" />
             <RowDefinition Height="*" />
@@ -21,12 +20,15 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Border Grid.Row="0">
-                    <StackPanel Orientation="Horizontal">
-                        <Button Click="AddWidgetButton_Click">Add widget</Button>
-                        <Button Click="PreferencesButton_Click">Preferences</Button>
-                    </StackPanel>
-                </Border>
+                <Grid Grid.Row="0" Margin="0 0 0 10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Click="AddWidgetButton_Click">Add widget</Button>
+                    <Button Grid.Column="1" Click="PreferencesButton_Click" HorizontalAlignment="Right">Preferences</Button>
+                </Grid>
 
                 <Grid x:Name="Grid" Grid.Row="1" RowSpacing="10" ColumnSpacing="10">
                     <Grid.RowDefinitions>
@@ -120,6 +122,5 @@
             </Grid>
 
         </Border>
-
     </Grid>
 </Window>

@@ -32,8 +32,8 @@ public sealed partial class EditWidgetDialog : Page
         _data = data;
         _storageService = storageService;
 
-        EditSettingsTitle = $"{data.Title} - settings";
-        EditAreaTitle = $"{data.Title} - area";
+        EditSettingsTitle = $"{data.Title}: settings";
+        EditAreaTitle = $"{data.Title}: area";
 
         Initialize();
         _areaPicker = new(_storageService, data.Id);

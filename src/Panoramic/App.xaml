@@ -11,7 +11,7 @@
             </ResourceDictionary.MergedDictionaries>
             <!-- Other app resources here -->
 
-            <SolidColorBrush x:Key="PanoramicWidgetBackgroundBrush" Color="#151515" />
+            <SolidColorBrush x:Key="PanoramicWidgetBackgroundBrush" Color="#222" />
             <CornerRadius x:Key="PanoramicWidgetCornerRadius">5</CornerRadius>
         </ResourceDictionary>
     </Application.Resources>

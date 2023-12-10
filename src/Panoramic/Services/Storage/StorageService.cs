@@ -57,7 +57,7 @@ public class StorageService : IStorageService
 
     public StorageService()
     {
-        InitializeStoragePath();
+        StoragePath = InitializeStoragePath();
 
         var queueController = DispatcherQueueController.CreateOnDedicatedThread();
         var queue = queueController.DispatcherQueue;
@@ -201,7 +201,7 @@ public class StorageService : IStorageService
         return File.WriteAllTextAsync(path, json);
     }
 
-    private void InitializeStoragePath()
+    private string InitializeStoragePath()
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         object? storagePathValue = localSettings.Values[nameof(StoragePath)];
@@ -213,12 +213,10 @@ public class StorageService : IStorageService
             {
                 Directory.CreateDirectory(defaultPath);
             }
-            StoragePath = defaultPath;
+            return defaultPath;
         }
-        else
-        {
-            StoragePath = (string)storagePathValue;
-        }
+        
+        return (string)storagePathValue;
     }
 
     private string GetWritePath(Guid id) => Path.Combine(StoragePath, $"{id}.json");

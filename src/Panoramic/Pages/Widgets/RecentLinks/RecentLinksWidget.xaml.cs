@@ -36,7 +36,7 @@ public sealed partial class RecentLinksWidget : Page
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
-            Title = $"{widgetData.Title} - settings",
+            Title = content.EditSettingsTitle,
             Content = content,
             PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
