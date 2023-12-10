@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
 using Panoramic.Models;
 using Panoramic.Services.Storage.Models;
+using Windows.Storage;
 
 namespace Panoramic.Services.Storage;
 
@@ -16,6 +17,7 @@ public interface IStorageService
     event EventHandler<WidgetUpdatedEventArgs>? WidgetUpdated;
     event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
 
+    string StoragePath { get; }
     Dictionary<Guid, WidgetData> Widgets { get; }
 
     Task ReadAsync();
@@ -32,11 +34,12 @@ public interface IStorageService
         where T : WidgetData;
     Task SaveWidgetAsync<T>(Guid id)
         where T : WidgetData;
+
+    void ChangeStoragePath(string storagePath);
 }
 
 public class StorageService : IStorageService
 {
-    private static readonly string BasePath = "C:\\Users\\david\\Desktop\\panoramic";
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         Converters = { new JsonStringEnumConverter() }
@@ -54,6 +57,8 @@ public class StorageService : IStorageService
 
     public StorageService()
     {
+        InitializeStoragePath();
+
         var queueController = DispatcherQueueController.CreateOnDedicatedThread();
         var queue = queueController.DispatcherQueue;
 
@@ -77,11 +82,13 @@ public class StorageService : IStorageService
     public event EventHandler<WidgetUpdatedEventArgs>? WidgetUpdated;
     public event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
 
+    public string StoragePath { get; private set; }
+
     public Dictionary<Guid, WidgetData> Widgets { get; } = new();
 
     public async Task ReadAsync()
     {
-        var dataFiles = Directory.GetFiles(BasePath, "*.json");
+        var dataFiles = Directory.GetFiles(StoragePath, "*.json");
 
         var tasks = dataFiles.Select(ReadWidgetDataAsync);
 
@@ -148,6 +155,19 @@ public class StorageService : IStorageService
         WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(id));
     }
 
+    public void ChangeStoragePath(string storagePath)
+    {
+        var dataFiles = Directory.GetFiles(StoragePath, "*.json");
+
+        foreach (var file in dataFiles)
+        {
+            var fileName = Path.GetFileName(file);
+            File.Move(file, Path.Combine(storagePath, fileName));
+        }
+
+        StoragePath = storagePath;
+    }
+
     private async Task ReadWidgetDataAsync(string filePath)
     {
         var json = await File.ReadAllTextAsync(filePath);
@@ -181,7 +201,27 @@ public class StorageService : IStorageService
         return File.WriteAllTextAsync(path, json);
     }
 
-    private static string GetWritePath(Guid id) => Path.Combine(BasePath, $"{id}.json");
+    private void InitializeStoragePath()
+    {
+        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+        object? storagePathValue = localSettings.Values[nameof(StoragePath)];
+
+        if (storagePathValue is null)
+        {
+            var defaultPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Panoramic");
+            if (!Directory.Exists(defaultPath))
+            {
+                Directory.CreateDirectory(defaultPath);
+            }
+            StoragePath = defaultPath;
+        }
+        else
+        {
+            StoragePath = (string)storagePathValue;
+        }
+    }
+
+    private string GetWritePath(Guid id) => Path.Combine(StoragePath, $"{id}.json");
 }
 
 public class WidgetUpdatedEventArgs : EventArgs

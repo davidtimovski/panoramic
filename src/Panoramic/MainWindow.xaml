@@ -22,7 +22,10 @@
                 </Grid.RowDefinitions>
 
                 <Border Grid.Row="0">
-                    <Button Click="AddWidgetButton_Click">Add widget</Button>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Click="AddWidgetButton_Click">Add widget</Button>
+                        <Button Click="PreferencesButton_Click">Preferences</Button>
+                    </StackPanel>
                 </Border>
 
                 <Grid x:Name="Grid" Grid.Row="1" RowSpacing="10" ColumnSpacing="10">

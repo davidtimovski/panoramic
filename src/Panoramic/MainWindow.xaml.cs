@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
+using Panoramic.Pages;
 using Panoramic.Pages.Widgets;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.RecentLinks;
@@ -18,10 +19,7 @@ public sealed partial class MainWindow : Window
     private readonly IStorageService _storageService;
     private readonly IServiceProvider _serviceProvider;
 
-    public MainWindow(
-        IStorageService storageService,
-        IServiceProvider serviceProvider,
-        MainViewModel viewModel)
+    public MainWindow(IStorageService storageService, IServiceProvider serviceProvider, MainViewModel viewModel)
     {
         InitializeComponent();
 
@@ -110,5 +108,23 @@ public sealed partial class MainWindow : Window
         }
 
         Grid.Children.Add(content);
+    }
+
+    private async void PreferencesButton_Click(object _, RoutedEventArgs e)
+    {
+        var content = new PreferencesDialog(_storageService, this);
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            Title = "Preferences",
+            Content = content,
+            PrimaryButtonText = "Save",
+            CloseButtonText = "Cancel",
+            PrimaryButtonCommand = new RelayCommand(content.Submit)
+        };
+
+        content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+
+        await dialog.ShowAsync();
     }
 }
