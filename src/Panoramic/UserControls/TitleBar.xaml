@@ -9,8 +9,8 @@
 
     <Border Padding="8 0">
         <StackPanel Orientation="Horizontal">
-            
-            <Image Source="/Assets/Images/VisualAssets/logo.targetsize-24.png"
+
+            <Image Source="/Assets/Images/Square44x44Logo.targetsize-24.png"
                    Width="24"
                    Height="24"
                    VerticalAlignment="Center" />
