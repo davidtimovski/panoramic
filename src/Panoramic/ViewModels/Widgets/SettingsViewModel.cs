@@ -1,6 +1,6 @@
 ﻿using System;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Panoramic.Services.Storage.Models;
+using Panoramic.Models.Domain;
 
 namespace Panoramic.ViewModels.Widgets;
 

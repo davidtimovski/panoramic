@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Panoramic.Models.Domain;
 using Panoramic.Models.Events;
-using Panoramic.Services.Storage;
-using Panoramic.Services.Storage.Models;
+using Panoramic.Services;
 
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 

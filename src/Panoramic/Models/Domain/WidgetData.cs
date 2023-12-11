@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Text.Json.Serialization;
-using Panoramic.Models;
 using Panoramic.Utils.Serialization;
 
-namespace Panoramic.Services.Storage.Models;
+namespace Panoramic.Models.Domain;
 
 public abstract class WidgetData
 {

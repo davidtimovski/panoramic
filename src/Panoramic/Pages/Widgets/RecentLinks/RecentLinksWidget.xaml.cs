@@ -3,9 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Panoramic.Models.Domain;
 using Panoramic.Services;
-using Panoramic.Services.Storage;
-using Panoramic.Services.Storage.Models;
 using Panoramic.ViewModels.Widgets.RecentLinks;
 
 namespace Panoramic.Pages.Widgets.RecentLinks;

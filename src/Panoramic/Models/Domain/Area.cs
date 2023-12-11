@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Panoramic.Services.Storage.Models;
+namespace Panoramic.Models.Domain;
 
 public class Area
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Panoramic.Services.Storage.Models;
+using Panoramic.Models.Domain;
 
 namespace Panoramic.Utils.Serialization;
 

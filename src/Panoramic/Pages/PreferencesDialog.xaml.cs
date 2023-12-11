@@ -2,7 +2,7 @@ using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Events;
-using Panoramic.Services.Storage;
+using Panoramic.Services;
 using Panoramic.ViewModels;
 using Windows.Storage;
 using Windows.Storage.AccessCache;

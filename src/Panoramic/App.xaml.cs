@@ -7,7 +7,6 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
 using Panoramic.Services;
-using Panoramic.Services.Storage;
 using Panoramic.ViewModels;
 
 namespace Panoramic;
@@ -48,7 +47,7 @@ public partial class App : Application
             Process.GetCurrentProcess().Kill();
             return;
         }
-        
+
         var storageService = _serviceProvider.GetRequiredService<IStorageService>();
         await storageService.ReadAsync();
 

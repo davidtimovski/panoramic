@@ -7,10 +7,10 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
 using Panoramic.Models;
-using Panoramic.Services.Storage.Models;
+using Panoramic.Models.Domain;
 using Windows.Storage;
 
-namespace Panoramic.Services.Storage;
+namespace Panoramic.Services;
 
 public interface IStorageService
 {
@@ -215,7 +215,7 @@ public class StorageService : IStorageService
             }
             return defaultPath;
         }
-        
+
         return (string)storagePathValue;
     }
 

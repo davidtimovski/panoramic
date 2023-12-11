@@ -4,9 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Dispatching;
+using Panoramic.Models.Domain;
 using Panoramic.Services;
-using Panoramic.Services.Storage;
-using Panoramic.Services.Storage.Models;
 
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 

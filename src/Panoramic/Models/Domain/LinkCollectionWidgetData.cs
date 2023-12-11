@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using Panoramic.Models;
 
-namespace Panoramic.Services.Storage.Models;
+namespace Panoramic.Models.Domain;
 
 public class LinkCollectionWidgetData : WidgetData
 {

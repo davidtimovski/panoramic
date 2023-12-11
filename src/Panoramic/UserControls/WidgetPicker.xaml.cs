@@ -5,7 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Panoramic.Models;
-using Panoramic.Services.Storage.Models;
+using Panoramic.Models.Domain;
 
 namespace Panoramic.UserControls;
 

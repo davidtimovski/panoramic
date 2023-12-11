@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Panoramic.Services.Storage;
+using Panoramic.Services;
 
 namespace Panoramic.ViewModels;
 

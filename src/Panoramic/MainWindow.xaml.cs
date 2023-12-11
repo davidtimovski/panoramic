@@ -4,12 +4,12 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
+using Panoramic.Models.Domain;
 using Panoramic.Pages;
 using Panoramic.Pages.Widgets;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.RecentLinks;
-using Panoramic.Services.Storage;
-using Panoramic.Services.Storage.Models;
+using Panoramic.Services;
 using Panoramic.ViewModels;
 
 namespace Panoramic;

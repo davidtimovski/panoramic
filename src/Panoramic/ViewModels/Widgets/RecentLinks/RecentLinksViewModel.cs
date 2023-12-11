@@ -2,9 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Panoramic.Models.Domain;
 using Panoramic.Services;
-using Panoramic.Services.Storage;
-using Panoramic.Services.Storage.Models;
 
 namespace Panoramic.ViewModels.Widgets.RecentLinks;
 
@@ -41,7 +40,7 @@ public partial class RecentLinksViewModel : ObservableObject
         _data.Links.Clear();
         _storageService.EnqueueWidgetWrite(_data.Id);
 
-        Recent.Clear();        
+        Recent.Clear();
     }
 
     private void HyperlinkClicked(object? _, HyperlinkClickedEventArgs e)
