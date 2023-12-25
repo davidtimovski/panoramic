@@ -13,11 +13,9 @@ public sealed partial class WidgetPicker : UserControl
 {
     private readonly Dictionary<WidgetType, ToggleButton> _toggleLookup = new();
 
-    public WidgetPicker(Area area, WidgetType? widgetType)
+    public WidgetPicker(WidgetType? widgetType)
     {
         InitializeComponent();
-
-        AreaLabel = $"Area: {area}";
 
         WidgetClicked = new RelayCommand<string>(WidgetToggled);
 
@@ -29,8 +27,6 @@ public sealed partial class WidgetPicker : UserControl
             _toggleLookup[widgetType.Value].IsChecked = true;
         }
     }
-
-    public string AreaLabel { get; }
 
     public event EventHandler<WidgetPickedEventArgs>? WidgetPicked;
     public event EventHandler<EventArgs>? WidgetDeselected;

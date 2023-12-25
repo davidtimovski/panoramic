@@ -6,16 +6,11 @@ namespace Panoramic.Models.Domain;
 
 public abstract class WidgetData
 {
-    public WidgetData(WidgetType type)
-    {
-        Type = type;
-    }
-
     [JsonPropertyName("id")]
     public required Guid Id { get; init; }
 
     [JsonPropertyName("type")]
-    public WidgetType Type { get; }
+    public required WidgetType Type { get; init; }
 
     [JsonPropertyName("area")]
     [JsonConverter(typeof(AreaJsonConverter))]

@@ -11,13 +11,11 @@ public class RecentLinkViewModel
     {
         _eventHub = eventHub;
 
-        Id = uri.ToString();
         Title = title;
         Uri = uri;
         Clicked = clicked;
     }
 
-    public string Id { get; set; }
     public string Title { get; set; }
     public Uri Uri { get; set; }
     public DateTime Clicked { get; set; }
@@ -25,6 +23,6 @@ public class RecentLinkViewModel
     public void Click()
     {
         Clicked = DateTime.Now;
-        _eventHub.RaiseHyperlinkClicked(Id, Title, Uri, Clicked);
+        _eventHub.RaiseHyperlinkClicked(Title, Uri, Clicked);
     }
 }

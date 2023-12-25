@@ -4,6 +4,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
 using Panoramic.Models.Domain;
+using Panoramic.Models.Domain.LinkCollection;
+using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Models.Events;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.RecentLinks;
@@ -17,7 +19,7 @@ namespace Panoramic.Pages.Widgets;
 
 public sealed partial class EditWidgetDialog : Page
 {
-    private readonly WidgetData _data;
+    private readonly Widget _widget;
     private readonly IStorageService _storageService;
     private readonly AreaPicker _areaPicker;
 
@@ -25,18 +27,18 @@ public sealed partial class EditWidgetDialog : Page
     private Page? settingsContent;
     private SettingsViewModel? settingsVm;
 
-    public EditWidgetDialog(WidgetData data, IStorageService storageService)
+    public EditWidgetDialog(Widget widget, IStorageService storageService)
     {
         InitializeComponent();
 
-        _data = data;
+        _widget = widget;
         _storageService = storageService;
 
-        EditSettingsTitle = $"{data.Title}: settings";
-        EditAreaTitle = $"{data.Title}: area";
+        EditSettingsTitle = $"{widget.Title}: settings";
+        EditAreaTitle = $"{widget.Title}: area";
 
         Initialize();
-        _areaPicker = new(_storageService, data.Id);
+        _areaPicker = new(_storageService, widget.Id);
         _areaPicker.AreaReset += AreaReset;
         _areaPicker.AreaPicked += AreaPicked;
     }
@@ -75,10 +77,10 @@ public sealed partial class EditWidgetDialog : Page
 
     private void Initialize()
     {
-        switch (_data.Type)
+        switch (_widget.Type)
         {
             case WidgetType.RecentLinks:
-                var recentLinksVm = new RecentLinksSettingsViewModel(_storageService, (RecentLinksWidgetData)_data);
+                var recentLinksVm = new RecentLinksSettingsViewModel(_storageService, ((RecentLinksWidget)_widget).GetData());
                 recentLinksVm.Validated += Validated;
 
                 var recentLinksForm = new RecentLinksSettingsForm(recentLinksVm);
@@ -88,7 +90,7 @@ public sealed partial class EditWidgetDialog : Page
                 settingsContent = recentLinksForm;
                 break;
             case WidgetType.LinkCollection:
-                var linkCollectionVm = new LinkCollectionSettingsViewModel(_storageService, (LinkCollectionWidgetData)_data);
+                var linkCollectionVm = new LinkCollectionSettingsViewModel(_storageService, ((LinkCollectionWidget)_widget).GetData());
                 linkCollectionVm.Validated += Validated;
 
                 var linkCollectionForm = new LinkCollectionSettingsForm(linkCollectionVm);

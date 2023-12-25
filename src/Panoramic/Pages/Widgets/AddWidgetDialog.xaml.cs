@@ -4,6 +4,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
 using Panoramic.Models.Domain;
+using Panoramic.Models.Domain.LinkCollection;
+using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Models.Events;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.RecentLinks;
@@ -69,7 +71,7 @@ public sealed partial class AddWidgetDialog : Page
     {
         StepChanged?.Invoke(this, new DialogStepChangedEventArgs(WidgetPickerTitle));
 
-        var widgetPicker = new WidgetPicker(selectedArea!, selectedWidgetType);
+        var widgetPicker = new WidgetPicker(selectedWidgetType);
         widgetPicker.WidgetPicked += WidgetPicked;
         widgetPicker.WidgetDeselected += WidgetDeselected;
 
@@ -88,7 +90,16 @@ public sealed partial class AddWidgetDialog : Page
         switch (selectedWidgetType)
         {
             case WidgetType.RecentLinks:
-                var recentLinksVm = new RecentLinksSettingsViewModel(_storageService, RecentLinksWidgetData.New(selectedArea!));
+                var recentLinksVm = new RecentLinksSettingsViewModel(_storageService, new RecentLinksData
+                {
+                    Id = Guid.Empty,
+                    Type = WidgetType.RecentLinks,
+                    Title = RecentLinksWidget.DefaultTitle,
+                    Area = selectedArea!,
+                    Capacity = RecentLinksWidget.DefaultCapacity,
+                    OnlyFromToday = RecentLinksWidget.DefaultOnlyFromToday,
+                    Links = new()
+                });
                 recentLinksVm.Validated += Validated;
 
                 var recentLinksForm = new RecentLinksSettingsForm(recentLinksVm);
@@ -96,7 +107,14 @@ public sealed partial class AddWidgetDialog : Page
                 ContentFrame.Content = recentLinksForm;
                 break;
             case WidgetType.LinkCollection:
-                var linkCollectionVm = new LinkCollectionSettingsViewModel(_storageService, LinkCollectionWidgetData.New(selectedArea!));
+                var linkCollectionVm = new LinkCollectionSettingsViewModel(_storageService, new LinkCollectionData
+                {
+                    Id = Guid.Empty,
+                    Type = WidgetType.RecentLinks,
+                    Title = RecentLinksWidget.DefaultTitle,
+                    Area = selectedArea!,
+                    Links = new()
+                });
                 linkCollectionVm.Validated += Validated;
 
                 var linkCollectionForm = new LinkCollectionSettingsForm(linkCollectionVm);

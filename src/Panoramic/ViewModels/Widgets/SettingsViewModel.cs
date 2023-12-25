@@ -13,10 +13,7 @@ public partial class SettingsViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(AreaLabel))]
     private Area area;
-
-    public string AreaLabel => $"Area: {Area}";
 
     [ObservableProperty]
     private string title;

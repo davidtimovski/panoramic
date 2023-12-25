@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Panoramic.Models.Domain;
+using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Events;
 using Panoramic.Services;
 
@@ -9,13 +9,13 @@ namespace Panoramic.ViewModels.Widgets.LinkCollection;
 public partial class LinkCollectionSettingsViewModel : SettingsViewModel
 {
     private readonly IStorageService _storageService;
-    private readonly LinkCollectionWidgetData _data;
+    private readonly Guid _id;
 
-    public LinkCollectionSettingsViewModel(IStorageService storageService, LinkCollectionWidgetData data)
-        : base("My links", data)
+    public LinkCollectionSettingsViewModel(IStorageService storageService, LinkCollectionData data)
+        : base(LinkCollectionWidget.DefaultTitle, data)
     {
         _storageService = storageService;
-        _data = data;
+        _id = data.Id;
     }
 
     public event EventHandler<ValidationEventArgs>? Validated;
@@ -24,22 +24,17 @@ public partial class LinkCollectionSettingsViewModel : SettingsViewModel
 
     public async Task SubmitAsync()
     {
-        if (_data.Id == Guid.Empty)
+        if (_id == Guid.Empty)
         {
-            var data = new LinkCollectionWidgetData
-            {
-                Id = Guid.NewGuid(),
-                Area = Area,
-                Title = Title.Trim(),
-                Links = new()
-            };
-            await _storageService.AddNewWidgetAsync(data);
+            var widget = new LinkCollectionWidget(Area, Title.Trim());
+            await _storageService.AddNewWidgetAsync(widget);
         }
         else
         {
-            _data.Area = Area;
-            _data.Title = Title.Trim();
-            await _storageService.SaveWidgetAsync<LinkCollectionWidgetData>(_data.Id);
+            var widget = _storageService.Widgets[_id];
+            widget.Area = Area;
+            widget.Title = Title.Trim();
+            await _storageService.SaveWidgetAsync(_id);
         }
     }
 }

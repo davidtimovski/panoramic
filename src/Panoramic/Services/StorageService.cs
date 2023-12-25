@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
 using Panoramic.Models;
 using Panoramic.Models.Domain;
+using Panoramic.Models.Domain.LinkCollection;
+using Panoramic.Models.Domain.RecentLinks;
 using Windows.Storage;
 
 namespace Panoramic.Services;
@@ -18,7 +20,7 @@ public interface IStorageService
     event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
 
     string StoragePath { get; }
-    Dictionary<Guid, WidgetData> Widgets { get; }
+    Dictionary<Guid, Widget> Widgets { get; }
 
     Task ReadAsync();
     Task WriteAsync();
@@ -30,10 +32,9 @@ public interface IStorageService
     void EnqueueWidgetWrite(Guid id);
 
     void DeleteWidget(Guid id);
-    Task AddNewWidgetAsync<T>(T data)
-        where T : WidgetData;
-    Task SaveWidgetAsync<T>(Guid id)
-        where T : WidgetData;
+    Task AddNewWidgetAsync<T>(T widget)
+        where T : Widget;
+    Task SaveWidgetAsync(Guid id);
 
     void ChangeStoragePath(string storagePath);
 }
@@ -70,7 +71,7 @@ public class StorageService : IStorageService
 
             foreach (var id in _unsavedWidgets)
             {
-                tasks.Add(WriteWidgetAsync(id));
+                tasks.Add(SaveWidgetAsync(id));
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
@@ -84,7 +85,7 @@ public class StorageService : IStorageService
 
     public string StoragePath { get; private set; }
 
-    public Dictionary<Guid, WidgetData> Widgets { get; } = new();
+    public Dictionary<Guid, Widget> Widgets { get; } = new();
 
     public async Task ReadAsync()
     {
@@ -97,12 +98,12 @@ public class StorageService : IStorageService
 
     public async Task WriteAsync()
     {
-        var usedAreas = Widgets.Where(x => x.Value is not null).ToList();
+        var widgetKvps = Widgets.Where(x => x.Value is not null).ToList();
 
-        var writeTasks = new List<Task>(usedAreas.Count);
-        foreach (var area in usedAreas)
+        var writeTasks = new List<Task>(widgetKvps.Count);
+        foreach (var widgetKvp in widgetKvps)
         {
-            writeTasks.Add(WriteWidgetAsync(area.Key));
+            writeTasks.Add(SaveWidgetAsync(widgetKvp.Key));
         }
 
         await Task.WhenAll(writeTasks).ConfigureAwait(false);
@@ -128,28 +129,28 @@ public class StorageService : IStorageService
         WidgetRemoved?.Invoke(this, new WidgetRemovedEventArgs(id));
     }
 
-    public async Task AddNewWidgetAsync<T>(T data)
-        where T : WidgetData
+    public async Task AddNewWidgetAsync<T>(T widget)
+        where T : Widget
     {
-        if (Widgets.ContainsKey(data.Id))
+        if (Widgets.ContainsKey(widget.Id))
         {
-            Widgets[data.Id] = data;
+            Widgets[widget.Id] = widget;
         }
         else
         {
-            Widgets.Add(data.Id, data);
+            Widgets.Add(widget.Id, widget);
         }
 
-        var json = JsonSerializer.Serialize(data, SerializerOptions);
-        await File.WriteAllTextAsync(GetWritePath(data.Id), json);
+        var json = Serialize(widget);
+        await File.WriteAllTextAsync(GetWritePath(widget.Id), json);
 
-        WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(data.Id));
+        WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(widget.Id));
     }
 
-    public async Task SaveWidgetAsync<T>(Guid id)
-        where T : WidgetData
+    public async Task SaveWidgetAsync(Guid id)
     {
-        var json = JsonSerializer.Serialize((T)Widgets[id], SerializerOptions);
+        var json = Serialize(Widgets[id]);
+
         await File.WriteAllTextAsync(GetWritePath(id), json);
 
         WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(id));
@@ -176,29 +177,24 @@ public class StorageService : IStorageService
         var typeProperty = jsonDoc.RootElement.GetProperty("type");
         var type = Enum.Parse<WidgetType>(typeProperty.GetString()!);
 
-        WidgetData data = type switch
+        Widget data = type switch
         {
-            WidgetType.RecentLinks => JsonSerializer.Deserialize<RecentLinksWidgetData>(json, SerializerOptions)!,
-            WidgetType.LinkCollection => JsonSerializer.Deserialize<LinkCollectionWidgetData>(json, SerializerOptions)!,
+            WidgetType.RecentLinks => RecentLinksWidget.Load(json, SerializerOptions),
+            WidgetType.LinkCollection => LinkCollectionWidget.Load(json, SerializerOptions),
             _ => throw new InvalidOperationException("Unsupported widget type")
         };
 
         Widgets.Add(data.Id, data);
     }
 
-    private Task WriteWidgetAsync(Guid id)
+    private static string Serialize(Widget widget)
     {
-        var value = Widgets[id]!;
-        var path = GetWritePath(id);
-
-        var json = value.Type switch
+        return widget.Type switch
         {
-            WidgetType.RecentLinks => JsonSerializer.Serialize((RecentLinksWidgetData)value, SerializerOptions),
-            WidgetType.LinkCollection => JsonSerializer.Serialize((LinkCollectionWidgetData)value, SerializerOptions),
+            WidgetType.RecentLinks => ((RecentLinksWidget)widget).Serialize(SerializerOptions),
+            WidgetType.LinkCollection => ((LinkCollectionWidget)widget).Serialize(SerializerOptions),
             _ => throw new InvalidOperationException("Unsupported widget type")
         };
-
-        return File.WriteAllTextAsync(path, json);
     }
 
     private string InitializeStoragePath()

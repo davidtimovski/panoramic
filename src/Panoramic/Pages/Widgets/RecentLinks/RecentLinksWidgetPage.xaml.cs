@@ -3,35 +3,35 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Panoramic.Models.Domain;
+using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Services;
 using Panoramic.ViewModels.Widgets.RecentLinks;
 
 namespace Panoramic.Pages.Widgets.RecentLinks;
 
-public sealed partial class RecentLinksWidget : Page
+public sealed partial class RecentLinksWidgetPage : Page
 {
     private readonly IStorageService _storageService;
     private readonly Guid _id;
 
-    public RecentLinksWidget(IServiceProvider serviceProvider, RecentLinksWidgetData data)
+    public RecentLinksWidgetPage(IServiceProvider serviceProvider, RecentLinksWidget widget)
     {
         InitializeComponent();
 
         _storageService = serviceProvider.GetRequiredService<IStorageService>();
-        _id = data.Id;
+        _id = widget.Id;
 
         var eventHub = serviceProvider.GetRequiredService<IEventHub>();
-        ViewModel = new RecentLinksViewModel(_storageService, eventHub, data);
+        ViewModel = new RecentLinksViewModel(_storageService, eventHub, widget);
     }
 
     public RecentLinksViewModel ViewModel { get; }
 
     private async void SettingsButton_Click(object _, RoutedEventArgs e)
     {
-        var widgetData = _storageService.Widgets[_id];
+        var widget = _storageService.Widgets[_id];
 
-        var content = new EditWidgetDialog(widgetData, _storageService);
+        var content = new EditWidgetDialog(widget, _storageService);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -39,11 +39,14 @@ public sealed partial class RecentLinksWidget : Page
             Content = content,
             PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new AsyncRelayCommand(content.SubmitAsync)
+            PrimaryButtonCommand = new AsyncRelayCommand(content.SubmitAsync),
+            CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })
         };
 
         content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
         content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+
+        ViewModel.Highlighted = true;
 
         await dialog.ShowAsync();
     }

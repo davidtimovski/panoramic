@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Panoramic.Models.Domain;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Services;
 
 namespace Panoramic.ViewModels.Widgets.RecentLinks;
@@ -11,21 +11,21 @@ public partial class RecentLinksViewModel : ObservableObject
 {
     private readonly IStorageService _storageService;
     private readonly IEventHub _eventHub;
-    private readonly RecentLinksWidgetData _data;
+    private readonly RecentLinksWidget _widget;
 
     public RecentLinksViewModel(
         IStorageService storageService,
         IEventHub eventHub,
-        RecentLinksWidgetData data)
+        RecentLinksWidget widget)
     {
         _storageService = storageService;
 
         _eventHub = eventHub;
         _eventHub.HyperlinkClicked += HyperlinkClicked;
 
-        _data = data;
+        _widget = widget;
 
-        Title = data.Title;
+        Title = widget.Title;
 
         SetViewModel();
     }
@@ -35,43 +35,27 @@ public partial class RecentLinksViewModel : ObservableObject
 
     public ObservableCollection<RecentLinkViewModel> Recent { get; } = new();
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Background))]
+    private bool highlighted;
+
+    public SolidColorBrush Background => Highlighted
+        ? (Application.Current.Resources["PanoramicWidgetHighlightedBackgroundBrush"] as SolidColorBrush)!
+        : (Application.Current.Resources["PanoramicWidgetBackgroundBrush"] as SolidColorBrush)!;
+
     public void ClearRecent()
     {
-        _data.Links.Clear();
-        _storageService.EnqueueWidgetWrite(_data.Id);
+        _widget.Clear();
+        _storageService.EnqueueWidgetWrite(_widget.Id);
 
         Recent.Clear();
     }
 
     private void HyperlinkClicked(object? _, HyperlinkClickedEventArgs e)
     {
-        var url = e.Uri.ToString();
+        _widget.HyperlinkClicked(e.Title, e.Uri, e.Clicked);
 
-        var link = _data.Links.FirstOrDefault(x => string.Equals(x.Url, url, StringComparison.OrdinalIgnoreCase));
-        if (link is null)
-        {
-            _data.Links.Add(new RecentLink { Title = e.Title, Url = e.Uri.ToString(), Clicked = e.Clicked });
-
-            if (_data.Links.Count > _data.Capacity)
-            {
-                _data.Links.RemoveAt(0);
-            }
-        }
-        else
-        {
-            link.Clicked = e.Clicked;
-        }
-
-        var query = _data.Links.AsEnumerable();
-        if (_data.OnlyFromToday)
-        {
-            query = query.Where(x => x.Clicked >= DateTime.Today);
-        }
-
-        _data.Links.Clear();
-        _data.Links.AddRange(query.OrderByDescending(x => x.Clicked).Take(_data.Capacity));
-
-        _storageService.EnqueueWidgetWrite(_data.Id);
+        _storageService.EnqueueWidgetWrite(_widget.Id);
 
         SetViewModel();
     }
@@ -80,9 +64,9 @@ public partial class RecentLinksViewModel : ObservableObject
     {
         Recent.Clear();
 
-        foreach (var recentLink in _data.Links)
+        foreach (var recentLink in _widget.Links)
         {
-            Recent.Add(new RecentLinkViewModel(_eventHub, recentLink.Title, new Uri(recentLink.Url, UriKind.Absolute), recentLink.Clicked));
+            Recent.Add(new RecentLinkViewModel(_eventHub, recentLink.Title, recentLink.Uri, recentLink.Clicked));
         }
     }
 }

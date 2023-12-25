@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Panoramic.Models.Domain;
+using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Models.Events;
 using Panoramic.Services;
 
@@ -10,13 +10,13 @@ namespace Panoramic.ViewModels.Widgets.RecentLinks;
 public partial class RecentLinksSettingsViewModel : SettingsViewModel
 {
     private readonly IStorageService _storageService;
-    private readonly RecentLinksWidgetData _data;
+    private readonly Guid _id;
 
-    public RecentLinksSettingsViewModel(IStorageService storageService, RecentLinksWidgetData data)
-        : base("Recent", data)
+    public RecentLinksSettingsViewModel(IStorageService storageService, RecentLinksData data)
+        : base(RecentLinksWidget.DefaultTitle, data)
     {
         _storageService = storageService;
-        _data = data;
+        _id = data.Id;
 
         if (data is null)
         {
@@ -42,26 +42,20 @@ public partial class RecentLinksSettingsViewModel : SettingsViewModel
 
     public async Task SubmitAsync()
     {
-        if (_data.Id == Guid.Empty)
+        if (_id == Guid.Empty)
         {
-            var data = new RecentLinksWidgetData
-            {
-                Id = Guid.NewGuid(),
-                Area = Area,
-                Title = Title.Trim(),
-                Capacity = Capacity,
-                OnlyFromToday = OnlyFromToday,
-                Links = new()
-            };
-            await _storageService.AddNewWidgetAsync(data);
+            var widget = new RecentLinksWidget(Area, Title.Trim(), Capacity, OnlyFromToday);
+            await _storageService.AddNewWidgetAsync(widget);
         }
         else
         {
-            _data.Area = Area;
-            _data.Title = Title.Trim();
-            _data.Capacity = Capacity;
-            _data.OnlyFromToday = OnlyFromToday;
-            await _storageService.SaveWidgetAsync<RecentLinksWidgetData>(_data.Id);
+            var widget = (RecentLinksWidget)_storageService.Widgets[_id];
+            widget.Area = Area;
+            widget.Title = Title;
+            widget.Capacity = Capacity;
+            widget.OnlyFromToday = OnlyFromToday;
+
+            await _storageService.SaveWidgetAsync(_id);
         }
     }
 }

@@ -7,15 +7,9 @@
     <Grid RowSpacing="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
-        <TextBlock Grid.Row="0" Text="{x:Bind ViewModel.AreaLabel, Mode=OneWay}" />
-
-        <TextBlock Grid.Row="1">Widget: Link collection</TextBlock>
-
-        <TextBox Grid.Row="2"
+        
+        <TextBox Grid.Row="0"
                  Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  TextChanged="{x:Bind ViewModel.ValidateAndEmit}"
                  Header="Title"

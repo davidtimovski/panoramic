@@ -5,6 +5,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
 using Panoramic.Models.Domain;
+using Panoramic.Models.Domain.LinkCollection;
+using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Pages;
 using Panoramic.Pages.Widgets;
 using Panoramic.Pages.Widgets.LinkCollection;
@@ -85,26 +87,26 @@ public sealed partial class MainWindow : Window
 
     private void LoadWidget(Guid id)
     {
-        var data = _storageService.Widgets[id];
-        Page content = data.Type switch
+        var widget = _storageService.Widgets[id];
+        Page content = widget.Type switch
         {
-            WidgetType.RecentLinks => new RecentLinksWidget(_serviceProvider, (RecentLinksWidgetData)data),
-            WidgetType.LinkCollection => new LinkCollectionWidget(_serviceProvider, (LinkCollectionWidgetData)data),
+            WidgetType.RecentLinks => new RecentLinksWidgetPage(_serviceProvider, (RecentLinksWidget)widget),
+            WidgetType.LinkCollection => new LinkCollectionWidgetPage(_serviceProvider, (LinkCollectionWidget)widget),
             _ => throw new InvalidOperationException("Unsupported widget type")
         };
 
-        Area area = (Area)data.Area;
+        Area area = (Area)widget.Area;
 
-        content.SetValue(Page.NameProperty, data.Id.ToString("N"));
+        content.SetValue(Page.NameProperty, widget.Id.ToString("N"));
         content.SetValue(Grid.RowProperty, area.Row);
         content.SetValue(Grid.ColumnProperty, area.Column);
         content.SetValue(Grid.RowSpanProperty, area.RowSpan);
         content.SetValue(Grid.ColumnSpanProperty, area.ColumnSpan);
 
-        var widget = Grid.Children.OfType<Page>().FirstOrDefault(x => x.Name == data.Id.ToString("N"));
+        var widgetPage = Grid.Children.OfType<Page>().FirstOrDefault(x => x.Name == widget.Id.ToString("N"));
         if (widget is not null)
         {
-            Grid.Children.Remove(widget);
+            Grid.Children.Remove(widgetPage);
         }
 
         Grid.Children.Add(content);

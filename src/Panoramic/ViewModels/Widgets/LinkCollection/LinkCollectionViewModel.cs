@@ -1,43 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.UI.Dispatching;
-using Panoramic.Models.Domain;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Services;
 
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
-// TODO: Add possibility of removing links
-// Ordering links
-// Have a setting for ordered or auto-ordered links
 public partial class LinkCollectionViewModel : ObservableObject
 {
-    private readonly IStorageService _storageService;
-    private readonly IEventHub _eventHub;
-    private readonly DispatcherQueue _dispatcherQueue;
-    private readonly LinkCollectionWidgetData _data;
-
-    public LinkCollectionViewModel(
-        IStorageService storageService,
-        IEventHub eventHub,
-        DispatcherQueue dispatcherQueue,
-        LinkCollectionWidgetData data)
+    public LinkCollectionViewModel(IEventHub eventHub, LinkCollectionWidget widget)
     {
-        _storageService = storageService;
+        Title = widget.Title;
 
-        _eventHub = eventHub;
-        _eventHub.HyperlinkClicked += HyperlinkClicked;
-
-        _dispatcherQueue = dispatcherQueue;
-        _data = data;
-
-        Title = data.Title;
-
-        foreach (var item in data.Links)
+        foreach (var item in widget.Links)
         {
-            Links.Add(new LinkViewModel(eventHub, item.Title, new Uri(item.Url, UriKind.Absolute), item.Clicks));
+            Links.Add(new LinkViewModel(eventHub, item.Title, item.Uri));
         }
     }
 
@@ -46,38 +24,11 @@ public partial class LinkCollectionViewModel : ObservableObject
 
     public ObservableCollection<LinkViewModel> Links = new();
 
-    public void AddLink(string title, string url)
-    {
-        var now = DateTime.Now;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Background))]
+    private bool highlighted;
 
-        _data.Links.Add(new LinkCollectionItem { Title = title, Url = url, Clicks = new List<DateTime> { now } });
-        _storageService.EnqueueWidgetWrite(_data.Id);
-
-        ReorderBookmarks(new LinkViewModel(_eventHub, title, new Uri(url, UriKind.Absolute), new List<DateTime> { now }));
-    }
-
-    private void HyperlinkClicked(object? _, HyperlinkClickedEventArgs e)
-    {
-        ReorderBookmarks();
-    }
-
-    private void ReorderBookmarks(LinkViewModel? bookmarkToAdd = null)
-    {
-        var bookmarksReordered = Links.OrderByDescending(x => x.Weight).ThenByDescending(x => x.LastClick).ToList();
-
-        _dispatcherQueue.TryEnqueue(() =>
-        {
-            Links.Clear();
-
-            if (bookmarkToAdd is not null)
-            {
-                Links.Add(bookmarkToAdd);
-            }
-
-            foreach (var bookmark in bookmarksReordered)
-            {
-                Links.Add(bookmark);
-            }
-        });
-    }
+    public SolidColorBrush Background => Highlighted
+        ? (Application.Current.Resources["PanoramicWidgetHighlightedBackgroundBrush"] as SolidColorBrush)!
+        : (Application.Current.Resources["PanoramicWidgetBackgroundBrush"] as SolidColorBrush)!;
 }

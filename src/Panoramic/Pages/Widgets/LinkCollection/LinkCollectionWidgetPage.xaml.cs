@@ -5,60 +5,63 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Panoramic.Models.Domain;
+using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Services;
 using Panoramic.ViewModels;
 using Panoramic.ViewModels.Widgets.LinkCollection;
 
 namespace Panoramic.Pages.Widgets.LinkCollection;
 
-public sealed partial class LinkCollectionWidget : Page
+public sealed partial class LinkCollectionWidgetPage : Page
 {
     private readonly IStorageService _storageService;
     private readonly HttpClient _httpClient;
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly Guid _id;
 
-    public LinkCollectionWidget(IServiceProvider serviceProvider, LinkCollectionWidgetData data)
+    public LinkCollectionWidgetPage(IServiceProvider serviceProvider, LinkCollectionWidget widget)
     {
         InitializeComponent();
 
         _storageService = serviceProvider.GetRequiredService<IStorageService>();
         _httpClient = serviceProvider.GetRequiredService<HttpClient>();
         _dispatcherQueue = serviceProvider.GetRequiredService<DispatcherQueue>();
-        _id = data.Id;
+        _id = widget.Id;
 
         var eventHub = serviceProvider.GetRequiredService<IEventHub>();
-        ViewModel = new LinkCollectionViewModel(_storageService, eventHub, _dispatcherQueue, data);
+        ViewModel = new LinkCollectionViewModel(eventHub, widget);
     }
 
     public LinkCollectionViewModel ViewModel { get; }
 
-    private async void AddButton_Click(object _, RoutedEventArgs e)
+    private async void EditButton_Click(object _, RoutedEventArgs e)
     {
-        var vm = new AddLinkViewModel();
-        var content = new AddLinkDialog(_httpClient, _dispatcherQueue, vm);
+        var widget = (LinkCollectionWidget)_storageService.Widgets[_id];
+        var data = widget.GetData();
+        var vm = new EditViewModel(_httpClient, _dispatcherQueue, _storageService, data);
+
+        var content = new EditDialog(vm);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
-            Title = "Add link",
+            Title = "Edit link collection",
             Content = content,
-            PrimaryButtonText = "Add",
+            PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => ViewModel.AddLink(content.ViewModel.Title, content.ViewModel.Uri)),
-            IsPrimaryButtonEnabled = false
+            PrimaryButtonCommand = new AsyncRelayCommand(vm.SaveAsync),
+            CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })
         };
 
-        vm.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        ViewModel.Highlighted = true;
 
         await dialog.ShowAsync();
     }
 
     private async void SettingsButton_Click(object _, RoutedEventArgs e)
     {
-        var widgetData = _storageService.Widgets[_id];
+        var widget = _storageService.Widgets[_id];
 
-        var content = new EditWidgetDialog(widgetData, _storageService);
+        var content = new EditWidgetDialog(widget, _storageService);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -66,24 +69,27 @@ public sealed partial class LinkCollectionWidget : Page
             Content = content,
             PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new AsyncRelayCommand(content.SubmitAsync)
+            PrimaryButtonCommand = new AsyncRelayCommand(content.SubmitAsync),
+            CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })
         };
 
         content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
         content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+
+        ViewModel.Highlighted = true;
 
         await dialog.ShowAsync();
     }
 
     private async void RemoveButton_Click(object _, RoutedEventArgs e)
     {
-        var widgetData = _storageService.Widgets[_id];
+        var widget = _storageService.Widgets[_id];
 
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
             Title = "Remove widget",
-            Content = $"Are you sure want to remove {widgetData.Title}?\n\nAny data that it holds will also be deleted permanently.",
+            Content = $"Are you sure want to remove {widget.Title}?\n\nAny data that it holds will also be deleted permanently.",
             PrimaryButtonText = "Yes, remove",
             CloseButtonText = "Cancel",
             PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_id); })
