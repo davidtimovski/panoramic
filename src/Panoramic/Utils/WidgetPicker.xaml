@@ -17,7 +17,7 @@
             <ToggleButton Grid.Row="0" x:Name="RecentLinksToggle" Command="{x:Bind WidgetClicked}" CommandParameter="RecentLinks" HorizontalAlignment="Stretch">
                 <StackPanel>
                     <TextBlock HorizontalAlignment="Center" FontWeight="Bold">Recent links</TextBlock>
-                    <TextBlock Margin="0 5 0 0">Lists links that you have recently clicked in Panoramic</TextBlock>
+                    <TextBlock Margin="0 5 0 0">Shows links that you have recently clicked in Panoramic</TextBlock>
                 </StackPanel>
             </ToggleButton>
 
@@ -28,10 +28,10 @@
                 </StackPanel>
             </ToggleButton>
 
-            <ToggleButton Grid.Row="2" x:Name="RecentLinksToggle2" Command="{x:Bind WidgetClicked}" CommandParameter="RecentLinks" HorizontalAlignment="Stretch">
+            <ToggleButton Grid.Row="2" x:Name="NoteToggle" Command="{x:Bind WidgetClicked}" CommandParameter="Note" HorizontalAlignment="Stretch">
                 <StackPanel>
-                    <TextBlock HorizontalAlignment="Center" FontWeight="Bold">Recent links</TextBlock>
-                    <TextBlock Margin="0 5 0 0">Lists links that you have recently clicked in Panoramic</TextBlock>
+                    <TextBlock HorizontalAlignment="Center" FontWeight="Bold">Note</TextBlock>
+                    <TextBlock Margin="0 5 0 0">Shows text</TextBlock>
                 </StackPanel>
             </ToggleButton>
 

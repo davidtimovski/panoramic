@@ -5,21 +5,24 @@ using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
 using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.LinkCollection;
+using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Models.Events;
 using Panoramic.Pages.Widgets.LinkCollection;
+using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
 using Panoramic.Services;
 using Panoramic.UserControls;
 using Panoramic.ViewModels.Widgets;
 using Panoramic.ViewModels.Widgets.LinkCollection;
+using Panoramic.ViewModels.Widgets.Note;
 using Panoramic.ViewModels.Widgets.RecentLinks;
 
 namespace Panoramic.Pages.Widgets;
 
 public sealed partial class EditWidgetDialog : Page
 {
-    private readonly Widget _widget;
+    private readonly IWidget _widget;
     private readonly IStorageService _storageService;
     private readonly AreaPicker _areaPicker;
 
@@ -27,7 +30,7 @@ public sealed partial class EditWidgetDialog : Page
     private Page? settingsContent;
     private SettingsViewModel? settingsVm;
 
-    public EditWidgetDialog(Widget widget, IStorageService storageService)
+    public EditWidgetDialog(IWidget widget, IStorageService storageService)
     {
         InitializeComponent();
 
@@ -98,6 +101,16 @@ public sealed partial class EditWidgetDialog : Page
                 settingsVm = linkCollectionVm;
                 widgetForm = linkCollectionForm;
                 settingsContent = linkCollectionForm;
+                break;
+            case WidgetType.Note:
+                var noteVm = new NoteSettingsViewModel(_storageService, ((NoteWidget)_widget).GetData());
+                noteVm.Validated += Validated;
+
+                var noteForm = new NoteSettingsForm(noteVm);
+
+                settingsVm = noteVm;
+                widgetForm = noteForm;
+                settingsContent = noteForm;
                 break;
             default:
                 throw new InvalidOperationException("Unsupported widget type");

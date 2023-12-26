@@ -1,31 +1,42 @@
 using System;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Panoramic.Models.Domain.RecentLinks;
+using Panoramic.Models.Domain.Note;
 using Panoramic.Services;
-using Panoramic.ViewModels.Widgets.RecentLinks;
+using Panoramic.ViewModels.Widgets.Note;
 
-namespace Panoramic.Pages.Widgets.RecentLinks;
+namespace Panoramic.Pages.Widgets.Note;
 
-public sealed partial class RecentLinksWidgetPage : Page
+public sealed partial class NoteWidgetPage : Page
 {
     private readonly IStorageService _storageService;
-    private readonly RecentLinksWidget _widget;
+    private readonly NoteWidget _widget;
 
-    public RecentLinksWidgetPage(IServiceProvider serviceProvider, RecentLinksWidget widget)
+    public NoteWidgetPage(IServiceProvider serviceProvider, NoteWidget widget)
     {
         InitializeComponent();
 
         _storageService = serviceProvider.GetRequiredService<IStorageService>();
         _widget = widget;
 
-        var eventHub = serviceProvider.GetRequiredService<IEventHub>();
-        ViewModel = new RecentLinksViewModel(_storageService, eventHub, widget);
+        ViewModel = new NoteViewModel(widget);
+
+        Editor.Document.SetText(TextSetOptions.None, widget.Text);
+        Editor.TextChanged += Editor_TextChanged;
     }
 
-    public RecentLinksViewModel ViewModel { get; }
+    private void Editor_TextChanged(object sender, RoutedEventArgs e)
+    {
+        Editor.Document.GetText(TextGetOptions.None, out var text);
+        _widget.Text = text;
+
+        _storageService.EnqueueWidgetWrite(_widget.Id);
+    }
+
+    public NoteViewModel ViewModel { get; }
 
     private async void SettingsButton_Click(object _, RoutedEventArgs e)
     {

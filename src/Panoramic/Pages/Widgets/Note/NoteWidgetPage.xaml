@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Panoramic.Pages.Widgets.Note.NoteWidgetPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Border Padding="15" Background="{x:Bind ViewModel.Background, Mode=OneWay}" CornerRadius="{StaticResource PanoramicWidgetCornerRadius}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{x:Bind ViewModel.Title, Mode=OneWay}" FontSize="16" Foreground="#ddd" TextWrapping="Wrap" />
+
+                    <DropDownButton Grid.Column="1" AutomationProperties.Name="Setting">
+                        <DropDownButton.Content>
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE712;" FontSize="14" />
+                        </DropDownButton.Content>
+                        <DropDownButton.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <MenuFlyoutItem Click="SettingsButton_Click">Settings</MenuFlyoutItem>
+                                <MenuFlyoutItem Click="RemoveButton_Click">Remove</MenuFlyoutItem>
+                            </MenuFlyout>
+                        </DropDownButton.Flyout>
+                    </DropDownButton>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="1" Margin="0 15 0 0">
+                <RichEditBox x:Name="Editor" />
+            </Border>
+
+        </Grid>
+    </Border>
+
+</Page>

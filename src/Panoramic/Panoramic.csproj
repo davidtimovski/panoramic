@@ -12,7 +12,7 @@
 		<EnableMsixTooling>true</EnableMsixTooling>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.54" />
@@ -30,7 +30,6 @@
 	<ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
 		<ProjectCapability Include="Msix" />
 	</ItemGroup>
-
 	<!-- 
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution 
     Explorer "Package and Publish" context menu entry to be enabled for this project even if 
@@ -39,4 +38,13 @@
 	<PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
 		<HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
 	</PropertyGroup>
+	<ItemGroup>
+	  <CustomAdditionalCompileInputs Remove="EditTextWindow.xaml" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="EditTextWindow.xaml" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Resource Remove="EditTextWindow.xaml" />
+	</ItemGroup>
 </Project>

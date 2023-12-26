@@ -115,6 +115,6 @@ public partial class EditViewModel : ObservableObject
         }
 
         widget.SetData(links);
-        await _storageService.SaveWidgetAsync(_id);
+        await _storageService.SaveWidgetAsync(widget);
     }
 }

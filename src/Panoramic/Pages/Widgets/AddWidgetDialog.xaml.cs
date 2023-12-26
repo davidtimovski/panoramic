@@ -5,13 +5,16 @@ using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
 using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.LinkCollection;
+using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Models.Events;
 using Panoramic.Pages.Widgets.LinkCollection;
+using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
 using Panoramic.Services;
 using Panoramic.UserControls;
 using Panoramic.ViewModels.Widgets.LinkCollection;
+using Panoramic.ViewModels.Widgets.Note;
 using Panoramic.ViewModels.Widgets.RecentLinks;
 
 namespace Panoramic.Pages.Widgets;
@@ -110,7 +113,7 @@ public sealed partial class AddWidgetDialog : Page
                 var linkCollectionVm = new LinkCollectionSettingsViewModel(_storageService, new LinkCollectionData
                 {
                     Id = Guid.Empty,
-                    Type = WidgetType.RecentLinks,
+                    Type = WidgetType.LinkCollection,
                     Title = RecentLinksWidget.DefaultTitle,
                     Area = selectedArea!,
                     Links = new()
@@ -120,6 +123,20 @@ public sealed partial class AddWidgetDialog : Page
                 var linkCollectionForm = new LinkCollectionSettingsForm(linkCollectionVm);
                 widgetForm = linkCollectionForm;
                 ContentFrame.Content = linkCollectionForm;
+                break;
+            case WidgetType.Note:
+                var noteVm = new NoteSettingsViewModel(_storageService, new NoteData
+                {
+                    Id = Guid.Empty,
+                    Type = WidgetType.Note,
+                    Title = NoteWidget.DefaultTitle,
+                    Area = selectedArea!
+                });
+                noteVm.Validated += Validated;
+
+                var noteForm = new NoteSettingsForm(noteVm);
+                widgetForm = noteForm;
+                ContentFrame.Content = noteForm;
                 break;
             default:
                 throw new InvalidOperationException("Unsupported widget type");

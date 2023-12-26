@@ -3,5 +3,6 @@
 public enum WidgetType
 {
     RecentLinks,
-    LinkCollection
+    LinkCollection,
+    Note
 }

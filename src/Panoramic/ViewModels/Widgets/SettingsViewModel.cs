@@ -6,7 +6,7 @@ namespace Panoramic.ViewModels.Widgets;
 
 public partial class SettingsViewModel : ObservableObject
 {
-    public SettingsViewModel(string defaultTitle, WidgetData data)
+    public SettingsViewModel(string defaultTitle, IWidgetData data)
     {
         area = data.Area;
         title = data.Id == Guid.Empty ? defaultTitle : data.Title;

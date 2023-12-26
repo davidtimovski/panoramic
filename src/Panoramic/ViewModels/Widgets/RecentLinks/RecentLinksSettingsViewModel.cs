@@ -18,16 +18,8 @@ public partial class RecentLinksSettingsViewModel : SettingsViewModel
         _storageService = storageService;
         _id = data.Id;
 
-        if (data is null)
-        {
-            capacity = 15;
-            onlyFromToday = true;
-        }
-        else
-        {
-            capacity = data.Capacity;
-            onlyFromToday = data.OnlyFromToday;
-        }
+        capacity = data.Capacity;
+        onlyFromToday = data.OnlyFromToday;
     }
 
     public event EventHandler<ValidationEventArgs>? Validated;
@@ -55,7 +47,7 @@ public partial class RecentLinksSettingsViewModel : SettingsViewModel
             widget.Capacity = Capacity;
             widget.OnlyFromToday = OnlyFromToday;
 
-            await _storageService.SaveWidgetAsync(_id);
+            await _storageService.SaveWidgetAsync(widget);
         }
     }
 }

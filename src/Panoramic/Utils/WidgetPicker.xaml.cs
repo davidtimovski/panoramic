@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Panoramic.Models;
-using Panoramic.Models.Domain;
 
 namespace Panoramic.UserControls;
 
@@ -21,6 +20,7 @@ public sealed partial class WidgetPicker : UserControl
 
         _toggleLookup.Add(WidgetType.RecentLinks, RecentLinksToggle);
         _toggleLookup.Add(WidgetType.LinkCollection, LinkCollectionToggle);
+        _toggleLookup.Add(WidgetType.Note, NoteToggle);
 
         if (widgetType is not null)
         {

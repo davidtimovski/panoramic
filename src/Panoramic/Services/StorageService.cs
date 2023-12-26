@@ -9,6 +9,7 @@ using Microsoft.UI.Dispatching;
 using Panoramic.Models;
 using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.LinkCollection;
+using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Domain.RecentLinks;
 using Windows.Storage;
 
@@ -20,7 +21,7 @@ public interface IStorageService
     event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
 
     string StoragePath { get; }
-    Dictionary<Guid, Widget> Widgets { get; }
+    Dictionary<Guid, IWidget> Widgets { get; }
 
     Task ReadAsync();
     Task WriteAsync();
@@ -31,16 +32,17 @@ public interface IStorageService
     /// </summary>
     void EnqueueWidgetWrite(Guid id);
 
-    void DeleteWidget(Guid id);
-    Task AddNewWidgetAsync<T>(T widget)
-        where T : Widget;
-    Task SaveWidgetAsync(Guid id);
+    void DeleteWidget(IWidget widget);
+    Task AddNewWidgetAsync(IWidget widget);
+    Task SaveWidgetAsync(IWidget widget);
 
     void ChangeStoragePath(string storagePath);
 }
 
 public class StorageService : IStorageService
 {
+    private const string DataFileName = "data.json";
+
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         Converters = { new JsonStringEnumConverter() }
@@ -71,7 +73,8 @@ public class StorageService : IStorageService
 
             foreach (var id in _unsavedWidgets)
             {
-                tasks.Add(SaveWidgetAsync(id));
+                var widget = Widgets[id];
+                tasks.Add(SaveWidgetAsync(widget));
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
@@ -85,13 +88,13 @@ public class StorageService : IStorageService
 
     public string StoragePath { get; private set; }
 
-    public Dictionary<Guid, Widget> Widgets { get; } = new();
+    public Dictionary<Guid, IWidget> Widgets { get; } = new();
 
     public async Task ReadAsync()
     {
-        var dataFiles = Directory.GetFiles(StoragePath, "*.json");
+        var widgetDirs = Directory.GetDirectories(StoragePath);
 
-        var tasks = dataFiles.Select(ReadWidgetDataAsync);
+        var tasks = widgetDirs.Select(ReadWidgetAsync);
 
         await Task.WhenAll(tasks).ConfigureAwait(false);
     }
@@ -103,7 +106,7 @@ public class StorageService : IStorageService
         var writeTasks = new List<Task>(widgetKvps.Count);
         foreach (var widgetKvp in widgetKvps)
         {
-            writeTasks.Add(SaveWidgetAsync(widgetKvp.Key));
+            writeTasks.Add(widgetKvp.Value.WriteAsync(StoragePath, SerializerOptions));
         }
 
         await Task.WhenAll(writeTasks).ConfigureAwait(false);
@@ -121,17 +124,19 @@ public class StorageService : IStorageService
         _timer.Start();
     }
 
-    public void DeleteWidget(Guid id)
+    public void DeleteWidget(IWidget widget)
     {
-        Widgets.Remove(id);
-        File.Delete(GetWritePath(id));
+        widget.Delete(StoragePath);
 
-        WidgetRemoved?.Invoke(this, new WidgetRemovedEventArgs(id));
+        Widgets.Remove(widget.Id);
+
+        WidgetRemoved?.Invoke(this, new WidgetRemovedEventArgs(widget.Id));
     }
 
-    public async Task AddNewWidgetAsync<T>(T widget)
-        where T : Widget
+    public async Task AddNewWidgetAsync(IWidget widget)
     {
+        await widget.WriteAsync(StoragePath, SerializerOptions);
+
         if (Widgets.ContainsKey(widget.Id))
         {
             Widgets[widget.Id] = widget;
@@ -141,60 +146,64 @@ public class StorageService : IStorageService
             Widgets.Add(widget.Id, widget);
         }
 
-        var json = Serialize(widget);
-        await File.WriteAllTextAsync(GetWritePath(widget.Id), json);
+        WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(widget.Id));
+    }
+
+    public async Task SaveWidgetAsync(IWidget widget)
+    {
+        await widget.WriteAsync(StoragePath, SerializerOptions);
 
         WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(widget.Id));
     }
 
-    public async Task SaveWidgetAsync(Guid id)
-    {
-        var json = Serialize(Widgets[id]);
-
-        await File.WriteAllTextAsync(GetWritePath(id), json);
-
-        WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(id));
-    }
-
     public void ChangeStoragePath(string storagePath)
     {
-        var dataFiles = Directory.GetFiles(StoragePath, "*.json");
+        var widgetDirs = Directory.GetDirectories(StoragePath);
 
-        foreach (var file in dataFiles)
+        foreach (var directory in widgetDirs)
         {
-            var fileName = Path.GetFileName(file);
-            File.Move(file, Path.Combine(storagePath, fileName));
+            var directoryName = new DirectoryInfo(directory).Name;
+            Directory.CreateDirectory(Path.Combine(storagePath, directoryName));
+            
+            var files = Directory.GetFiles(directory);
+            foreach (var file in files)
+            {
+                var fileName = Path.GetFileName(file);
+                File.Move(file, Path.Combine(storagePath, directoryName, fileName), true);
+            }
         }
+
+        Directory.Delete(StoragePath, true);
 
         StoragePath = storagePath;
     }
 
-    private async Task ReadWidgetDataAsync(string filePath)
+    private async Task ReadWidgetAsync(string widgetDirectory)
     {
-        var json = await File.ReadAllTextAsync(filePath);
+        var dataFilePath = Path.Combine(widgetDirectory, DataFileName);
+        var json = await File.ReadAllTextAsync(dataFilePath);
 
         using var jsonDoc = JsonDocument.Parse(json);
         var typeProperty = jsonDoc.RootElement.GetProperty("type");
         var type = Enum.Parse<WidgetType>(typeProperty.GetString()!);
 
-        Widget data = type switch
+        switch (type)
         {
-            WidgetType.RecentLinks => RecentLinksWidget.Load(json, SerializerOptions),
-            WidgetType.LinkCollection => LinkCollectionWidget.Load(json, SerializerOptions),
-            _ => throw new InvalidOperationException("Unsupported widget type")
-        };
-
-        Widgets.Add(data.Id, data);
-    }
-
-    private static string Serialize(Widget widget)
-    {
-        return widget.Type switch
-        {
-            WidgetType.RecentLinks => ((RecentLinksWidget)widget).Serialize(SerializerOptions),
-            WidgetType.LinkCollection => ((LinkCollectionWidget)widget).Serialize(SerializerOptions),
-            _ => throw new InvalidOperationException("Unsupported widget type")
-        };
+            case WidgetType.RecentLinks:
+                var recentLinksWidget = RecentLinksWidget.Load(json, SerializerOptions);
+                Widgets.Add(recentLinksWidget.Id, recentLinksWidget);
+                break;
+            case WidgetType.LinkCollection:
+                var linkCollectionWidget = LinkCollectionWidget.Load(json, SerializerOptions);
+                Widgets.Add(linkCollectionWidget.Id, linkCollectionWidget);
+                break;
+            case WidgetType.Note:
+                var noteWidget = await NoteWidget.LoadAsync(json, widgetDirectory, SerializerOptions);
+                Widgets.Add(noteWidget.Id, noteWidget);
+                break;
+            default:
+                throw new InvalidOperationException("Unsupported widget type");
+        }
     }
 
     private string InitializeStoragePath()
@@ -214,8 +223,6 @@ public class StorageService : IStorageService
 
         return (string)storagePathValue;
     }
-
-    private string GetWritePath(Guid id) => Path.Combine(StoragePath, $"{id}.json");
 }
 
 public class WidgetUpdatedEventArgs : EventArgs

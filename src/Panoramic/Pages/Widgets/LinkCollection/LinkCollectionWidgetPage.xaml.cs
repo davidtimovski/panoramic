@@ -17,7 +17,7 @@ public sealed partial class LinkCollectionWidgetPage : Page
     private readonly IStorageService _storageService;
     private readonly HttpClient _httpClient;
     private readonly DispatcherQueue _dispatcherQueue;
-    private readonly Guid _id;
+    private readonly LinkCollectionWidget _widget;
 
     public LinkCollectionWidgetPage(IServiceProvider serviceProvider, LinkCollectionWidget widget)
     {
@@ -26,7 +26,7 @@ public sealed partial class LinkCollectionWidgetPage : Page
         _storageService = serviceProvider.GetRequiredService<IStorageService>();
         _httpClient = serviceProvider.GetRequiredService<HttpClient>();
         _dispatcherQueue = serviceProvider.GetRequiredService<DispatcherQueue>();
-        _id = widget.Id;
+        _widget = widget;
 
         var eventHub = serviceProvider.GetRequiredService<IEventHub>();
         ViewModel = new LinkCollectionViewModel(eventHub, widget);
@@ -36,8 +36,7 @@ public sealed partial class LinkCollectionWidgetPage : Page
 
     private async void EditButton_Click(object _, RoutedEventArgs e)
     {
-        var widget = (LinkCollectionWidget)_storageService.Widgets[_id];
-        var data = widget.GetData();
+        var data = _widget.GetData();
         var vm = new EditViewModel(_httpClient, _dispatcherQueue, _storageService, data);
 
         var content = new EditDialog(vm);
@@ -59,9 +58,7 @@ public sealed partial class LinkCollectionWidgetPage : Page
 
     private async void SettingsButton_Click(object _, RoutedEventArgs e)
     {
-        var widget = _storageService.Widgets[_id];
-
-        var content = new EditWidgetDialog(widget, _storageService);
+        var content = new EditWidgetDialog(_widget, _storageService);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -83,16 +80,14 @@ public sealed partial class LinkCollectionWidgetPage : Page
 
     private async void RemoveButton_Click(object _, RoutedEventArgs e)
     {
-        var widget = _storageService.Widgets[_id];
-
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
             Title = "Remove widget",
-            Content = $"Are you sure want to remove {widget.Title}?\n\nAny data that it holds will also be deleted permanently.",
+            Content = $"Are you sure want to remove {_widget.Title}?\n\nAny data that it holds will also be deleted permanently.",
             PrimaryButtonText = "Yes, remove",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_id); })
+            PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_widget); })
         };
         await dialog.ShowAsync();
     }

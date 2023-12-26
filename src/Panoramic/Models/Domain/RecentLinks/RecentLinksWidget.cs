@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Panoramic.Models.Domain.RecentLinks;
 
-public class RecentLinksWidget : Widget
+public class RecentLinksWidget : IWidget
 {
     public const string DefaultTitle = "Recent";
     public const int DefaultCapacity = 15;
@@ -15,8 +17,11 @@ public class RecentLinksWidget : Widget
     /// Constructs a new recent links widget.
     /// </summary>
     public RecentLinksWidget(Area area, string title, int capacity, bool onlyFromToday)
-        : base(Guid.NewGuid(), WidgetType.RecentLinks, area, title)
     {
+        Id = Guid.NewGuid();
+        Type = WidgetType.RecentLinks;
+        Area = area;
+        Title = title;
         Capacity = capacity;
         OnlyFromToday = onlyFromToday;
         links = new();
@@ -26,13 +31,20 @@ public class RecentLinksWidget : Widget
     /// Constructs a recent links widget based on en existing one.
     /// </summary>
     public RecentLinksWidget(RecentLinksData data)
-        : base(data.Id, WidgetType.RecentLinks, data.Area, data.Title)
     {
+        Id = data.Id;
+        Type = WidgetType.RecentLinks;
+        Area = data.Area;
+        Title = data.Title;
         Capacity = data.Capacity;
         OnlyFromToday = data.OnlyFromToday;
         links = data.Links.Select(x => new RecentLink { Title = x.Title, Uri = x.Uri, Clicked = x.Clicked }).ToList();
     }
 
+    public Guid Id { get; }
+    public WidgetType Type { get; }
+    public Area Area { get; set; }
+    public string Title { get; set; }
     public int Capacity { get; set; }
     public bool OnlyFromToday { get; set; }
 
@@ -90,16 +102,29 @@ public class RecentLinksWidget : Widget
             Links = Links.Select(x => new RecentLinkData { Title = x.Title, Uri = x.Uri, Clicked = x.Clicked }).ToList()
         };
 
-    public string Serialize(JsonSerializerOptions options)
-    {
-        var data = GetData();
-        return JsonSerializer.Serialize(data, options);
-    }
-
     public static RecentLinksWidget Load(string json, JsonSerializerOptions options)
     {
         var data = JsonSerializer.Deserialize<RecentLinksData>(json, options)!;
         return new(data);
+    }
+
+    public async Task WriteAsync(string storagePath, JsonSerializerOptions options)
+    {
+        var directory = Path.Combine(storagePath, Id.ToString());
+        Directory.CreateDirectory(directory);
+
+        var data = GetData();
+        var json = JsonSerializer.Serialize(data, options);
+
+        await File.WriteAllTextAsync(Path.Combine(directory, "data.json"), json);
+    }
+
+    public void Delete(string storagePath)
+    {
+        var directory = Path.Combine(storagePath, Id.ToString());
+
+        File.Delete(Path.Combine(directory, "data.json"));
+        Directory.Delete(directory);
     }
 }
 

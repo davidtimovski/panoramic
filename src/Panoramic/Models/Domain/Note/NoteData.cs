@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Panoramic.Utils.Serialization;
 using System.Text.Json.Serialization;
-using Panoramic.Utils.Serialization;
+using System;
 
-namespace Panoramic.Models.Domain;
+namespace Panoramic.Models.Domain.Note;
 
-public abstract class WidgetData
+public class NoteData : IWidgetData
 {
     [JsonPropertyName("id")]
     public required Guid Id { get; init; }

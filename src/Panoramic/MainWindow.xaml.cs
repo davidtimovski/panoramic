@@ -6,10 +6,12 @@ using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
 using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.LinkCollection;
+using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Pages;
 using Panoramic.Pages.Widgets;
 using Panoramic.Pages.Widgets.LinkCollection;
+using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
 using Panoramic.Services;
 using Panoramic.ViewModels;
@@ -92,6 +94,7 @@ public sealed partial class MainWindow : Window
         {
             WidgetType.RecentLinks => new RecentLinksWidgetPage(_serviceProvider, (RecentLinksWidget)widget),
             WidgetType.LinkCollection => new LinkCollectionWidgetPage(_serviceProvider, (LinkCollectionWidget)widget),
+            WidgetType.Note => new NoteWidgetPage(_serviceProvider, (NoteWidget)widget),
             _ => throw new InvalidOperationException("Unsupported widget type")
         };
 
