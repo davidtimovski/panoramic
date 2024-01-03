@@ -16,11 +16,20 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Text="{x:Bind ViewModel.Title, Mode=OneWay}" FontSize="16" Foreground="#ddd" TextWrapping="Wrap" />
 
-                    <DropDownButton Grid.Column="1" AutomationProperties.Name="Setting">
+                    <ToggleButton Grid.Column="1"
+                                  Click="EditButton_Click"
+                                  IsChecked="{x:Bind ViewModel.Editing, Mode=TwoWay}"
+                                  ToolTipService.ToolTip="{x:Bind ViewModel.EditToggleTooltip, Mode=OneWay}"
+                                  Margin="0 0 10 0">
+                        <FontIcon Glyph="&#xE70F;" FontSize="14" />
+                    </ToggleButton>
+
+                    <DropDownButton Grid.Column="2" AutomationProperties.Name="Setting">
                         <DropDownButton.Content>
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE712;" FontSize="14" />
                         </DropDownButton.Content>
@@ -35,7 +44,29 @@
             </Border>
 
             <Border Grid.Row="1" Margin="0 15 0 0">
-                <RichEditBox x:Name="Editor" />
+                <ScrollView Height="Auto">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        
+                        <TextBox Grid.Row="0"
+                                 Grid.Column="0"
+                                 x:Name="Editor"
+                                 Text="{x:Bind ViewModel.Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Visibility="{x:Bind ViewModel.EditorVisibility, Mode=OneWay}"
+                                 TextChanged="Editor_TextChanged"
+                                 AcceptsReturn="True" />
+                        <RichTextBlock Grid.Row="0"
+                                       Grid.Column="0"
+                                       x:Name="Presenter"
+                                       Visibility="{x:Bind ViewModel.PresenterVisibility, Mode=OneWay}" />
+                    </Grid>
+                </ScrollView>
             </Border>
 
         </Grid>

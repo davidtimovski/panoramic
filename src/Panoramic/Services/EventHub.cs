@@ -19,16 +19,9 @@ public class EventHub : IEventHub
     }
 }
 
-public class HyperlinkClickedEventArgs : EventArgs
+public class HyperlinkClickedEventArgs(string title, Uri uri, DateTime clicked) : EventArgs
 {
-    public HyperlinkClickedEventArgs(string title, Uri uri, DateTime clicked)
-    {
-        Title = title;
-        Uri = uri;
-        Clicked = clicked;
-    }
-
-    public string Title { get; }
-    public Uri Uri { get; }
-    public DateTime Clicked { get; }
+    public string Title { get; } = title;
+    public Uri Uri { get; } = uri;
+    public DateTime Clicked { get; } = clicked;
 }

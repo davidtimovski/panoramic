@@ -56,7 +56,7 @@ public class StorageService : IStorageService
     /// <summary>
     /// Stores the sections that have been changed and need to be written to disk.
     /// </summary>
-    private readonly HashSet<Guid> _unsavedWidgets = new();
+    private readonly HashSet<Guid> _unsavedWidgets = [];
 
     public StorageService()
     {
@@ -74,11 +74,12 @@ public class StorageService : IStorageService
             foreach (var id in _unsavedWidgets)
             {
                 var widget = Widgets[id];
-                tasks.Add(SaveWidgetAsync(widget));
+                tasks.Add(widget.WriteAsync(StoragePath, SerializerOptions));
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
 
+            _unsavedWidgets.Clear();
             _timer.Stop();
         };
     }
@@ -88,7 +89,7 @@ public class StorageService : IStorageService
 
     public string StoragePath { get; private set; }
 
-    public Dictionary<Guid, IWidget> Widgets { get; } = new();
+    public Dictionary<Guid, IWidget> Widgets { get; } = [];
 
     public async Task ReadAsync()
     {
@@ -115,10 +116,7 @@ public class StorageService : IStorageService
     /// <inheritdoc/>
     public void EnqueueWidgetWrite(Guid id)
     {
-        if (!_unsavedWidgets.Contains(id))
-        {
-            _unsavedWidgets.Add(id);
-        }
+        _unsavedWidgets.Add(id);
 
         _timer.Stop();
         _timer.Start();
@@ -137,13 +135,9 @@ public class StorageService : IStorageService
     {
         await widget.WriteAsync(StoragePath, SerializerOptions);
 
-        if (Widgets.ContainsKey(widget.Id))
+        if (!Widgets.TryAdd(widget.Id, widget))
         {
             Widgets[widget.Id] = widget;
-        }
-        else
-        {
-            Widgets.Add(widget.Id, widget);
         }
 
         WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(widget.Id));
@@ -189,17 +183,17 @@ public class StorageService : IStorageService
 
         switch (type)
         {
-            case WidgetType.RecentLinks:
-                var recentLinksWidget = RecentLinksWidget.Load(json, SerializerOptions);
-                Widgets.Add(recentLinksWidget.Id, recentLinksWidget);
+            case WidgetType.Note:
+                var noteWidget = await NoteWidget.LoadAsync(json, widgetDirectory, SerializerOptions);
+                Widgets.Add(noteWidget.Id, noteWidget);
                 break;
             case WidgetType.LinkCollection:
                 var linkCollectionWidget = LinkCollectionWidget.Load(json, SerializerOptions);
                 Widgets.Add(linkCollectionWidget.Id, linkCollectionWidget);
                 break;
-            case WidgetType.Note:
-                var noteWidget = await NoteWidget.LoadAsync(json, widgetDirectory, SerializerOptions);
-                Widgets.Add(noteWidget.Id, noteWidget);
+            case WidgetType.RecentLinks:
+                var recentLinksWidget = RecentLinksWidget.Load(json, SerializerOptions);
+                Widgets.Add(recentLinksWidget.Id, recentLinksWidget);
                 break;
             default:
                 throw new InvalidOperationException("Unsupported widget type");
@@ -225,22 +219,12 @@ public class StorageService : IStorageService
     }
 }
 
-public class WidgetUpdatedEventArgs : EventArgs
+public class WidgetUpdatedEventArgs(Guid id) : EventArgs
 {
-    public WidgetUpdatedEventArgs(Guid id)
-    {
-        Id = id;
-    }
-
-    public Guid Id { get; }
+    public Guid Id { get; } = id;
 }
 
-public class WidgetRemovedEventArgs : EventArgs
+public class WidgetRemovedEventArgs(Guid id) : EventArgs
 {
-    public WidgetRemovedEventArgs(Guid id)
-    {
-        Id = id;
-    }
-
-    public Guid Id { get; }
+    public Guid Id { get; } = id;
 }

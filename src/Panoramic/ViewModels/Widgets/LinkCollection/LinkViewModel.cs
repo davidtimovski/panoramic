@@ -3,20 +3,12 @@ using Panoramic.Services;
 
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
-public class LinkViewModel
+public class LinkViewModel(IEventHub eventHub, string title, Uri uri)
 {
-    private readonly IEventHub _eventHub;
+    private readonly IEventHub _eventHub = eventHub;
 
-    public LinkViewModel(IEventHub eventHub, string title, Uri uri)
-    {
-        _eventHub = eventHub;
-
-        Title = title;
-        Uri = uri;
-    }
-
-    public string Title { get; set; }
-    public Uri Uri { get; set; }
+    public string Title { get; set; } = title;
+    public Uri Uri { get; set; } = uri;
     public short Order { get; set; }
 
     public void Clicked()

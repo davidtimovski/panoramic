@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Panoramic.UserControls.WidgetPicker"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ScrollView Height="300" Margin="0 10 0 0">
+        <Grid RowSpacing="10">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <ToggleButton Grid.Row="0" x:Name="NoteToggle" Command="{x:Bind WidgetClicked}" CommandParameter="Note" HorizontalAlignment="Stretch">
+                <StackPanel>
+                    <TextBlock HorizontalAlignment="Center" FontWeight="Bold">Note</TextBlock>
+                    <TextBlock HorizontalAlignment="Center" Margin="0 5 0 0">Textual note that supports simplified markdown</TextBlock>
+                </StackPanel>
+            </ToggleButton>
+
+            <ToggleButton Grid.Row="1" x:Name="LinkCollectionToggle" Command="{x:Bind WidgetClicked}" CommandParameter="LinkCollection" HorizontalAlignment="Stretch">
+                <StackPanel>
+                    <TextBlock HorizontalAlignment="Center" FontWeight="Bold">Link collection</TextBlock>
+                    <TextBlock HorizontalAlignment="Center" Margin="0 5 0 0">List of links</TextBlock>
+                </StackPanel>
+            </ToggleButton>
+
+            <ToggleButton Grid.Row="2" x:Name="RecentLinksToggle" Command="{x:Bind WidgetClicked}" CommandParameter="RecentLinks" HorizontalAlignment="Stretch">
+                <StackPanel>
+                    <TextBlock HorizontalAlignment="Center" FontWeight="Bold">Recent links</TextBlock>
+                    <TextBlock HorizontalAlignment="Center" Margin="0 5 0 0">Links that you have recently clicked in Panoramic</TextBlock>
+                </StackPanel>
+            </ToggleButton>
+        </Grid>
+    </ScrollView>
+
+</UserControl>

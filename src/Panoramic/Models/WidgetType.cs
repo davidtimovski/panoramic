@@ -2,7 +2,7 @@
 
 public enum WidgetType
 {
-    RecentLinks,
+    Note,
     LinkCollection,
-    Note
+    RecentLinks,
 }

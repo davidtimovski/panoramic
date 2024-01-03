@@ -34,6 +34,7 @@ public partial class App : Application
         services.AddSingleton<MainViewModel>();
 
         services.AddSingleton<IEventHub, EventHub>();
+        services.AddSingleton<IMarkdownService, MarkdownService>();
 
         services.AddSingleton(DispatcherQueue.GetForCurrentThread());
     }

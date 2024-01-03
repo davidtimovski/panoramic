@@ -22,7 +22,7 @@ public partial class LinkCollectionViewModel : ObservableObject
     [ObservableProperty]
     private string title;
 
-    public ObservableCollection<LinkViewModel> Links = new();
+    public ObservableCollection<LinkViewModel> Links = [];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Background))]

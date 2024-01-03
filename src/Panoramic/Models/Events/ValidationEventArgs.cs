@@ -2,12 +2,7 @@
 
 namespace Panoramic.Models.Events;
 
-public class ValidationEventArgs : EventArgs
+public class ValidationEventArgs(bool valid) : EventArgs
 {
-    public ValidationEventArgs(bool valid)
-    {
-        Valid = valid;
-    }
-
-    public bool Valid { get; }
+    public bool Valid { get; } = valid;
 }

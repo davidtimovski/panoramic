@@ -7,7 +7,7 @@ namespace Panoramic.Models.Domain.Note;
 
 public class NoteWidget : IWidget
 {
-    private const string ContentFileName = "content.txt";
+    private const string ContentFileName = "content.md";
 
     public const string DefaultTitle = "My note";
 

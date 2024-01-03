@@ -1,4 +1,6 @@
+using System;
 using System.Threading.Tasks;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
 using Panoramic.ViewModels.Widgets.LinkCollection;
@@ -12,6 +14,8 @@ public sealed partial class LinkCollectionSettingsForm : Page, IWidgetForm
         InitializeComponent();
 
         ViewModel = viewModel;
+
+        TitleTextBox.Loaded += TitleTextBox_Loaded;
     }
 
     public LinkCollectionSettingsViewModel ViewModel { get; }
@@ -19,5 +23,14 @@ public sealed partial class LinkCollectionSettingsForm : Page, IWidgetForm
     public Task SubmitAsync()
     {
         return ViewModel.SubmitAsync();
+    }
+
+    private void TitleTextBox_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel.Id == Guid.Empty)
+        {
+            TitleTextBox.Focus(FocusState.Programmatic);
+            TitleTextBox.SelectAll();
+        }
     }
 }

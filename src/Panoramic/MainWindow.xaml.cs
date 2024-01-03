@@ -92,9 +92,9 @@ public sealed partial class MainWindow : Window
         var widget = _storageService.Widgets[id];
         Page content = widget.Type switch
         {
-            WidgetType.RecentLinks => new RecentLinksWidgetPage(_serviceProvider, (RecentLinksWidget)widget),
-            WidgetType.LinkCollection => new LinkCollectionWidgetPage(_serviceProvider, (LinkCollectionWidget)widget),
             WidgetType.Note => new NoteWidgetPage(_serviceProvider, (NoteWidget)widget),
+            WidgetType.LinkCollection => new LinkCollectionWidgetPage(_serviceProvider, (LinkCollectionWidget)widget),
+            WidgetType.RecentLinks => new RecentLinksWidgetPage(_serviceProvider, (RecentLinksWidget)widget),
             _ => throw new InvalidOperationException("Unsupported widget type")
         };
 

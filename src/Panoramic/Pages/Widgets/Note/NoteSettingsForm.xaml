@@ -10,6 +10,7 @@
         </Grid.RowDefinitions>
 
         <TextBox Grid.Row="0"
+                 x:Name="TitleTextBox"
                  Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  TextChanged="{x:Bind ViewModel.ValidateAndEmit}"
                  Header="Title"

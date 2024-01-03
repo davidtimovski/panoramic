@@ -24,7 +24,7 @@ public class RecentLinksWidget : IWidget
         Title = title;
         Capacity = capacity;
         OnlyFromToday = onlyFromToday;
-        links = new();
+        links = [];
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public class RecentLinksWidget : IWidget
         }
         private set
         {
-            links = value.ToList();
+            links = [.. value];
         }
     }
 

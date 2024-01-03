@@ -20,7 +20,7 @@ public class LinkCollectionWidget : IWidget
         Type = WidgetType.LinkCollection;
         Area = area;
         Title = title;
-        links = new();
+        links = [];
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public class LinkCollectionWidget : IWidget
         }
         private set
         {
-            links = value.ToList();
+            links = [.. value];
         }
     }
 

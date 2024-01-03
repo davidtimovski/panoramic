@@ -33,7 +33,7 @@ public partial class RecentLinksViewModel : ObservableObject
     [ObservableProperty]
     private string title;
 
-    public ObservableCollection<RecentLinkViewModel> Recent { get; } = new();
+    public ObservableCollection<RecentLinkViewModel> Recent { get; } = [];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Background))]

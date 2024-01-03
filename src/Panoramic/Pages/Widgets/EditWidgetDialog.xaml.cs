@@ -37,8 +37,8 @@ public sealed partial class EditWidgetDialog : Page
         _widget = widget;
         _storageService = storageService;
 
-        EditSettingsTitle = $"{widget.Title}: settings";
-        EditAreaTitle = $"{widget.Title}: area";
+        EditSettingsTitle = $"{widget.Title} - settings";
+        EditAreaTitle = $"{widget.Title} - area";
 
         Initialize();
         _areaPicker = new(_storageService, widget.Id);
@@ -82,15 +82,15 @@ public sealed partial class EditWidgetDialog : Page
     {
         switch (_widget.Type)
         {
-            case WidgetType.RecentLinks:
-                var recentLinksVm = new RecentLinksSettingsViewModel(_storageService, ((RecentLinksWidget)_widget).GetData());
-                recentLinksVm.Validated += Validated;
+            case WidgetType.Note:
+                var noteVm = new NoteSettingsViewModel(_storageService, ((NoteWidget)_widget).GetData());
+                noteVm.Validated += Validated;
 
-                var recentLinksForm = new RecentLinksSettingsForm(recentLinksVm);
+                var noteForm = new NoteSettingsForm(noteVm);
 
-                settingsVm = recentLinksVm;
-                widgetForm = recentLinksForm;
-                settingsContent = recentLinksForm;
+                settingsVm = noteVm;
+                widgetForm = noteForm;
+                settingsContent = noteForm;
                 break;
             case WidgetType.LinkCollection:
                 var linkCollectionVm = new LinkCollectionSettingsViewModel(_storageService, ((LinkCollectionWidget)_widget).GetData());
@@ -102,15 +102,15 @@ public sealed partial class EditWidgetDialog : Page
                 widgetForm = linkCollectionForm;
                 settingsContent = linkCollectionForm;
                 break;
-            case WidgetType.Note:
-                var noteVm = new NoteSettingsViewModel(_storageService, ((NoteWidget)_widget).GetData());
-                noteVm.Validated += Validated;
+            case WidgetType.RecentLinks:
+                var recentLinksVm = new RecentLinksSettingsViewModel(_storageService, ((RecentLinksWidget)_widget).GetData());
+                recentLinksVm.Validated += Validated;
 
-                var noteForm = new NoteSettingsForm(noteVm);
+                var recentLinksForm = new RecentLinksSettingsForm(recentLinksVm);
 
-                settingsVm = noteVm;
-                widgetForm = noteForm;
-                settingsContent = noteForm;
+                settingsVm = recentLinksVm;
+                widgetForm = recentLinksForm;
+                settingsContent = recentLinksForm;
                 break;
             default:
                 throw new InvalidOperationException("Unsupported widget type");

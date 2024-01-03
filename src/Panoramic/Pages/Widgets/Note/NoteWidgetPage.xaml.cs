@@ -1,7 +1,6 @@
 using System;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.Note;
@@ -13,6 +12,7 @@ namespace Panoramic.Pages.Widgets.Note;
 public sealed partial class NoteWidgetPage : Page
 {
     private readonly IStorageService _storageService;
+    private readonly IMarkdownService _markdownService;
     private readonly NoteWidget _widget;
 
     public NoteWidgetPage(IServiceProvider serviceProvider, NoteWidget widget)
@@ -20,19 +20,17 @@ public sealed partial class NoteWidgetPage : Page
         InitializeComponent();
 
         _storageService = serviceProvider.GetRequiredService<IStorageService>();
+        _markdownService = serviceProvider.GetRequiredService<IMarkdownService>();
         _widget = widget;
 
         ViewModel = new NoteViewModel(widget);
 
-        Editor.Document.SetText(TextSetOptions.None, widget.Text);
-        Editor.TextChanged += Editor_TextChanged;
+        SetPresenterContent();
     }
 
-    private void Editor_TextChanged(object sender, RoutedEventArgs e)
+    private void Editor_TextChanged(object _, TextChangedEventArgs e)
     {
-        Editor.Document.GetText(TextGetOptions.None, out var text);
-        _widget.Text = text;
-
+        _widget.Text = ViewModel.Text;
         _storageService.EnqueueWidgetWrite(_widget.Id);
     }
 
@@ -72,5 +70,28 @@ public sealed partial class NoteWidgetPage : Page
             PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_widget); })
         };
         await dialog.ShowAsync();
+    }
+
+    private void SetPresenterContent()
+    {
+        var paragraphs = _markdownService.TextToMarkdownParagraphs(ViewModel.Text);
+        Presenter.Blocks.Clear();
+
+        foreach (var paragraph in paragraphs)
+        {
+            Presenter.Blocks.Add(paragraph);
+        }
+    }
+
+    private void EditButton_Click(object _, RoutedEventArgs e)
+    {
+        if (ViewModel.Editing)
+        {
+            Editor.Focus(FocusState.Programmatic);
+        }
+        else
+        {
+            SetPresenterContent();
+        }
     }
 }

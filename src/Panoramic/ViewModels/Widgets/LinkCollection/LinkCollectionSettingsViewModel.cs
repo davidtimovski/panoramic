@@ -6,17 +6,11 @@ using Panoramic.Services;
 
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
-public partial class LinkCollectionSettingsViewModel : SettingsViewModel
+public partial class LinkCollectionSettingsViewModel(IStorageService storageService, LinkCollectionData data)
+    : SettingsViewModel(LinkCollectionWidget.DefaultTitle, data)
 {
-    private readonly IStorageService _storageService;
-    private readonly Guid _id;
-
-    public LinkCollectionSettingsViewModel(IStorageService storageService, LinkCollectionData data)
-        : base(LinkCollectionWidget.DefaultTitle, data)
-    {
-        _storageService = storageService;
-        _id = data.Id;
-    }
+    private readonly IStorageService _storageService = storageService;
+    public Guid Id { get; } = data.Id;
 
     public event EventHandler<ValidationEventArgs>? Validated;
 
@@ -24,14 +18,14 @@ public partial class LinkCollectionSettingsViewModel : SettingsViewModel
 
     public async Task SubmitAsync()
     {
-        if (_id == Guid.Empty)
+        if (Id == Guid.Empty)
         {
             var widget = new LinkCollectionWidget(Area, Title.Trim());
             await _storageService.AddNewWidgetAsync(widget);
         }
         else
         {
-            var widget = _storageService.Widgets[_id];
+            var widget = _storageService.Widgets[Id];
             widget.Area = Area;
             widget.Title = Title.Trim();
 

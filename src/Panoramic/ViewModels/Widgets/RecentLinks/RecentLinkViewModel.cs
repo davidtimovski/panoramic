@@ -3,22 +3,13 @@ using Panoramic.Services;
 
 namespace Panoramic.ViewModels.Widgets.RecentLinks;
 
-public class RecentLinkViewModel
+public class RecentLinkViewModel(IEventHub eventHub, string title, Uri uri, DateTime clicked)
 {
-    private readonly IEventHub _eventHub;
+    private readonly IEventHub _eventHub = eventHub;
 
-    public RecentLinkViewModel(IEventHub eventHub, string title, Uri uri, DateTime clicked)
-    {
-        _eventHub = eventHub;
-
-        Title = title;
-        Uri = uri;
-        Clicked = clicked;
-    }
-
-    public string Title { get; set; }
-    public Uri Uri { get; set; }
-    public DateTime Clicked { get; set; }
+    public string Title { get; set; } = title;
+    public Uri Uri { get; set; } = uri;
+    public DateTime Clicked { get; set; } = clicked;
 
     public void Click()
     {

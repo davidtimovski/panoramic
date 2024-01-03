@@ -49,7 +49,7 @@ public partial class EditViewModel : ObservableObject
 
     public bool NewLinkFormValid => NewLinkTitle.Trim().Length > 0 && UriHelper.Create(NewLinkUrl) is not null;
 
-    public ObservableCollection<EditLinkViewModel> Links { get; } = new();
+    public ObservableCollection<EditLinkViewModel> Links { get; } = [];
 
     public async void PasteNewLinkUrl(object _, TextControlPasteEventArgs e)
     {

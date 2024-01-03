@@ -10,7 +10,7 @@ namespace Panoramic.UserControls;
 
 public sealed partial class WidgetPicker : UserControl
 {
-    private readonly Dictionary<WidgetType, ToggleButton> _toggleLookup = new();
+    private readonly Dictionary<WidgetType, ToggleButton> _toggleLookup = [];
 
     public WidgetPicker(WidgetType? widgetType)
     {
@@ -18,9 +18,9 @@ public sealed partial class WidgetPicker : UserControl
 
         WidgetClicked = new RelayCommand<string>(WidgetToggled);
 
-        _toggleLookup.Add(WidgetType.RecentLinks, RecentLinksToggle);
-        _toggleLookup.Add(WidgetType.LinkCollection, LinkCollectionToggle);
         _toggleLookup.Add(WidgetType.Note, NoteToggle);
+        _toggleLookup.Add(WidgetType.LinkCollection, LinkCollectionToggle);
+        _toggleLookup.Add(WidgetType.RecentLinks, RecentLinksToggle);
 
         if (widgetType is not null)
         {
@@ -56,12 +56,7 @@ public sealed partial class WidgetPicker : UserControl
     }
 }
 
-public class WidgetPickedEventArgs : EventArgs
+public class WidgetPickedEventArgs(WidgetType type) : EventArgs
 {
-    public WidgetPickedEventArgs(WidgetType type)
-    {
-        Type = type;
-    }
-
-    public WidgetType Type { get; }
+    public WidgetType Type { get; } = type;
 }

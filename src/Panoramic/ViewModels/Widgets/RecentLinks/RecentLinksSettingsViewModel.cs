@@ -7,41 +7,32 @@ using Panoramic.Services;
 
 namespace Panoramic.ViewModels.Widgets.RecentLinks;
 
-public partial class RecentLinksSettingsViewModel : SettingsViewModel
+public partial class RecentLinksSettingsViewModel(IStorageService storageService, RecentLinksData data)
+    : SettingsViewModel(RecentLinksWidget.DefaultTitle, data)
 {
-    private readonly IStorageService _storageService;
-    private readonly Guid _id;
-
-    public RecentLinksSettingsViewModel(IStorageService storageService, RecentLinksData data)
-        : base(RecentLinksWidget.DefaultTitle, data)
-    {
-        _storageService = storageService;
-        _id = data.Id;
-
-        capacity = data.Capacity;
-        onlyFromToday = data.OnlyFromToday;
-    }
+    private readonly IStorageService _storageService = storageService;
+    public Guid Id { get; } = data.Id;
 
     public event EventHandler<ValidationEventArgs>? Validated;
 
     [ObservableProperty]
-    private int capacity;
+    private int capacity = data.Capacity;
 
     [ObservableProperty]
-    private bool onlyFromToday;
+    private bool onlyFromToday = data.OnlyFromToday;
 
     public void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs(TitleIsValid()));
 
     public async Task SubmitAsync()
     {
-        if (_id == Guid.Empty)
+        if (Id == Guid.Empty)
         {
             var widget = new RecentLinksWidget(Area, Title.Trim(), Capacity, OnlyFromToday);
             await _storageService.AddNewWidgetAsync(widget);
         }
         else
         {
-            var widget = (RecentLinksWidget)_storageService.Widgets[_id];
+            var widget = (RecentLinksWidget)_storageService.Widgets[Id];
             widget.Area = Area;
             widget.Title = Title;
             widget.Capacity = Capacity;

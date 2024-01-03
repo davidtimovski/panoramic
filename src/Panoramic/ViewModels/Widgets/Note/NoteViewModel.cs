@@ -10,6 +10,7 @@ public partial class NoteViewModel : ObservableObject
     public NoteViewModel(NoteWidget widget)
     {
         Title = widget.Title;
+        Text = widget.Text;
     }
 
     [ObservableProperty]
@@ -18,6 +19,21 @@ public partial class NoteViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Background))]
     private bool highlighted;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(EditorVisibility))]
+    [NotifyPropertyChangedFor(nameof(PresenterVisibility))]
+    [NotifyPropertyChangedFor(nameof(EditToggleTooltip))]
+    private bool editing;
+
+    [ObservableProperty]
+    private string text;
+
+    public Visibility EditorVisibility => Editing ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility PresenterVisibility => Editing ? Visibility.Collapsed : Visibility.Visible;
+
+    public string EditToggleTooltip => Editing ? "Stop editing" : "Edit";
 
     public SolidColorBrush Background => Highlighted
         ? (Application.Current.Resources["PanoramicWidgetHighlightedBackgroundBrush"] as SolidColorBrush)!

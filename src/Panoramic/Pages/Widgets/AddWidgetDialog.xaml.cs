@@ -21,8 +21,8 @@ namespace Panoramic.Pages.Widgets;
 
 public sealed partial class AddWidgetDialog : Page
 {
-    private const string WidgetPickerTitle = "Add widget: widget type";
-    private const string WidgetSettingsTitle = "Add widget: settings";
+    private const string WidgetPickerTitle = "Add widget - type";
+    private const string WidgetSettingsTitle = "Add widget - settings";
 
     private readonly IStorageService _storageService;
     private readonly AreaPicker _areaPicker;
@@ -45,7 +45,7 @@ public sealed partial class AddWidgetDialog : Page
         ShowAreaPicker();
     }
 
-    public const string AreaPickerTitle = "Add widget: choose an area";
+    public const string AreaPickerTitle = "Add widget - choose an area";
 
     public event EventHandler<DialogStepChangedEventArgs>? StepChanged;
     public event EventHandler<ValidationEventArgs>? Validated;
@@ -92,38 +92,6 @@ public sealed partial class AddWidgetDialog : Page
 
         switch (selectedWidgetType)
         {
-            case WidgetType.RecentLinks:
-                var recentLinksVm = new RecentLinksSettingsViewModel(_storageService, new RecentLinksData
-                {
-                    Id = Guid.Empty,
-                    Type = WidgetType.RecentLinks,
-                    Title = RecentLinksWidget.DefaultTitle,
-                    Area = selectedArea!,
-                    Capacity = RecentLinksWidget.DefaultCapacity,
-                    OnlyFromToday = RecentLinksWidget.DefaultOnlyFromToday,
-                    Links = new()
-                });
-                recentLinksVm.Validated += Validated;
-
-                var recentLinksForm = new RecentLinksSettingsForm(recentLinksVm);
-                widgetForm = recentLinksForm;
-                ContentFrame.Content = recentLinksForm;
-                break;
-            case WidgetType.LinkCollection:
-                var linkCollectionVm = new LinkCollectionSettingsViewModel(_storageService, new LinkCollectionData
-                {
-                    Id = Guid.Empty,
-                    Type = WidgetType.LinkCollection,
-                    Title = RecentLinksWidget.DefaultTitle,
-                    Area = selectedArea!,
-                    Links = new()
-                });
-                linkCollectionVm.Validated += Validated;
-
-                var linkCollectionForm = new LinkCollectionSettingsForm(linkCollectionVm);
-                widgetForm = linkCollectionForm;
-                ContentFrame.Content = linkCollectionForm;
-                break;
             case WidgetType.Note:
                 var noteVm = new NoteSettingsViewModel(_storageService, new NoteData
                 {
@@ -137,6 +105,38 @@ public sealed partial class AddWidgetDialog : Page
                 var noteForm = new NoteSettingsForm(noteVm);
                 widgetForm = noteForm;
                 ContentFrame.Content = noteForm;
+                break;
+            case WidgetType.LinkCollection:
+                var linkCollectionVm = new LinkCollectionSettingsViewModel(_storageService, new LinkCollectionData
+                {
+                    Id = Guid.Empty,
+                    Type = WidgetType.LinkCollection,
+                    Title = RecentLinksWidget.DefaultTitle,
+                    Area = selectedArea!,
+                    Links = []
+                });
+                linkCollectionVm.Validated += Validated;
+
+                var linkCollectionForm = new LinkCollectionSettingsForm(linkCollectionVm);
+                widgetForm = linkCollectionForm;
+                ContentFrame.Content = linkCollectionForm;
+                break;
+            case WidgetType.RecentLinks:
+                var recentLinksVm = new RecentLinksSettingsViewModel(_storageService, new RecentLinksData
+                {
+                    Id = Guid.Empty,
+                    Type = WidgetType.RecentLinks,
+                    Title = RecentLinksWidget.DefaultTitle,
+                    Area = selectedArea!,
+                    Capacity = RecentLinksWidget.DefaultCapacity,
+                    OnlyFromToday = RecentLinksWidget.DefaultOnlyFromToday,
+                    Links = []
+                });
+                recentLinksVm.Validated += Validated;
+
+                var recentLinksForm = new RecentLinksSettingsForm(recentLinksVm);
+                widgetForm = recentLinksForm;
+                ContentFrame.Content = recentLinksForm;
                 break;
             default:
                 throw new InvalidOperationException("Unsupported widget type");

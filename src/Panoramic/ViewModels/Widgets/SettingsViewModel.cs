@@ -4,19 +4,13 @@ using Panoramic.Models.Domain;
 
 namespace Panoramic.ViewModels.Widgets;
 
-public partial class SettingsViewModel : ObservableObject
+public partial class SettingsViewModel(string defaultTitle, IWidgetData data) : ObservableObject
 {
-    public SettingsViewModel(string defaultTitle, IWidgetData data)
-    {
-        area = data.Area;
-        title = data.Id == Guid.Empty ? defaultTitle : data.Title;
-    }
+    [ObservableProperty]
+    private Area area = data.Area;
 
     [ObservableProperty]
-    private Area area;
-
-    [ObservableProperty]
-    private string title;
+    private string title = data.Id == Guid.Empty ? defaultTitle : data.Title;
 
     protected bool TitleIsValid() => Title.Trim().Length > 0;
 }
