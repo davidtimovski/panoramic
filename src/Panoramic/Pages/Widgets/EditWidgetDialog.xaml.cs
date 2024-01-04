@@ -84,9 +84,9 @@ public sealed partial class EditWidgetDialog : Page
         {
             case WidgetType.Note:
                 var noteVm = new NoteSettingsViewModel(_storageService, ((NoteWidget)_widget).GetData());
-                noteVm.Validated += Validated;
 
                 var noteForm = new NoteSettingsForm(noteVm);
+                noteForm.ViewModel.Validated += Validated;
 
                 settingsVm = noteVm;
                 widgetForm = noteForm;
@@ -94,9 +94,9 @@ public sealed partial class EditWidgetDialog : Page
                 break;
             case WidgetType.LinkCollection:
                 var linkCollectionVm = new LinkCollectionSettingsViewModel(_storageService, ((LinkCollectionWidget)_widget).GetData());
-                linkCollectionVm.Validated += Validated;
 
                 var linkCollectionForm = new LinkCollectionSettingsForm(linkCollectionVm);
+                linkCollectionForm.ViewModel.Validated += Validated;
 
                 settingsVm = linkCollectionVm;
                 widgetForm = linkCollectionForm;
@@ -104,9 +104,9 @@ public sealed partial class EditWidgetDialog : Page
                 break;
             case WidgetType.RecentLinks:
                 var recentLinksVm = new RecentLinksSettingsViewModel(_storageService, ((RecentLinksWidget)_widget).GetData());
-                recentLinksVm.Validated += Validated;
 
                 var recentLinksForm = new RecentLinksSettingsForm(recentLinksVm);
+                recentLinksForm.ViewModel.Validated += Validated;
 
                 settingsVm = recentLinksVm;
                 widgetForm = recentLinksForm;

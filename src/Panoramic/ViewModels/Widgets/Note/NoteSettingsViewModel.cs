@@ -8,7 +8,7 @@ using Panoramic.Services;
 namespace Panoramic.ViewModels.Widgets.Note;
 
 public partial class NoteSettingsViewModel(IStorageService storageService, NoteData data)
-    : SettingsViewModel(NoteWidget.DefaultTitle, data)
+    : SettingsViewModel(data)
 {
     private readonly IStorageService _storageService = storageService;
     public Guid Id { get; } = data.Id;
@@ -21,7 +21,9 @@ public partial class NoteSettingsViewModel(IStorageService storageService, NoteD
     [ObservableProperty]
     private bool onlyFromToday;
 
-    public void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs(TitleIsValid()));
+    public void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs(TitleIsValid() && CanBeCreated()));
+
+    private bool CanBeCreated() => NoteWidget.CanBeCreated(Title.Trim(), _storageService.StoragePath);
 
     public async Task SubmitAsync()
     {

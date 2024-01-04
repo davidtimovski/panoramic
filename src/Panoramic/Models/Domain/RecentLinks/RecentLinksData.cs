@@ -18,15 +18,15 @@ public class RecentLinksData : IWidgetData
     public required Area Area { get; set; }
 
     [JsonPropertyName("title")]
-    public required string Title { get; set; }
+    public string Title { get; set; } = "Recent";
 
     [JsonRequired]
     [JsonPropertyName("capacity")]
-    public required int Capacity { get; set; }
+    public int Capacity { get; set; } = 15;
 
     [JsonRequired]
     [JsonPropertyName("onlyFromToday")]
-    public required bool OnlyFromToday { get; set; }
+    public bool OnlyFromToday { get; set; } = false;
 
     [JsonRequired]
     [JsonPropertyName("links")]

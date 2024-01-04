@@ -42,10 +42,11 @@
                 <Border.Resources>
                     <DataTemplate x:Key="RecentLinksViewTemplate" x:DataType="vm:RecentLinkViewModel">
                         <HyperlinkButton Content="{x:Bind Title}"
-                                     NavigateUri="{x:Bind Uri}"
-                                     HorizontalAlignment="Stretch"
-                                     HorizontalContentAlignment="Left"
-                                     Click="{x:Bind Click}" />
+                                         NavigateUri="{x:Bind Uri}"
+                                         ToolTipService.ToolTip="{x:Bind Tooltip}"
+                                         HorizontalAlignment="Stretch"
+                                         HorizontalContentAlignment="Left"
+                                         Click="{x:Bind Click}" />
                     </DataTemplate>
                 </Border.Resources>
 

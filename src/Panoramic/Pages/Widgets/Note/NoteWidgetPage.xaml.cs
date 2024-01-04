@@ -67,14 +67,18 @@ public sealed partial class NoteWidgetPage : Page
             Content = $"Are you sure want to remove {_widget.Title}?\n\nAny data that it holds will also be deleted permanently.",
             PrimaryButtonText = "Yes, remove",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_widget); })
+            PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_widget); }),
+            CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })
         };
+
+        ViewModel.Highlighted = true;
+
         await dialog.ShowAsync();
     }
 
     private void SetPresenterContent()
     {
-        var paragraphs = _markdownService.TextToMarkdownParagraphs(ViewModel.Text);
+        var paragraphs = _markdownService.TextToMarkdownParagraphs(ViewModel.Text, ViewModel.Title);
         Presenter.Blocks.Clear();
 
         foreach (var paragraph in paragraphs)

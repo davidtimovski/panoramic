@@ -41,8 +41,6 @@ public interface IStorageService
 
 public class StorageService : IStorageService
 {
-    private const string DataFileName = "data.json";
-
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         Converters = { new JsonStringEnumConverter() }
@@ -93,9 +91,10 @@ public class StorageService : IStorageService
 
     public async Task ReadAsync()
     {
-        var widgetDirs = Directory.GetDirectories(StoragePath);
+        var widgetsDirectory = Path.Combine(StoragePath, "widgets");
+        var widgetFilePaths = Directory.GetFiles(widgetsDirectory, "*.json");
 
-        var tasks = widgetDirs.Select(ReadWidgetAsync);
+        var tasks = widgetFilePaths.Select(ReadWidgetAsync);
 
         await Task.WhenAll(tasks).ConfigureAwait(false);
     }
@@ -152,30 +151,19 @@ public class StorageService : IStorageService
 
     public void ChangeStoragePath(string storagePath)
     {
-        var widgetDirs = Directory.GetDirectories(StoragePath);
-
-        foreach (var directory in widgetDirs)
+        if (Directory.Exists(storagePath))
         {
-            var directoryName = new DirectoryInfo(directory).Name;
-            Directory.CreateDirectory(Path.Combine(storagePath, directoryName));
-            
-            var files = Directory.GetFiles(directory);
-            foreach (var file in files)
-            {
-                var fileName = Path.GetFileName(file);
-                File.Move(file, Path.Combine(storagePath, directoryName, fileName), true);
-            }
+            Directory.Delete(storagePath, true);
         }
 
-        Directory.Delete(StoragePath, true);
+        Directory.Move(StoragePath, storagePath);
 
         StoragePath = storagePath;
     }
 
-    private async Task ReadWidgetAsync(string widgetDirectory)
+    private async Task ReadWidgetAsync(string widgetFilePath)
     {
-        var dataFilePath = Path.Combine(widgetDirectory, DataFileName);
-        var json = await File.ReadAllTextAsync(dataFilePath);
+        var json = await File.ReadAllTextAsync(widgetFilePath);
 
         using var jsonDoc = JsonDocument.Parse(json);
         var typeProperty = jsonDoc.RootElement.GetProperty("type");
@@ -184,7 +172,7 @@ public class StorageService : IStorageService
         switch (type)
         {
             case WidgetType.Note:
-                var noteWidget = await NoteWidget.LoadAsync(json, widgetDirectory, SerializerOptions);
+                var noteWidget = await NoteWidget.LoadAsync(json, StoragePath, SerializerOptions);
                 Widgets.Add(noteWidget.Id, noteWidget);
                 break;
             case WidgetType.LinkCollection:
@@ -212,6 +200,13 @@ public class StorageService : IStorageService
             {
                 Directory.CreateDirectory(defaultPath);
             }
+
+            var widgetsPath = Path.Combine(defaultPath, "widgets");
+            if (!Directory.Exists(widgetsPath))
+            {
+                Directory.CreateDirectory(widgetsPath);
+            }
+
             return defaultPath;
         }
 

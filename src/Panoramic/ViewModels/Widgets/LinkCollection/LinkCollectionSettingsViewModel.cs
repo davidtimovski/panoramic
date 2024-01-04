@@ -7,7 +7,7 @@ using Panoramic.Services;
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
 public partial class LinkCollectionSettingsViewModel(IStorageService storageService, LinkCollectionData data)
-    : SettingsViewModel(LinkCollectionWidget.DefaultTitle, data)
+    : SettingsViewModel(data)
 {
     private readonly IStorageService _storageService = storageService;
     public Guid Id { get; } = data.Id;

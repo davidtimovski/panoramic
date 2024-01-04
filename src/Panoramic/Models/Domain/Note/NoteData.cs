@@ -17,5 +17,5 @@ public class NoteData : IWidgetData
     public required Area Area { get; set; }
 
     [JsonPropertyName("title")]
-    public required string Title { get; set; }
+    public string Title { get; set; } = "My note";
 }

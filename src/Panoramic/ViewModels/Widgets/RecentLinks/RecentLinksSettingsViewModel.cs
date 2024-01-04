@@ -8,7 +8,7 @@ using Panoramic.Services;
 namespace Panoramic.ViewModels.Widgets.RecentLinks;
 
 public partial class RecentLinksSettingsViewModel(IStorageService storageService, RecentLinksData data)
-    : SettingsViewModel(RecentLinksWidget.DefaultTitle, data)
+    : SettingsViewModel(data)
 {
     private readonly IStorageService _storageService = storageService;
     public Guid Id { get; } = data.Id;

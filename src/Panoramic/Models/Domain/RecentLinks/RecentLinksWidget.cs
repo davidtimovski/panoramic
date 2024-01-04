@@ -9,10 +9,6 @@ namespace Panoramic.Models.Domain.RecentLinks;
 
 public class RecentLinksWidget : IWidget
 {
-    public const string DefaultTitle = "Recent";
-    public const int DefaultCapacity = 15;
-    public const bool DefaultOnlyFromToday = false;
-
     /// <summary>
     /// Constructs a new recent links widget.
     /// </summary>
@@ -110,21 +106,18 @@ public class RecentLinksWidget : IWidget
 
     public async Task WriteAsync(string storagePath, JsonSerializerOptions options)
     {
-        var directory = Path.Combine(storagePath, Id.ToString());
-        Directory.CreateDirectory(directory);
+        var widgetsDirectory = Path.Combine(storagePath, "widgets");
 
         var data = GetData();
         var json = JsonSerializer.Serialize(data, options);
 
-        await File.WriteAllTextAsync(Path.Combine(directory, "data.json"), json);
+        await File.WriteAllTextAsync(Path.Combine(widgetsDirectory, $"{Id}.json"), json);
     }
 
     public void Delete(string storagePath)
     {
-        var directory = Path.Combine(storagePath, Id.ToString());
-
-        File.Delete(Path.Combine(directory, "data.json"));
-        Directory.Delete(directory);
+        var widgetsDirectory = Path.Combine(storagePath, "widgets");
+        File.Delete(Path.Combine(widgetsDirectory, $"{Id}.json"));
     }
 }
 

@@ -7,10 +7,6 @@ namespace Panoramic.Models.Domain.Note;
 
 public class NoteWidget : IWidget
 {
-    private const string ContentFileName = "content.md";
-
-    public const string DefaultTitle = "My note";
-
     /// <summary>
     /// Constructs a new note widget.
     /// </summary>
@@ -51,32 +47,39 @@ public class NoteWidget : IWidget
             Title = Title
         };
 
-    public static async Task<NoteWidget> LoadAsync(string json, string path, JsonSerializerOptions options)
+    /// <summary>
+    /// Checks whether the file already exists on the file system and returns false if it does.
+    /// </summary>
+    public static bool CanBeCreated(string title, string storagePath)
+    {
+        var filePath = Path.Combine(storagePath, $"{title}.md");
+        return !File.Exists(filePath);
+    }
+
+    public static async Task<NoteWidget> LoadAsync(string json, string storagePath, JsonSerializerOptions options)
     {
         var data = JsonSerializer.Deserialize<NoteData>(json, options)!;
-        var text = await File.ReadAllTextAsync(Path.Combine(path, ContentFileName));
+        var text = await File.ReadAllTextAsync(Path.Combine(storagePath, $"{data.Title}.md"));
 
         return new(data, text);
     }
 
     public async Task WriteAsync(string storagePath, JsonSerializerOptions options)
     {
-        var directory = Path.Combine(storagePath, Id.ToString());
-        Directory.CreateDirectory(directory);
+        var widgetsDirectory = Path.Combine(storagePath, "widgets");
 
         var data = GetData();
         var json = JsonSerializer.Serialize(data, options);
 
-        await File.WriteAllTextAsync(Path.Combine(directory, ContentFileName), Text);
-        await File.WriteAllTextAsync(Path.Combine(directory, "data.json"), json);
+        await File.WriteAllTextAsync(Path.Combine(storagePath, $"{Title}.md"), Text);
+        await File.WriteAllTextAsync(Path.Combine(widgetsDirectory, $"{Id}.json"), json);
     }
 
     public void Delete(string storagePath)
     {
-        var directory = Path.Combine(storagePath, Id.ToString());
+        var widgetsDirectory = Path.Combine(storagePath, "widgets");
 
-        File.Delete(Path.Combine(directory, ContentFileName));
-        File.Delete(Path.Combine(directory, "data.json"));
-        Directory.Delete(directory);
+        File.Delete(Path.Combine(storagePath, $"{Title}.md"));
+        File.Delete(Path.Combine(widgetsDirectory, $"{Id}.json"));
     }
 }

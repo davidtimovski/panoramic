@@ -87,8 +87,12 @@ public sealed partial class LinkCollectionWidgetPage : Page
             Content = $"Are you sure want to remove {_widget.Title}?\n\nAny data that it holds will also be deleted permanently.",
             PrimaryButtonText = "Yes, remove",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_widget); })
+            PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_widget); }),
+            CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })
         };
+
+        ViewModel.Highlighted = true;
+
         await dialog.ShowAsync();
     }
 }

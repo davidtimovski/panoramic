@@ -97,12 +97,12 @@ public sealed partial class AddWidgetDialog : Page
                 {
                     Id = Guid.Empty,
                     Type = WidgetType.Note,
-                    Title = NoteWidget.DefaultTitle,
                     Area = selectedArea!
                 });
-                noteVm.Validated += Validated;
 
                 var noteForm = new NoteSettingsForm(noteVm);
+                noteForm.ViewModel.Validated += Validated;
+
                 widgetForm = noteForm;
                 ContentFrame.Content = noteForm;
                 break;
@@ -111,13 +111,13 @@ public sealed partial class AddWidgetDialog : Page
                 {
                     Id = Guid.Empty,
                     Type = WidgetType.LinkCollection,
-                    Title = RecentLinksWidget.DefaultTitle,
                     Area = selectedArea!,
                     Links = []
                 });
-                linkCollectionVm.Validated += Validated;
 
                 var linkCollectionForm = new LinkCollectionSettingsForm(linkCollectionVm);
+                linkCollectionForm.ViewModel.Validated += Validated;
+
                 widgetForm = linkCollectionForm;
                 ContentFrame.Content = linkCollectionForm;
                 break;
@@ -126,15 +126,13 @@ public sealed partial class AddWidgetDialog : Page
                 {
                     Id = Guid.Empty,
                     Type = WidgetType.RecentLinks,
-                    Title = RecentLinksWidget.DefaultTitle,
                     Area = selectedArea!,
-                    Capacity = RecentLinksWidget.DefaultCapacity,
-                    OnlyFromToday = RecentLinksWidget.DefaultOnlyFromToday,
                     Links = []
                 });
-                recentLinksVm.Validated += Validated;
 
                 var recentLinksForm = new RecentLinksSettingsForm(recentLinksVm);
+                recentLinksForm.ViewModel.Validated += Validated;
+
                 widgetForm = recentLinksForm;
                 ContentFrame.Content = recentLinksForm;
                 break;
