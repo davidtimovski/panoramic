@@ -14,7 +14,11 @@
                  Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  TextChanged="{x:Bind ViewModel.ValidateAndEmit}"
                  Header="Title"
-                 MaxLength="60" />
+                 MaxLength="60">
+            <TextBox.Description>
+                <TextBlock TextWrapping="Wrap">Will be used as the name of a markdown file saved on the file system, so naming rules for files will apply.</TextBlock>
+            </TextBox.Description>
+        </TextBox>
     </Grid>
 
 </Page>

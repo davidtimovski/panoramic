@@ -7,12 +7,19 @@ namespace Panoramic.Models.Domain.Note;
 
 public class NoteWidget : IWidget
 {
+    private readonly string dataFileName;
+
+    private string fileName;
+    
     /// <summary>
     /// Constructs a new note widget.
     /// </summary>
     public NoteWidget(Area area, string title)
     {
         Id = Guid.NewGuid();
+        dataFileName = $"{Id}.json";
+        fileName = $"{title}.md";
+
         Type = WidgetType.Note;
         Area = area;
         Title = title;
@@ -20,11 +27,14 @@ public class NoteWidget : IWidget
     }
 
     /// <summary>
-    /// Constructs a note widget based on en existing one.
+    /// Constructs a note widget based on existing data.
     /// </summary>
-    public NoteWidget(NoteData data, string text)
+    public NoteWidget(NoteData data, string text, string fileName)
     {
         Id = data.Id;
+        dataFileName = $"{Id}.json";
+        this.fileName = fileName;
+
         Type = WidgetType.Note;
         Area = data.Area;
         Title = data.Title;
@@ -59,27 +69,39 @@ public class NoteWidget : IWidget
     public static async Task<NoteWidget> LoadAsync(string json, string storagePath, JsonSerializerOptions options)
     {
         var data = JsonSerializer.Deserialize<NoteData>(json, options)!;
-        var text = await File.ReadAllTextAsync(Path.Combine(storagePath, $"{data.Title}.md"));
 
-        return new(data, text);
+        var fileName = $"{data.Title}.md";
+        var text = await File.ReadAllTextAsync(Path.Combine(storagePath, fileName));
+
+        return new(data, text, fileName);
     }
 
     public async Task WriteAsync(string storagePath, JsonSerializerOptions options)
     {
         var widgetsDirectory = Path.Combine(storagePath, "widgets");
 
+        var newFileName = $"{Title}.md";
+        if (newFileName != fileName)
+        {
+            var originalPath = Path.Combine(storagePath, fileName);
+            var newPath = Path.Combine(storagePath, newFileName);
+            File.Move(originalPath, newPath, true);
+
+            fileName = newFileName;
+        }
+
         var data = GetData();
         var json = JsonSerializer.Serialize(data, options);
 
-        await File.WriteAllTextAsync(Path.Combine(storagePath, $"{Title}.md"), Text);
-        await File.WriteAllTextAsync(Path.Combine(widgetsDirectory, $"{Id}.json"), json);
+        await File.WriteAllTextAsync(Path.Combine(storagePath, fileName), Text);
+        await File.WriteAllTextAsync(Path.Combine(widgetsDirectory, dataFileName), json);
     }
 
     public void Delete(string storagePath)
     {
         var widgetsDirectory = Path.Combine(storagePath, "widgets");
 
-        File.Delete(Path.Combine(storagePath, $"{Title}.md"));
-        File.Delete(Path.Combine(widgetsDirectory, $"{Id}.json"));
+        File.Delete(Path.Combine(storagePath, fileName));
+        File.Delete(Path.Combine(widgetsDirectory, dataFileName));
     }
 }

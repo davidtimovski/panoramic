@@ -114,7 +114,7 @@ public partial class EditViewModel : ObservableObject
             });
         }
 
-        widget.SetData(links);
+        widget.Links = links;
         await _storageService.SaveWidgetAsync(widget);
     }
 }

@@ -9,12 +9,16 @@ namespace Panoramic.Models.Domain.LinkCollection;
 
 public class LinkCollectionWidget : IWidget
 {
+    private readonly string dataFileName;
+
     /// <summary>
     /// Constructs a new link collection widget.
     /// </summary>
     public LinkCollectionWidget(Area area, string title)
     {
         Id = Guid.NewGuid();
+        dataFileName = $"{Id}.json";
+
         Type = WidgetType.LinkCollection;
         Area = area;
         Title = title;
@@ -22,11 +26,13 @@ public class LinkCollectionWidget : IWidget
     }
 
     /// <summary>
-    /// Constructs a link collection widget based on en existing one.
+    /// Constructs a link collection widget based on existing data.
     /// </summary>
     public LinkCollectionWidget(LinkCollectionData data)
     {
         Id = data.Id;
+        dataFileName = $"{Id}.json";
+
         Type = WidgetType.LinkCollection;
         Area = data.Area;
         Title = data.Title;
@@ -41,19 +47,11 @@ public class LinkCollectionWidget : IWidget
     private List<LinkCollectionItem> links;
     public IReadOnlyList<LinkCollectionItem> Links
     {
-        get
+        get => links;
+        set
         {
-            return links.OrderBy(x => x.Order).ToList();
+            links = [.. value.OrderBy(x => x.Order)];
         }
-        private set
-        {
-            links = [.. value];
-        }
-    }
-
-    public void SetData(List<LinkCollectionItem> links)
-    {
-        this.links = links;
     }
 
     public LinkCollectionData GetData() =>
@@ -79,13 +77,13 @@ public class LinkCollectionWidget : IWidget
         var data = GetData();
         var json = JsonSerializer.Serialize(data, options);
 
-        await File.WriteAllTextAsync(Path.Combine(widgetsDirectory, $"{Id}.json"), json);
+        await File.WriteAllTextAsync(Path.Combine(widgetsDirectory, dataFileName), json);
     }
 
     public void Delete(string storagePath)
     {
         var widgetsDirectory = Path.Combine(storagePath, "widgets");
-        File.Delete(Path.Combine(widgetsDirectory, $"{Id}.json"));
+        File.Delete(Path.Combine(widgetsDirectory, dataFileName));
     }
 }
 

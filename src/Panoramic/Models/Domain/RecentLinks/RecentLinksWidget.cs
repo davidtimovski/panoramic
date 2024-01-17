@@ -9,12 +9,16 @@ namespace Panoramic.Models.Domain.RecentLinks;
 
 public class RecentLinksWidget : IWidget
 {
+    private readonly string dataFileName;
+
     /// <summary>
     /// Constructs a new recent links widget.
     /// </summary>
     public RecentLinksWidget(Area area, string title, int capacity, bool onlyFromToday)
     {
         Id = Guid.NewGuid();
+        dataFileName = $"{Id}.json";
+
         Type = WidgetType.RecentLinks;
         Area = area;
         Title = title;
@@ -24,11 +28,13 @@ public class RecentLinksWidget : IWidget
     }
 
     /// <summary>
-    /// Constructs a recent links widget based on en existing one.
+    /// Constructs a recent links widget based on existing data.
     /// </summary>
     public RecentLinksWidget(RecentLinksData data)
     {
         Id = data.Id;
+        dataFileName = $"{Id}.json";
+
         Type = WidgetType.RecentLinks;
         Area = data.Area;
         Title = data.Title;
@@ -111,13 +117,13 @@ public class RecentLinksWidget : IWidget
         var data = GetData();
         var json = JsonSerializer.Serialize(data, options);
 
-        await File.WriteAllTextAsync(Path.Combine(widgetsDirectory, $"{Id}.json"), json);
+        await File.WriteAllTextAsync(Path.Combine(widgetsDirectory, dataFileName), json);
     }
 
     public void Delete(string storagePath)
     {
         var widgetsDirectory = Path.Combine(storagePath, "widgets");
-        File.Delete(Path.Combine(widgetsDirectory, $"{Id}.json"));
+        File.Delete(Path.Combine(widgetsDirectory, dataFileName));
     }
 }
 
