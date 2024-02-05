@@ -1,6 +1,6 @@
-﻿using Panoramic.Utils.Serialization;
+﻿using System;
 using System.Text.Json.Serialization;
-using System;
+using Panoramic.Utils.Serialization;
 
 namespace Panoramic.Models.Domain.Note;
 
@@ -16,6 +16,6 @@ public class NoteData : IWidgetData
     [JsonConverter(typeof(AreaJsonConverter))]
     public required Area Area { get; set; }
 
-    [JsonPropertyName("title")]
-    public string Title { get; set; } = "My note";
+    [JsonPropertyName("relativeFilePath")]
+    public string? RelativeFilePath { get; set; }
 }

@@ -21,22 +21,17 @@ public partial class NoteSettingsViewModel(IStorageService storageService, NoteD
     [ObservableProperty]
     private bool onlyFromToday;
 
-    public void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs(TitleIsValid() && CanBeCreated()));
-
-    private bool CanBeCreated() => NoteWidget.CanBeCreated(Title.Trim(), _storageService.StoragePath);
-
     public async Task SubmitAsync()
     {
         if (Id == Guid.Empty)
         {
-            var widget = new NoteWidget(Area, Title.Trim());
+            var widget = new NoteWidget(_storageService, Area);
             await _storageService.AddNewWidgetAsync(widget);
         }
         else
         {
             var widget = _storageService.Widgets[Id];
             widget.Area = Area;
-            widget.Title = Title;
 
             await _storageService.SaveWidgetAsync(widget);
         }

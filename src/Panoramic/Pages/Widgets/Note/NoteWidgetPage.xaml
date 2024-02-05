@@ -2,7 +2,8 @@
 <Page
     x:Class="Panoramic.Pages.Widgets.Note.NoteWidgetPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:m="using:Panoramic.Models.Domain.Note">
 
     <Border Padding="15" Background="{x:Bind ViewModel.Background, Mode=OneWay}" CornerRadius="{StaticResource PanoramicWidgetCornerRadius}">
         <Grid>
@@ -17,19 +18,32 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="{x:Bind ViewModel.Title, Mode=OneWay}" FontSize="16" Foreground="#ddd" TextWrapping="Wrap" />
+                    <TextBlock Grid.Column="0"
+                               Text="{x:Bind ViewModel.Title, Mode=OneWay}"
+                               FontSize="16"
+                               Foreground="#ddd"
+                               TextWrapping="Wrap" />
 
                     <ToggleButton Grid.Column="1"
                                   Click="EditButton_Click"
+                                  Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}"
                                   IsChecked="{x:Bind ViewModel.Editing, Mode=TwoWay}"
                                   ToolTipService.ToolTip="{x:Bind ViewModel.EditToggleTooltip, Mode=OneWay}"
                                   Margin="0 0 10 0">
                         <FontIcon Glyph="&#xE70F;" FontSize="14" />
                     </ToggleButton>
 
-                    <DropDownButton Grid.Column="2" AutomationProperties.Name="Setting">
+                    <ToggleButton Grid.Column="2"
+                                IsChecked="{x:Bind ViewModel.ExplorerVisible, Mode=TwoWay}"
+                                ToolTipService.ToolTip="{x:Bind ViewModel.ExplorerNoteToggleTooltip, Mode=OneWay}"
+                                Margin="0 0 10 0">
+                        <FontIcon Glyph="&#xE838;" FontSize="14" />
+                    </ToggleButton>
+
+                    <DropDownButton Grid.Column="3" AutomationProperties.Name="Setting">
                         <DropDownButton.Content>
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE712;" FontSize="14" />
                         </DropDownButton.Content>
@@ -44,29 +58,80 @@
             </Border>
 
             <Border Grid.Row="1" Margin="0 15 0 0">
-                <ScrollView Height="Auto">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
+                <Border.Resources>
+                    <DataTemplate x:Key="FolderTemplate" x:DataType="m:ExplorerItem">
+                        <TreeViewItem AutomationProperties.Name="{x:Bind Name}" ItemsSource="{x:Bind Children}" IsExpanded="True">
+                            <TreeViewItem.ContextFlyout>
+                                <MenuBarItemFlyout>
+                                    <MenuFlyoutItem Click="AddNote_Click">Add note</MenuFlyoutItem>
+                                    <MenuFlyoutItem Click="AddFolder_Click">Add folder</MenuFlyoutItem>
+                                    <MenuFlyoutItem Click="RenameFolder_Click">Rename</MenuFlyoutItem>
+                                    <MenuFlyoutItem Click="DeleteFolder_Click">Delete</MenuFlyoutItem>
+                                </MenuBarItemFlyout>
+                            </TreeViewItem.ContextFlyout>
+                            
+                            <StackPanel Orientation="Horizontal">
+                                <FontIcon Glyph="&#xE8B7;" Foreground="#ddd" />
+                                <TextBlock Margin="0 0 10 0"/>
+                                <TextBlock Text="{x:Bind Name}" />
+                            </StackPanel>
+                        </TreeViewItem>
+                    </DataTemplate>
 
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        
-                        <TextBox Grid.Row="0"
-                                 Grid.Column="0"
-                                 x:Name="Editor"
-                                 Text="{x:Bind ViewModel.Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 Visibility="{x:Bind ViewModel.EditorVisibility, Mode=OneWay}"
-                                 TextChanged="Editor_TextChanged"
-                                 AcceptsReturn="True" />
-                        <RichTextBlock Grid.Row="0"
-                                       Grid.Column="0"
-                                       x:Name="Presenter"
-                                       Visibility="{x:Bind ViewModel.PresenterVisibility, Mode=OneWay}" />
-                    </Grid>
-                </ScrollView>
+                    <DataTemplate x:Key="FileTemplate" x:DataType="m:ExplorerItem">
+                        <TreeViewItem AutomationProperties.Name="{x:Bind Name}">
+                            <TreeViewItem.ContextFlyout>
+                                <MenuBarItemFlyout>
+                                    <MenuFlyoutItem Click="RenameNote_Click">Rename</MenuFlyoutItem>
+                                    <MenuFlyoutItem Click="DeleteNote_Click">Delete</MenuFlyoutItem>
+                                </MenuBarItemFlyout>
+                            </TreeViewItem.ContextFlyout>
+                            
+                            <StackPanel Orientation="Horizontal">
+                                <FontIcon Glyph="&#xE8A5;" Foreground="{StaticResource PanoramicBlueForeground}" />
+                                <TextBlock Margin="0 0 10 0"/>
+                                <TextBlock Text="{x:Bind Name}"/>
+                            </StackPanel>
+                        </TreeViewItem>
+                    </DataTemplate>
+
+                    <m:ExplorerItemTemplateSelector x:Key="ExplorerItemTemplateSelector"
+                        FolderTemplate="{StaticResource FolderTemplate}"
+                        FileTemplate="{StaticResource FileTemplate}" />
+                </Border.Resources>
+
+                <StackPanel>
+                    <TreeView ItemsSource="{x:Bind ViewModel.ExplorerItems, Mode=OneWay}"
+                              ItemTemplateSelector="{StaticResource ExplorerItemTemplateSelector}"
+                              Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}"
+                              SelectedItem="{x:Bind ViewModel.SelectedNote, Mode=OneWay}"
+                              SelectionChanged="Explorer_SelectionChanged"
+                              CanDragItems="False"
+                              AllowDrop="False" />
+
+                    <ScrollView Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" Height="Auto">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox Grid.Row="0"
+                                     Grid.Column="0"
+                                     x:Name="Editor"
+                                     Text="{x:Bind ViewModel.SelectedNote.Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     Visibility="{x:Bind ViewModel.EditorVisibility, Mode=OneWay}"
+                                     AcceptsReturn="True" />
+                            <RichTextBlock Grid.Row="0"
+                                           Grid.Column="0"
+                                           x:Name="Presenter"
+                                           Visibility="{x:Bind ViewModel.PresenterVisibility, Mode=OneWay}" />
+                        </Grid>
+                    </ScrollView>
+                </StackPanel>
             </Border>
 
         </Grid>

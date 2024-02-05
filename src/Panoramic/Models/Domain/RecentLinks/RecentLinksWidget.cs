@@ -4,20 +4,24 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Panoramic.Services;
 
 namespace Panoramic.Models.Domain.RecentLinks;
 
 public class RecentLinksWidget : IWidget
 {
-    private readonly string dataFileName;
+    private readonly IStorageService _storageService;
+    private readonly string _dataFileName;
 
     /// <summary>
     /// Constructs a new recent links widget.
     /// </summary>
-    public RecentLinksWidget(Area area, string title, int capacity, bool onlyFromToday)
+    public RecentLinksWidget(IStorageService storageService, Area area, string title, int capacity, bool onlyFromToday)
     {
+        _storageService = storageService;
+
         Id = Guid.NewGuid();
-        dataFileName = $"{Id}.json";
+        _dataFileName = $"{Id}.json";
 
         Type = WidgetType.RecentLinks;
         Area = area;
@@ -30,11 +34,12 @@ public class RecentLinksWidget : IWidget
     /// <summary>
     /// Constructs a recent links widget based on existing data.
     /// </summary>
-    public RecentLinksWidget(RecentLinksData data)
+    public RecentLinksWidget(IStorageService storageService, RecentLinksData data)
     {
-        Id = data.Id;
-        dataFileName = $"{Id}.json";
+        _storageService = storageService;
+        _dataFileName = $"{data.Id}.json";
 
+        Id = data.Id;
         Type = WidgetType.RecentLinks;
         Area = data.Area;
         Title = data.Title;
@@ -104,26 +109,24 @@ public class RecentLinksWidget : IWidget
             Links = Links.Select(x => new RecentLinkData { Title = x.Title, Uri = x.Uri, Clicked = x.Clicked }).ToList()
         };
 
-    public static RecentLinksWidget Load(string json, JsonSerializerOptions options)
+    public static RecentLinksWidget Load(IStorageService storageService, string json)
     {
-        var data = JsonSerializer.Deserialize<RecentLinksData>(json, options)!;
-        return new(data);
+        var data = JsonSerializer.Deserialize<RecentLinksData>(json, storageService.SerializerOptions)!;
+        return new(storageService, data);
     }
 
-    public async Task WriteAsync(string storagePath, JsonSerializerOptions options)
+    public async Task WriteAsync()
     {
-        var widgetsDirectory = Path.Combine(storagePath, "widgets");
-
         var data = GetData();
-        var json = JsonSerializer.Serialize(data, options);
+        var json = JsonSerializer.Serialize(data, _storageService.SerializerOptions);
 
-        await File.WriteAllTextAsync(Path.Combine(widgetsDirectory, dataFileName), json);
+        await File.WriteAllTextAsync(Path.Combine(_storageService.WidgetsFolderPath, _dataFileName), json);
     }
 
-    public void Delete(string storagePath)
+    public void Delete()
     {
-        var widgetsDirectory = Path.Combine(storagePath, "widgets");
-        File.Delete(Path.Combine(widgetsDirectory, dataFileName));
+        var dataFilePath = Path.Combine(_storageService.WidgetsFolderPath, _dataFileName);
+        File.Delete(dataFilePath);
     }
 }
 

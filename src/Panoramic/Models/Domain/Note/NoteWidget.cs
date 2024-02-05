@@ -1,52 +1,52 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Panoramic.Services;
 
 namespace Panoramic.Models.Domain.Note;
 
 public class NoteWidget : IWidget
 {
-    private readonly string dataFileName;
+    private readonly IStorageService _storageService;
+    private readonly string _dataFileName;
 
-    private string fileName;
-    
     /// <summary>
     /// Constructs a new note widget.
     /// </summary>
-    public NoteWidget(Area area, string title)
+    public NoteWidget(IStorageService storageService, Area area)
     {
+        _storageService = storageService;
+
         Id = Guid.NewGuid();
-        dataFileName = $"{Id}.json";
-        fileName = $"{title}.md";
+        _dataFileName = $"{Id}.json";
 
         Type = WidgetType.Note;
         Area = area;
-        Title = title;
-        Text = string.Empty;
     }
 
     /// <summary>
     /// Constructs a note widget based on existing data.
     /// </summary>
-    public NoteWidget(NoteData data, string text, string fileName)
+    public NoteWidget(IStorageService storageService, NoteData data)
     {
-        Id = data.Id;
-        dataFileName = $"{Id}.json";
-        this.fileName = fileName;
+        _storageService = storageService;
+        _dataFileName = $"{data.Id}.json";
 
+        Id = data.Id;
         Type = WidgetType.Note;
         Area = data.Area;
-        Title = data.Title;
-        Text = text;
+
+        SetSelectedNote(data.RelativeFilePath);
     }
 
     public Guid Id { get; }
     public WidgetType Type { get; }
     public Area Area { get; set; }
-    public string Title { get; set; }
-
-    public string Text { get; set; }
+    public string? RelativeFilePath { get; private set; }
+    public string? FilePath { get; private set; }
+    public ExplorerItem? SelectedNote { get; private set; }
 
     public NoteData GetData() =>
         new()
@@ -54,54 +54,86 @@ public class NoteWidget : IWidget
             Id = Id,
             Type = WidgetType.Note,
             Area = Area,
-            Title = Title
+            RelativeFilePath = RelativeFilePath
         };
 
-    /// <summary>
-    /// Checks whether the file already exists on the file system and returns false if it does.
-    /// </summary>
-    public static bool CanBeCreated(string title, string storagePath)
+    public static bool FolderCanBeCreated(string title, string directory)
     {
-        var filePath = Path.Combine(storagePath, $"{title}.md");
-        return !File.Exists(filePath);
-    }
-
-    public static async Task<NoteWidget> LoadAsync(string json, string storagePath, JsonSerializerOptions options)
-    {
-        var data = JsonSerializer.Deserialize<NoteData>(json, options)!;
-
-        var fileName = $"{data.Title}.md";
-        var text = await File.ReadAllTextAsync(Path.Combine(storagePath, fileName));
-
-        return new(data, text, fileName);
-    }
-
-    public async Task WriteAsync(string storagePath, JsonSerializerOptions options)
-    {
-        var widgetsDirectory = Path.Combine(storagePath, "widgets");
-
-        var newFileName = $"{Title}.md";
-        if (newFileName != fileName)
+        if (string.Equals(title, "widgets", StringComparison.OrdinalIgnoreCase))
         {
-            var originalPath = Path.Combine(storagePath, fileName);
-            var newPath = Path.Combine(storagePath, newFileName);
-            File.Move(originalPath, newPath, true);
-
-            fileName = newFileName;
+            return false;
         }
 
-        var data = GetData();
-        var json = JsonSerializer.Serialize(data, options);
-
-        await File.WriteAllTextAsync(Path.Combine(storagePath, fileName), Text);
-        await File.WriteAllTextAsync(Path.Combine(widgetsDirectory, dataFileName), json);
+        var parentDirectory = Path.GetDirectoryName(directory)!;
+        var path = Path.Combine(parentDirectory, title);
+        return !Directory.Exists(path);
     }
 
-    public void Delete(string storagePath)
+    public static bool NoteCanBeCreated(string title, string directory)
     {
-        var widgetsDirectory = Path.Combine(storagePath, "widgets");
+        var parentDirectory = Path.GetDirectoryName(directory)!;
+        var path = Path.Combine(parentDirectory, $"{title}.md");
+        return !File.Exists(path);
+    }
 
-        File.Delete(Path.Combine(storagePath, fileName));
-        File.Delete(Path.Combine(widgetsDirectory, dataFileName));
+    public void SetSelectedNote(string? relativeFilePath)
+    {
+        RelativeFilePath = relativeFilePath;
+
+        if (RelativeFilePath is null)
+        {
+            FilePath = null;
+            SelectedNote = null;
+        }
+        else
+        {
+            FilePath = Path.Combine(_storageService.StoragePath, RelativeFilePath);
+            SelectedNote = GetSelectedNote(_storageService.ExplorerItems);
+            if (SelectedNote is null)
+            {
+                throw new InvalidOperationException($"Cannot load note at path: {FilePath}");
+            }
+
+            SelectedNote.Text = File.ReadAllText(FilePath);
+        }
+    }
+
+    public static async Task<NoteWidget> LoadAsync(IStorageService storageService, string json)
+    {
+        var data = JsonSerializer.Deserialize<NoteData>(json, storageService.SerializerOptions)!;
+        return new(storageService, data);
+    }
+
+    public async Task WriteAsync()
+    {
+        var data = GetData();
+        var json = JsonSerializer.Serialize(data, _storageService.SerializerOptions);
+
+        await File.WriteAllTextAsync(Path.Combine(_storageService.WidgetsFolderPath, _dataFileName), json);
+    }
+
+    public void Delete()
+    {
+        var dataFilePath = Path.Combine(_storageService.WidgetsFolderPath, _dataFileName);
+        File.Delete(dataFilePath);
+    }
+
+    private ExplorerItem? GetSelectedNote(IReadOnlyList<ExplorerItem> items)
+    {
+        foreach (var item in items)
+        {
+            if (item.Type == FileType.File && string.Equals(item.Path, FilePath, StringComparison.OrdinalIgnoreCase))
+            {
+                return item;
+            }
+
+            var found = GetSelectedNote(item.Children);
+            if (found is not null)
+            {
+                return found;
+            }
+        }
+
+        return null;
     }
 }

@@ -9,7 +9,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0"
+        <!--<TextBox Grid.Row="0"
                  x:Name="TitleTextBox"
                  Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  TextChanged="{x:Bind ViewModel.ValidateAndEmit}"
@@ -18,7 +18,7 @@
             <TextBox.Description>
                 <TextBlock TextWrapping="Wrap">Will be used as the name of a markdown file saved on the file system, so naming rules for files will apply.</TextBlock>
             </TextBox.Description>
-        </TextBox>
+        </TextBox>-->
     </Grid>
 
 </Page>
