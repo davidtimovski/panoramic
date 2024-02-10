@@ -37,11 +37,11 @@ public interface IStorageService
 
     void ChangeStoragePath(string storagePath);
 
-    void CreateFolder(string directory, string name);
+    void CreateFolder(Guid widgetId, string directory, string name);
     void RenameFolder(string path, string newName);
     void DeleteFolder(string path);
     void SelectNote(Guid widgetId, string? previousFilePath, string? newFilePath);
-    void CreateNote(string directory, string name);
+    void CreateNote(Guid widgetId, string directory, string name);
     void RenameNote(string path, string newName);
     void DeleteNote(string path);
 }

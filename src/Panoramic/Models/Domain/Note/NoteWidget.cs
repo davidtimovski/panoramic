@@ -98,13 +98,14 @@ public class NoteWidget : IWidget
             if (SelectedNote is not null)
             {
                 SelectedNote.Text = File.ReadAllText(NotePath.Absolute);
-                _storageService.SelectNote(Id, previousFilePath, NotePath?.Absolute);
             }
             else
             {
                 NotePath = null;
             }
         }
+
+        _storageService.SelectNote(Id, previousFilePath, NotePath?.Absolute);
     }
 
     public static async Task<NoteWidget> LoadAsync(IStorageService storageService, string json)
@@ -129,11 +130,11 @@ public class NoteWidget : IWidget
 
     private List<ExplorerItem> ConvertToExplorerItems(IReadOnlyList<FileSystemItem> fileSystemItems)
         => fileSystemItems.Select(x =>
-            new ExplorerItem(ConvertToExplorerItems(x.Children), x.SelectedInWidgetId is null || x.SelectedInWidgetId == Id)
+            new ExplorerItem(x.Path, ConvertToExplorerItems(x.Children))
             {
                 Name = x.Name,
                 Type = x.Type,
-                Path = x.Path,
+                IsEnabled = x.SelectedInWidgetId is null || x.SelectedInWidgetId == Id
             }
         ).ToList();
 
@@ -141,13 +142,13 @@ public class NoteWidget : IWidget
     {
         foreach (var item in fileSystemItems)
         {
-            if (item.Type == FileType.File && item.Path.Equals(NotePath))
+            if (item.Type == FileType.Note && item.Path.Equals(NotePath))
             {
-                return new ExplorerItem(item.SelectedInWidgetId is null || item.SelectedInWidgetId == Id)
+                return new ExplorerItem(item.Path, [])
                 {
                     Name = item.Name,
                     Type = item.Type,
-                    Path = item.Path,
+                    IsEnabled = item.SelectedInWidgetId is null || item.SelectedInWidgetId == Id
                 };
             }
 

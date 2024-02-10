@@ -181,7 +181,7 @@ public class StorageService : IStorageService
         StoragePath = storagePath;
     }
 
-    public void CreateFolder(string directory, string name)
+    public void CreateFolder(Guid widgetId, string directory, string name)
     {
         var path = Path.Combine(directory, name);
         Directory.CreateDirectory(path);
@@ -194,7 +194,7 @@ public class StorageService : IStorageService
         };
         AddItem(fileSystemItems, folder, directory);
 
-        FileCreated?.Invoke(this, new FileCreatedEventArgs(name, FileType.Folder, path));
+        FileCreated?.Invoke(this, new FileCreatedEventArgs(widgetId, name, FileType.Folder, path));
     }
 
     public void RenameFolder(string path, string newName)
@@ -221,7 +221,7 @@ public class StorageService : IStorageService
         NoteSelected?.Invoke(this, new NoteSelectedEventArgs(widgetId, previousFilePath, newFilePath));
     }
 
-    public void CreateNote(string directory, string name)
+    public void CreateNote(Guid widgetId, string directory, string name)
     {
         var path = Path.Combine(directory, $"{name}.md");
         File.Create(path).Dispose();
@@ -229,12 +229,13 @@ public class StorageService : IStorageService
         var note = new FileSystemItem
         {
             Name = name,
-            Type = FileType.File,
-            Path = new(path, StoragePath)
+            Type = FileType.Note,
+            Path = new(path, StoragePath),
+            SelectedInWidgetId = widgetId
         };
         AddItem(fileSystemItems, note, directory);
 
-        FileCreated?.Invoke(this, new FileCreatedEventArgs(name, FileType.File, path));
+        FileCreated?.Invoke(this, new FileCreatedEventArgs(widgetId, name, FileType.Note, path));
     }
 
     public void RenameNote(string path, string newName)
@@ -281,7 +282,7 @@ public class StorageService : IStorageService
     {
         for (var i = 0; i < items.Count; i++)
         {
-            if (items[i].Type == FileType.File)
+            if (items[i].Type == FileType.Note)
             {
                 continue;
             }
@@ -391,7 +392,7 @@ public class StorageService : IStorageService
         node.Children = subdirectories.Select(x => DirectoryToTreeViewNode(x, storagePath)).ToList();
 
         var filePaths = Directory.GetFiles(currentPath, "*.md").OrderBy(x => Path.GetFileName(x)).ToList();
-        node.Children.AddRange(filePaths.Select(x => new FileSystemItem { Name = Path.GetFileNameWithoutExtension(x), Type = FileType.File, Path = new(x, StoragePath) }));
+        node.Children.AddRange(filePaths.Select(x => new FileSystemItem { Name = Path.GetFileNameWithoutExtension(x), Type = FileType.Note, Path = new(x, StoragePath) }));
 
         return node;
     }

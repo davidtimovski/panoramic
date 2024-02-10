@@ -26,22 +26,22 @@
                                FontSize="16"
                                Foreground="#ddd"
                                TextWrapping="Wrap" />
+                    
+                    <Button Grid.Column="1"
+                            Click="{x:Bind ViewModel.DeselectNote}"
+                            Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}"
+                            ToolTipService.ToolTip="Explorer"
+                            Margin="0 0 10 0">
+                       <FontIcon Glyph="&#xE838;" FontSize="14" />
+                   </Button>
 
-                    <ToggleButton Grid.Column="1"
+                    <ToggleButton Grid.Column="2"
                                   Click="EditButton_Click"
                                   Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}"
                                   IsChecked="{x:Bind ViewModel.Editing, Mode=TwoWay}"
                                   ToolTipService.ToolTip="{x:Bind ViewModel.EditToggleTooltip, Mode=OneWay}"
                                   Margin="0 0 10 0">
                         <FontIcon Glyph="&#xE70F;" FontSize="14" />
-                    </ToggleButton>
-
-                    <ToggleButton Grid.Column="2"
-                                  IsChecked="{x:Bind ViewModel.ExplorerVisible, Mode=TwoWay}"
-                                  IsEnabled="{x:Bind ViewModel.ExplorerNoteToggleIsEnabled, Mode=OneWay}"
-                                  ToolTipService.ToolTip="{x:Bind ViewModel.ExplorerNoteToggleTooltip, Mode=OneWay}"
-                                  Margin="0 0 10 0">
-                        <FontIcon Glyph="&#xE838;" FontSize="14" />
                     </ToggleButton>
 
                     <DropDownButton Grid.Column="3" AutomationProperties.Name="Setting">
@@ -66,8 +66,8 @@
                                 <MenuBarItemFlyout>
                                     <MenuFlyoutItem Click="AddNote_Click">Add note</MenuFlyoutItem>
                                     <MenuFlyoutItem Click="AddFolder_Click">Add folder</MenuFlyoutItem>
-                                    <MenuFlyoutItem Click="RenameFolder_Click">Rename</MenuFlyoutItem>
-                                    <MenuFlyoutItem Click="DeleteFolder_Click">Delete</MenuFlyoutItem>
+                                    <MenuFlyoutItem Click="RenameFolder_Click" Visibility="{x:Bind RenameDeleteVisible}">Rename</MenuFlyoutItem>
+                                    <MenuFlyoutItem Click="DeleteFolder_Click" Visibility="{x:Bind RenameDeleteVisible}">Delete</MenuFlyoutItem>
                                 </MenuBarItemFlyout>
                             </TreeViewItem.ContextFlyout>
                             
@@ -99,11 +99,10 @@
                         FileTemplate="{StaticResource FileTemplate}" />
                 </Border.Resources>
 
-                <StackPanel>
+                <Grid>
                     <TreeView ItemsSource="{x:Bind ViewModel.ExplorerItems, Mode=OneWay}"
                               ItemTemplateSelector="{StaticResource ExplorerItemTemplateSelector}"
                               Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}"
-                              SelectedItem="{x:Bind ViewModel.SelectedNote, Mode=OneWay}"
                               SelectionChanged="Explorer_SelectionChanged"
                               CanDragItems="False"
                               AllowDrop="False" />
@@ -131,7 +130,7 @@
                                            Visibility="{x:Bind ViewModel.PresenterVisibility, Mode=OneWay}" />
                         </Grid>
                     </ScrollView>
-                </StackPanel>
+                </Grid>
             </Border>
 
         </Grid>

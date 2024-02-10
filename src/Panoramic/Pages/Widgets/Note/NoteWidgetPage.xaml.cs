@@ -74,52 +74,12 @@ public sealed partial class NoteWidgetPage : Page
         }
 
         var item = args.AddedItems[0] as ExplorerItem;
-        if (item!.Type == FileType.File)
+        if (item!.Type == FileType.Note)
         {
-            ViewModel.SetSelectedNote(item.Path.Absolute);
+            ViewModel.SelectNote(item.Path.Absolute);
             SetPresenterContent();
             _storageService.EnqueueWidgetWrite(_widget.Id);
         }
-    }
-
-    private async void SettingsButton_Click(object _, RoutedEventArgs e)
-    {
-        var content = new EditWidgetDialog(_widget, _storageService);
-        var dialog = new ContentDialog
-        {
-            XamlRoot = Content.XamlRoot,
-            Title = content.EditSettingsTitle,
-            Content = content,
-            PrimaryButtonText = "Save",
-            CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new AsyncRelayCommand(content.SubmitAsync),
-            CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })
-        };
-
-        content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
-        content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
-
-        ViewModel.Highlighted = true;
-
-        await dialog.ShowAsync();
-    }
-
-    private async void RemoveButton_Click(object _, RoutedEventArgs e)
-    {
-        var dialog = new ContentDialog
-        {
-            XamlRoot = Content.XamlRoot,
-            Title = "Remove widget",
-            Content = "Are you sure want to remove this widget?\n\nAny notes that you have will remain on the file system.",
-            PrimaryButtonText = "Yes, remove",
-            CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_widget); }),
-            CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })
-        };
-
-        ViewModel.Highlighted = true;
-
-        await dialog.ShowAsync();
     }
 
     private async void AddNote_Click(object _, RoutedEventArgs e)
@@ -136,7 +96,7 @@ public sealed partial class NoteWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Create",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateNote(item.Path.Absolute, content.ViewModel.Name))
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateNote(_widget.Id, item.Path.Absolute, content.ViewModel.Name))
         };
 
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
@@ -158,7 +118,7 @@ public sealed partial class NoteWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Create",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateFolder(item.Path.Absolute, content.ViewModel.Name))
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateFolder(_widget.Id, item.Path.Absolute, content.ViewModel.Name))
         };
 
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
@@ -242,6 +202,46 @@ public sealed partial class NoteWidgetPage : Page
             CloseButtonText = "Cancel",
             PrimaryButtonCommand = new RelayCommand(() => _storageService.DeleteNote(item.Path.Absolute))
         };
+
+        await dialog.ShowAsync();
+    }
+
+    private async void SettingsButton_Click(object _, RoutedEventArgs e)
+    {
+        var content = new EditWidgetDialog(_widget, _storageService);
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            Title = content.EditSettingsTitle,
+            Content = content,
+            PrimaryButtonText = "Save",
+            CloseButtonText = "Cancel",
+            PrimaryButtonCommand = new AsyncRelayCommand(content.SubmitAsync),
+            CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })
+        };
+
+        content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
+        content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+
+        ViewModel.Highlighted = true;
+
+        await dialog.ShowAsync();
+    }
+
+    private async void RemoveButton_Click(object _, RoutedEventArgs e)
+    {
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            Title = "Remove widget",
+            Content = "Are you sure want to remove this widget?\n\nAny notes that you have will remain on the file system.",
+            PrimaryButtonText = "Yes, remove",
+            CloseButtonText = "Cancel",
+            PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_widget); }),
+            CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })
+        };
+
+        ViewModel.Highlighted = true;
 
         await dialog.ShowAsync();
     }

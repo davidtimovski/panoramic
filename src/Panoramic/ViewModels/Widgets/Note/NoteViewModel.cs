@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Panoramic.Models.Domain.Note;
+using Panoramic.Services;
 using Panoramic.Services.Storage;
 
 namespace Panoramic.ViewModels.Widgets.Note;
@@ -23,8 +25,6 @@ public partial class NoteViewModel : ObservableObject
 
         _widget = widget;
 
-        explorerVisible = widget.NotePath is null;
-
         ReloadFiles();
 
         SelectedNote = _widget.SelectedNote;
@@ -33,23 +33,18 @@ public partial class NoteViewModel : ObservableObject
     public ObservableCollection<ExplorerItem> ExplorerItems { get; } = [];
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ExplorerNoteToggleIsEnabled))]
+    [NotifyPropertyChangedFor(nameof(Title))]
+    [NotifyPropertyChangedFor(nameof(ExplorerVisible))]
+    [NotifyPropertyChangedFor(nameof(NoteVisible))]
     private ExplorerItem? selectedNote;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Background))]
     private bool highlighted;
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Title))]
-    [NotifyPropertyChangedFor(nameof(ExplorerNoteToggleTooltip))]
-    [NotifyPropertyChangedFor(nameof(NoteVisible))]
-    private bool explorerVisible;
-
-    public string Title => ExplorerVisible ? "Explorer" : SelectedNote!.Name;
-    public string ExplorerNoteToggleTooltip => ExplorerVisible ? "View note" : "View explorer";
-    public bool ExplorerNoteToggleIsEnabled => SelectedNote is not null;
-    public bool NoteVisible => !ExplorerVisible;
+    public string Title => SelectedNote is null ? "Explorer" : SelectedNote.Name;
+    public bool ExplorerVisible => SelectedNote is null;
+    public bool NoteVisible => SelectedNote is not null;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EditorVisibility))]
@@ -67,10 +62,13 @@ public partial class NoteViewModel : ObservableObject
         ? (Application.Current.Resources["PanoramicWidgetHighlightedBackgroundBrush"] as SolidColorBrush)!
         : (Application.Current.Resources["PanoramicWidgetBackgroundBrush"] as SolidColorBrush)!;
 
-    public void SetSelectedNote(string? notePath)
+    public void SelectNote(string notePath)
         => _widget.SetSelectedNote(notePath);
 
-    public void ReloadFiles()
+    public void DeselectNote()
+        => _widget.SetSelectedNote(null);
+
+    private void ReloadFiles()
     {
         ExplorerItems.Clear();
 
@@ -104,14 +102,22 @@ public partial class NoteViewModel : ObservableObject
     {
         for (var i = 0; i < items.Count; i++)
         {
-            if (items[i].Type == FileType.File)
+            if (items[i].Type == FileType.Note)
             {
                 continue;
             }
 
             if (items[i].Path.Equals(item.Path.Parent))
             {
-                items[i].Children.Add(item);
+                var childrenCopy = items[i].Children.ToList();
+                childrenCopy.Add(item);
+                var ordered = childrenCopy.OrderBy(x => x.Type).ThenBy(x => x.Name).ToList();
+
+                items[i].Children.Clear();
+                foreach (var child in ordered)
+                {
+                    items[i].Children.Add(child);
+                }
                 return true;
             }
 
@@ -131,8 +137,7 @@ public partial class NoteViewModel : ObservableObject
     {
         if (SelectedNote is not null && SelectedNote.Path.IsSubPathOf(path))
         {
-            SetSelectedNote(null);
-            ExplorerVisible = true;
+            DeselectNote();
         }
 
         for (var i = 0; i < items.Count; i++)
@@ -159,6 +164,7 @@ public partial class NoteViewModel : ObservableObject
     {
         if (e.WidgetId == _widget.Id)
         {
+            SelectedNote = _widget.SelectedNote;
             return;
         }
 
@@ -167,14 +173,19 @@ public partial class NoteViewModel : ObservableObject
 
     private void FileCreated(object? _, FileCreatedEventArgs e)
     {
-        var explorerItem = new ExplorerItem(true)
+        var path = new FileSystemItemPath(e.Path, _storageService.StoragePath);
+        var explorerItem = new ExplorerItem(path, [])
         {
             Name = e.Name,
-            Type = e.Type,
-            Path = new(e.Path, _storageService.StoragePath)
+            Type = e.Type
         };
 
         AddItem(ExplorerItems, explorerItem, explorerItem.Path.Parent);
+
+        if (e.WidgetId == _widget.Id && e.Type == FileType.Note)
+        {
+            SelectNote(e.Path);
+        }
     }
 
     private void FileRenamed(object? _, EventArgs e) => ReloadFiles();

@@ -17,7 +17,10 @@ public sealed class FileSystemItemPath(string path, string storagePath)
 
     public override bool Equals(object? obj)
     {
-        ArgumentNullException.ThrowIfNull(obj, nameof(obj));
+        if (obj is null)
+        {
+            return false;
+        }
 
         if (obj is string stringPath)
         {

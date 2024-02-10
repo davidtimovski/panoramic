@@ -3,5 +3,5 @@
 public enum FileType
 {
     Folder,
-    File
+    Note
 }
