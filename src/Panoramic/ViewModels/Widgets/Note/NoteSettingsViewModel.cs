@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Events;
-using Panoramic.Services;
+using Panoramic.Services.Storage;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 

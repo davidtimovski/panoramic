@@ -7,6 +7,7 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
 using Panoramic.Services;
+using Panoramic.Services.Storage;
 using Panoramic.ViewModels;
 
 namespace Panoramic;

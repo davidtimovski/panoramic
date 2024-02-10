@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Panoramic.Services;
+using Panoramic.Services.Storage;
 
 namespace Panoramic.Models.Domain.Note;
 
@@ -38,14 +40,14 @@ public class NoteWidget : IWidget
         Type = WidgetType.Note;
         Area = data.Area;
 
-        SetSelectedNote(data.RelativeFilePath);
+        var notePath = data.RelativeFilePath is null ? null : Path.Combine(_storageService.StoragePath, data.RelativeFilePath);
+        SetSelectedNote(notePath);
     }
 
     public Guid Id { get; }
     public WidgetType Type { get; }
     public Area Area { get; set; }
-    public string? RelativeFilePath { get; private set; }
-    public string? FilePath { get; private set; }
+    public FileSystemItemPath? NotePath { get; private set; }
     public ExplorerItem? SelectedNote { get; private set; }
 
     public NoteData GetData() =>
@@ -54,7 +56,7 @@ public class NoteWidget : IWidget
             Id = Id,
             Type = WidgetType.Note,
             Area = Area,
-            RelativeFilePath = RelativeFilePath
+            RelativeFilePath = NotePath?.Relative
         };
 
     public static bool FolderCanBeCreated(string title, string directory)
@@ -76,25 +78,32 @@ public class NoteWidget : IWidget
         return !File.Exists(path);
     }
 
-    public void SetSelectedNote(string? relativeFilePath)
-    {
-        RelativeFilePath = relativeFilePath;
+    public IReadOnlyList<ExplorerItem> GetExplorerItems()
+        => ConvertToExplorerItems(_storageService.FileSystemItems);
 
-        if (RelativeFilePath is null)
+    public void SetSelectedNote(string? notePath)
+    {
+        var previousFilePath = NotePath?.Absolute;
+
+        if (notePath is null)
         {
-            FilePath = null;
+            NotePath = null;
             SelectedNote = null;
         }
         else
         {
-            FilePath = Path.Combine(_storageService.StoragePath, RelativeFilePath);
-            SelectedNote = GetSelectedNote(_storageService.ExplorerItems);
-            if (SelectedNote is null)
-            {
-                throw new InvalidOperationException($"Cannot load note at path: {FilePath}");
-            }
+            NotePath = new(notePath, _storageService.StoragePath);
+            SelectedNote = GetSelectedNote(_storageService.FileSystemItems);
 
-            SelectedNote.Text = File.ReadAllText(FilePath);
+            if (SelectedNote is not null)
+            {
+                SelectedNote.Text = File.ReadAllText(NotePath.Absolute);
+                _storageService.SelectNote(Id, previousFilePath, NotePath?.Absolute);
+            }
+            else
+            {
+                NotePath = null;
+            }
         }
     }
 
@@ -118,13 +127,28 @@ public class NoteWidget : IWidget
         File.Delete(dataFilePath);
     }
 
-    private ExplorerItem? GetSelectedNote(IReadOnlyList<ExplorerItem> items)
-    {
-        foreach (var item in items)
-        {
-            if (item.Type == FileType.File && string.Equals(item.Path, FilePath, StringComparison.OrdinalIgnoreCase))
+    private List<ExplorerItem> ConvertToExplorerItems(IReadOnlyList<FileSystemItem> fileSystemItems)
+        => fileSystemItems.Select(x =>
+            new ExplorerItem(ConvertToExplorerItems(x.Children), x.SelectedInWidgetId is null || x.SelectedInWidgetId == Id)
             {
-                return item;
+                Name = x.Name,
+                Type = x.Type,
+                Path = x.Path,
+            }
+        ).ToList();
+
+    private ExplorerItem? GetSelectedNote(IReadOnlyList<FileSystemItem> fileSystemItems)
+    {
+        foreach (var item in fileSystemItems)
+        {
+            if (item.Type == FileType.File && item.Path.Equals(NotePath))
+            {
+                return new ExplorerItem(item.SelectedInWidgetId is null || item.SelectedInWidgetId == Id)
+                {
+                    Name = item.Name,
+                    Type = item.Type,
+                    Path = item.Path,
+                };
             }
 
             var found = GetSelectedNote(item.Children);

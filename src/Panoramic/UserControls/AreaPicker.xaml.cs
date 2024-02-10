@@ -7,7 +7,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Panoramic.Models.Domain;
-using Panoramic.Services;
+using Panoramic.Services.Storage;
 
 namespace Panoramic.UserControls;
 

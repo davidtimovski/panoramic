@@ -1,11 +1,11 @@
 using System;
-using System.IO;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Services;
+using Panoramic.Services.Storage;
 using Panoramic.ViewModels.Widgets.Note;
 
 namespace Panoramic.Pages.Widgets.Note;
@@ -13,7 +13,6 @@ namespace Panoramic.Pages.Widgets.Note;
 public sealed partial class NoteWidgetPage : Page
 {
     private readonly IStorageService _storageService;
-    private readonly IEventHub _eventHub;
     private readonly IMarkdownService _markdownService;
     private readonly NoteWidget _widget;
 
@@ -23,10 +22,6 @@ public sealed partial class NoteWidgetPage : Page
 
         _storageService = serviceProvider.GetRequiredService<IStorageService>();
 
-        _eventHub = serviceProvider.GetRequiredService<IEventHub>();
-        _eventHub.FileCreated += FileCreated;
-        _eventHub.FileRenamed += FileRenamed;
-        _eventHub.FileDeleted += FileDeleted;
 
         _markdownService = serviceProvider.GetRequiredService<IMarkdownService>();
         _widget = widget;
@@ -38,10 +33,10 @@ public sealed partial class NoteWidgetPage : Page
 
     public NoteViewModel ViewModel { get; }
 
-    //private void Editor_TextChanged(object _, TextChangedEventArgs e)
-    //{
-    //    _widget.SelectedNote!.Text = ViewModel.SelectedNote!.Text;
-    //}
+    private void Editor_TextChanged(object _, TextChangedEventArgs e)
+    {
+        _widget.SelectedNote!.Text = ViewModel.SelectedNote!.Text;
+    }
 
     private void SetPresenterContent()
     {
@@ -81,7 +76,7 @@ public sealed partial class NoteWidgetPage : Page
         var item = args.AddedItems[0] as ExplorerItem;
         if (item!.Type == FileType.File)
         {
-            ViewModel.SetSelectedItem(item.Path);
+            ViewModel.SetSelectedNote(item.Path.Absolute);
             SetPresenterContent();
             _storageService.EnqueueWidgetWrite(_widget.Id);
         }
@@ -132,7 +127,7 @@ public sealed partial class NoteWidgetPage : Page
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
         var item = (ExplorerItem)menuItem.DataContext;
 
-        var content = new NewNoteForm(Path.GetDirectoryName(item.Path)!);
+        var content = new NewNoteForm(item.Path.Parent);
 
         var dialog = new ContentDialog
         {
@@ -141,11 +136,7 @@ public sealed partial class NoteWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Create",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() =>
-            {
-                _storageService.CreateNote(item.Path, content.ViewModel.Name);
-                _eventHub.RaiseFileCreated(content.ViewModel.Name, item.Path, FileType.File);
-            })
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateNote(item.Path.Absolute, content.ViewModel.Name))
         };
 
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
@@ -158,7 +149,7 @@ public sealed partial class NoteWidgetPage : Page
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
         var item = (ExplorerItem)menuItem.DataContext;
 
-        var content = new NewFolderForm(Path.GetDirectoryName(item.Path)!);
+        var content = new NewFolderForm(item.Path.Parent);
 
         var dialog = new ContentDialog
         {
@@ -167,11 +158,7 @@ public sealed partial class NoteWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Create",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() =>
-            {
-                _storageService.CreateFolder(item.Path, content.ViewModel.Name);
-                _eventHub.RaiseFileCreated(content.ViewModel.Name, item.Path, FileType.Folder);
-            })
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateFolder(item.Path.Absolute, content.ViewModel.Name))
         };
 
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
@@ -184,7 +171,7 @@ public sealed partial class NoteWidgetPage : Page
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
         var item = (ExplorerItem)menuItem.DataContext;
 
-        var content = new FolderRenameForm(item.Path);
+        var content = new FolderRenameForm(item.Path.Absolute);
 
         var dialog = new ContentDialog
         {
@@ -193,11 +180,7 @@ public sealed partial class NoteWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() =>
-            {
-                _storageService.RenameFolder(item.Path, content.ViewModel.Name);
-                _eventHub.RaiseFileRenamed();
-            })
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.RenameFolder(item.Path.Absolute, content.ViewModel.Name))
         };
 
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
@@ -217,11 +200,7 @@ public sealed partial class NoteWidgetPage : Page
             Content = $@"Are you sure want to delete the ""{item.Name}"" folder and everything in it?",
             PrimaryButtonText = "Yes, delete",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() =>
-            {
-                _storageService.DeleteFolder(item.Path);
-                _eventHub.RaiseFileDeleted(item.Path);
-            })
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.DeleteFolder(item.Path.Absolute))
         };
 
         await dialog.ShowAsync();
@@ -232,7 +211,7 @@ public sealed partial class NoteWidgetPage : Page
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
         var item = (ExplorerItem)menuItem.DataContext;
 
-        var content = new NoteRenameForm(item.Path);
+        var content = new NoteRenameForm(item.Path.Absolute);
 
         var dialog = new ContentDialog
         {
@@ -241,11 +220,7 @@ public sealed partial class NoteWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() =>
-            {
-                _storageService.RenameNote(item.Path, content.ViewModel.Name);
-                _eventHub.RaiseFileRenamed();
-            })
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.RenameNote(item.Path.Absolute, content.ViewModel.Name))
         };
 
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
@@ -265,19 +240,9 @@ public sealed partial class NoteWidgetPage : Page
             Content = $@"Are you sure want to delete the ""{item.Name}"" note?",
             PrimaryButtonText = "Yes, delete",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() =>
-            {
-                _storageService.DeleteNote(item.Path);
-                _eventHub.RaiseFileDeleted(item.Path);
-            })
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.DeleteNote(item.Path.Absolute))
         };
 
         await dialog.ShowAsync();
     }
-
-    private void FileCreated(object? _, FileCreatedEventArgs e) => ViewModel.AddItem(e.Name, e.Directory, e.Type);
-
-    private void FileRenamed(object? _, EventArgs e) => ViewModel.ReloadFiles();
-
-    private void FileDeleted(object? _, FileDeletedEventArgs e) => ViewModel.RemoveItem(e.Path);
 }

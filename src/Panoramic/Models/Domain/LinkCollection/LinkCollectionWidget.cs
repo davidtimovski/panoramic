@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Panoramic.Services;
+using Panoramic.Services.Storage;
 
 namespace Panoramic.Models.Domain.LinkCollection;
 

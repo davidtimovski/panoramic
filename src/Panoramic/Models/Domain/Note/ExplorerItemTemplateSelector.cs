@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Panoramic.Services.Storage;
 
 namespace Panoramic.Models.Domain.Note;
 

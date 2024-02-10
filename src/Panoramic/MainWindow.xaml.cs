@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
-using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Domain.RecentLinks;
@@ -13,7 +12,7 @@ using Panoramic.Pages.Widgets;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
-using Panoramic.Services;
+using Panoramic.Services.Storage;
 using Panoramic.ViewModels;
 
 namespace Panoramic;
@@ -70,11 +69,11 @@ public sealed partial class MainWindow : Window
             PrimaryButtonText = "Add",
             CloseButtonText = "Cancel",
             PrimaryButtonCommand = new AsyncRelayCommand(content.SubmitAsync),
-            IsPrimaryButtonEnabled = false
+            //IsPrimaryButtonEnabled = false
         };
 
         content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
-        content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        //content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
 
         await dialog.ShowAsync();
     }
@@ -98,15 +97,15 @@ public sealed partial class MainWindow : Window
             _ => throw new InvalidOperationException("Unsupported widget type")
         };
 
-        Area area = (Area)widget.Area;
+        var name = widget.Id.ToString("N");
 
-        content.SetValue(Page.NameProperty, widget.Id.ToString("N"));
-        content.SetValue(Grid.RowProperty, area.Row);
-        content.SetValue(Grid.ColumnProperty, area.Column);
-        content.SetValue(Grid.RowSpanProperty, area.RowSpan);
-        content.SetValue(Grid.ColumnSpanProperty, area.ColumnSpan);
+        content.SetValue(Page.NameProperty, name);
+        content.SetValue(Grid.RowProperty, widget.Area.Row);
+        content.SetValue(Grid.ColumnProperty, widget.Area.Column);
+        content.SetValue(Grid.RowSpanProperty, widget.Area.RowSpan);
+        content.SetValue(Grid.ColumnSpanProperty, widget.Area.ColumnSpan);
 
-        var widgetPage = Grid.Children.OfType<Page>().FirstOrDefault(x => x.Name == widget.Id.ToString("N"));
+        var widgetPage = Grid.Children.OfType<Page>().FirstOrDefault(x => x.Name == name);
         if (widget is not null)
         {
             Grid.Children.Remove(widgetPage);

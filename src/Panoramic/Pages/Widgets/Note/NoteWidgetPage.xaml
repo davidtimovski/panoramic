@@ -37,9 +37,10 @@
                     </ToggleButton>
 
                     <ToggleButton Grid.Column="2"
-                                IsChecked="{x:Bind ViewModel.ExplorerVisible, Mode=TwoWay}"
-                                ToolTipService.ToolTip="{x:Bind ViewModel.ExplorerNoteToggleTooltip, Mode=OneWay}"
-                                Margin="0 0 10 0">
+                                  IsChecked="{x:Bind ViewModel.ExplorerVisible, Mode=TwoWay}"
+                                  IsEnabled="{x:Bind ViewModel.ExplorerNoteToggleIsEnabled, Mode=OneWay}"
+                                  ToolTipService.ToolTip="{x:Bind ViewModel.ExplorerNoteToggleTooltip, Mode=OneWay}"
+                                  Margin="0 0 10 0">
                         <FontIcon Glyph="&#xE838;" FontSize="14" />
                     </ToggleButton>
 
@@ -72,25 +73,23 @@
                             
                             <StackPanel Orientation="Horizontal">
                                 <FontIcon Glyph="&#xE8B7;" Foreground="#ddd" />
-                                <TextBlock Margin="0 0 10 0"/>
-                                <TextBlock Text="{x:Bind Name}" />
+                                <TextBlock Text="{x:Bind Name}" Margin="10 0 0 0" />
                             </StackPanel>
                         </TreeViewItem>
                     </DataTemplate>
 
                     <DataTemplate x:Key="FileTemplate" x:DataType="m:ExplorerItem">
-                        <TreeViewItem AutomationProperties.Name="{x:Bind Name}">
+                        <TreeViewItem AutomationProperties.Name="{x:Bind Name}" IsEnabled="{x:Bind IsEnabled, Mode=OneWay}">
                             <TreeViewItem.ContextFlyout>
                                 <MenuBarItemFlyout>
                                     <MenuFlyoutItem Click="RenameNote_Click">Rename</MenuFlyoutItem>
                                     <MenuFlyoutItem Click="DeleteNote_Click">Delete</MenuFlyoutItem>
                                 </MenuBarItemFlyout>
                             </TreeViewItem.ContextFlyout>
-                            
-                            <StackPanel Orientation="Horizontal">
+
+                            <StackPanel Orientation="Horizontal" Opacity="{x:Bind Opacity, Mode=OneWay}">
                                 <FontIcon Glyph="&#xE8A5;" Foreground="{StaticResource PanoramicBlueForeground}" />
-                                <TextBlock Margin="0 0 10 0"/>
-                                <TextBlock Text="{x:Bind Name}"/>
+                                <TextBlock Text="{x:Bind Name}" Margin="10 0 0 0 "/>
                             </StackPanel>
                         </TreeViewItem>
                     </DataTemplate>
@@ -123,6 +122,7 @@
                                      Grid.Column="0"
                                      x:Name="Editor"
                                      Text="{x:Bind ViewModel.SelectedNote.Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     TextChanged="Editor_TextChanged"
                                      Visibility="{x:Bind ViewModel.EditorVisibility, Mode=OneWay}"
                                      AcceptsReturn="True" />
                             <RichTextBlock Grid.Row="0"

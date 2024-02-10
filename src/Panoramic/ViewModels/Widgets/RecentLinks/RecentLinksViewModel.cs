@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Services;
+using Panoramic.Services.Storage;
 
 namespace Panoramic.ViewModels.Widgets.RecentLinks;
 

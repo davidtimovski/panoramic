@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Panoramic.Models.Domain.Note;
-using Panoramic.Services;
+using Panoramic.Services.Storage;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 
@@ -18,19 +16,24 @@ public partial class NoteViewModel : ObservableObject
     public NoteViewModel(NoteWidget widget, IStorageService storageService)
     {
         _storageService = storageService;
+        _storageService.FileCreated += FileCreated;
+        _storageService.FileRenamed += FileRenamed;
+        _storageService.FileDeleted += FileDeleted;
+        _storageService.NoteSelected += NoteSelected;
+
         _widget = widget;
+
+        explorerVisible = widget.NotePath is null;
 
         ReloadFiles();
 
-        if (_widget.FilePath is not null)
-        {
-            SetSelectedItem(_widget.FilePath);
-        }
+        SelectedNote = _widget.SelectedNote;
     }
 
     public ObservableCollection<ExplorerItem> ExplorerItems { get; } = [];
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ExplorerNoteToggleIsEnabled))]
     private ExplorerItem? selectedNote;
 
     [ObservableProperty]
@@ -45,7 +48,7 @@ public partial class NoteViewModel : ObservableObject
 
     public string Title => ExplorerVisible ? "Explorer" : SelectedNote!.Name;
     public string ExplorerNoteToggleTooltip => ExplorerVisible ? "View note" : "View explorer";
-
+    public bool ExplorerNoteToggleIsEnabled => SelectedNote is not null;
     public bool NoteVisible => !ExplorerVisible;
 
     [ObservableProperty]
@@ -64,52 +67,57 @@ public partial class NoteViewModel : ObservableObject
         ? (Application.Current.Resources["PanoramicWidgetHighlightedBackgroundBrush"] as SolidColorBrush)!
         : (Application.Current.Resources["PanoramicWidgetBackgroundBrush"] as SolidColorBrush)!;
 
-    public void SetSelectedItem(string filePath)
-    {
-        var relativeFilePath = Path.GetRelativePath(_storageService.StoragePath, filePath);
-        _widget.SetSelectedNote(relativeFilePath);
-        SelectedNote = _widget.SelectedNote;
-
-        ExplorerVisible = false;
-    }
+    public void SetSelectedNote(string? notePath)
+        => _widget.SetSelectedNote(notePath);
 
     public void ReloadFiles()
     {
         ExplorerItems.Clear();
 
-        foreach (var item in _storageService.ExplorerItems)
+        var root = _widget.GetExplorerItems()[0];
+        ExplorerItems.Add(root);
+    }
+
+    private static void UpdateNoteSelection(ObservableCollection<ExplorerItem> items, string? previousFilePath, string? newFilePath)
+    {
+        foreach (var item in items)
         {
-            ExplorerItems.Add(item);
+            if (item.Type == FileType.Folder)
+            {
+                UpdateNoteSelection(item.Children, previousFilePath, newFilePath);
+            }
+            else
+            {
+                if (newFilePath is not null && item.Path.Equals(newFilePath))
+                {
+                    item.IsEnabled = false;
+                }
+                else if (previousFilePath is not null && item.Path.Equals(previousFilePath))
+                {
+                    item.IsEnabled = true;
+                }
+            }
         }
     }
 
-    public void AddItem(string name, string directory, FileType type)
+    private static bool AddItem(ObservableCollection<ExplorerItem> items, ExplorerItem item, string directory)
     {
-        var newItem = new ExplorerItem { Name = name, Path = Path.Combine(directory, name), Type = type };
-        AddItem(newItem, directory, ExplorerItems);
-    }
-
-    private static bool AddItem(ExplorerItem item, string directory, ObservableCollection<ExplorerItem> collection)
-    {
-        for (var i = 0; i < collection.Count; i++)
+        for (var i = 0; i < items.Count; i++)
         {
-            var parentDirectory = Path.GetDirectoryName(collection[i].Path);
-            if (string.Equals(parentDirectory, directory, StringComparison.OrdinalIgnoreCase))
+            if (items[i].Type == FileType.File)
             {
-                var updatedCopy = collection.Concat([item]).OrderBy(x => x.Name).ToList();
+                continue;
+            }
 
-                collection.Clear();
-                foreach (var copyItem in updatedCopy)
-                {
-                    collection.Add(copyItem);
-                }
-
+            if (items[i].Path.Equals(item.Path.Parent))
+            {
+                items[i].Children.Add(item);
                 return true;
             }
 
-            for (var j = 0; j < collection[i].Children.Count; j++)
+            for (var j = 0; j < items[i].Children.Count; j++)
             {
-                if (AddItem(item, directory, collection[i].Children))
+                if (AddItem(items[i].Children, item, directory))
                 {
                     return true;
                 }
@@ -119,21 +127,25 @@ public partial class NoteViewModel : ObservableObject
         return false;
     }
 
-    public void RemoveItem(string path) => RemoveItem(path, ExplorerItems);
-
-    private static bool RemoveItem(string path, ObservableCollection<ExplorerItem> collection)
+    private bool RemoveItem(ObservableCollection<ExplorerItem> items, string path)
     {
-        for (var i = 0; i < collection.Count; i++)
+        if (SelectedNote is not null && SelectedNote.Path.IsSubPathOf(path))
         {
-            if (string.Equals(collection[i].Path, path, StringComparison.OrdinalIgnoreCase))
+            SetSelectedNote(null);
+            ExplorerVisible = true;
+        }
+
+        for (var i = 0; i < items.Count; i++)
+        {
+            if (items[i].Path.Equals(path))
             {
-                collection.RemoveAt(i);
+                items.RemoveAt(i);
                 return true;
             }
 
-            for (var j = 0; j < collection[i].Children.Count; j++)
+            for (var j = 0; j < items[i].Children.Count; j++)
             {
-                if (RemoveItem(path, collection[i].Children))
+                if (RemoveItem(items[i].Children, path))
                 {
                     return true;
                 }
@@ -142,4 +154,30 @@ public partial class NoteViewModel : ObservableObject
 
         return false;
     }
+
+    private void NoteSelected(object? _, NoteSelectedEventArgs e)
+    {
+        if (e.WidgetId == _widget.Id)
+        {
+            return;
+        }
+
+        UpdateNoteSelection(ExplorerItems, e.PreviousFilePath, e.NewFilePath);
+    }
+
+    private void FileCreated(object? _, FileCreatedEventArgs e)
+    {
+        var explorerItem = new ExplorerItem(true)
+        {
+            Name = e.Name,
+            Type = e.Type,
+            Path = new(e.Path, _storageService.StoragePath)
+        };
+
+        AddItem(ExplorerItems, explorerItem, explorerItem.Path.Parent);
+    }
+
+    private void FileRenamed(object? _, EventArgs e) => ReloadFiles();
+
+    private void FileDeleted(object? _, FileDeletedEventArgs e) => RemoveItem(ExplorerItems, e.Path);
 }

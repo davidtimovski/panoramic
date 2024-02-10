@@ -11,7 +11,7 @@ using Panoramic.Models.Events;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
-using Panoramic.Services;
+using Panoramic.Services.Storage;
 using Panoramic.UserControls;
 using Panoramic.ViewModels.Widgets.LinkCollection;
 using Panoramic.ViewModels.Widgets.Note;
