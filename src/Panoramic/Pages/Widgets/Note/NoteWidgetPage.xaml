@@ -30,7 +30,7 @@
                     <Button Grid.Column="1"
                             Click="{x:Bind ViewModel.DeselectNote}"
                             Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}"
-                            ToolTipService.ToolTip="Explorer"
+                            ToolTipService.ToolTip="Explore"
                             Margin="0 0 10 0">
                        <FontIcon Glyph="&#xE838;" FontSize="14" />
                    </Button>
@@ -89,7 +89,7 @@
 
                             <StackPanel Orientation="Horizontal" Opacity="{x:Bind Opacity, Mode=OneWay}">
                                 <FontIcon Glyph="&#xE8A5;" Foreground="{StaticResource PanoramicBlueForeground}" />
-                                <TextBlock Text="{x:Bind Name}" Margin="10 0 0 0 "/>
+                                <TextBlock Text="{x:Bind Name}" Margin="10 0 0 0" />
                             </StackPanel>
                         </TreeViewItem>
                     </DataTemplate>

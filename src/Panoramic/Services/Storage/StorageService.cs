@@ -25,9 +25,14 @@ public class StorageService : IStorageService
     private readonly DispatcherQueueTimer _timer;
 
     /// <summary>
-    /// Stores the widgets that have been changed and need to be written to disk.
+    /// Holds the widgets that have been changed and need to be written to disk.
     /// </summary>
     private readonly HashSet<Guid> _unsavedWidgets = [];
+
+    /// <summary>
+    /// Holds the notes that have been changed and need to be written to disk.
+    /// </summary>
+    private readonly Dictionary<string, string> _unsavedNotes = [];
 
     public StorageService()
     {
@@ -45,23 +50,29 @@ public class StorageService : IStorageService
         _timer.Interval = TimeSpan.FromSeconds(15);
         _timer.Tick += async (timer, _) =>
         {
-            var tasks = new List<Task>(_unsavedWidgets.Count);
+            var tasks = new List<Task>(_unsavedWidgets.Count + _unsavedNotes.Count);
 
             foreach (var id in _unsavedWidgets)
             {
-                var widget = Widgets[id];
-                tasks.Add(widget.WriteAsync());
+                tasks.Add(Widgets[id].WriteAsync());
+            }
+
+            foreach (var note in _unsavedNotes)
+            {
+                tasks.Add(File.WriteAllTextAsync(note.Key, note.Value));
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
 
             _unsavedWidgets.Clear();
+            _unsavedNotes.Clear();
             _timer.Stop();
         };
     }
 
     public event EventHandler<WidgetUpdatedEventArgs>? WidgetUpdated;
     public event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
+    public event EventHandler<EventArgs>? StoragePathChanged;
     public event EventHandler<FileCreatedEventArgs>? FileCreated;
     public event EventHandler<EventArgs>? FileRenamed;
     public event EventHandler<FileDeletedEventArgs>? FileDeleted;
@@ -117,25 +128,31 @@ public class StorageService : IStorageService
 
     public async Task WriteNotesAsync()
     {
-        //var editedNotes = new List<FileSystemItem>();
-        //CollectEditedNotes(FileSystemItems, editedNotes);
+        var saveNoteTasks = new List<Task>(_unsavedNotes.Count);
+        foreach (var note in _unsavedNotes)
+        {
+            saveNoteTasks.Add(File.WriteAllTextAsync(note.Key, note.Value));
+        }
 
-        //// Save unsaved notes across all Note widgets.
-        //// If two widgets have changes to the same note, use the last changed one.
-        //var unsavedNotes = editedNotes.OrderByDescending(x => x.LastEdited).ToList();
-        //var saveNoteTasks = new List<Task>(unsavedNotes.Count);
-        //foreach (var note in unsavedNotes)
-        //{
-        //    saveNoteTasks.Add(File.WriteAllTextAsync(note.Path, note.Text));
-        //}
-
-        //await Task.WhenAll(saveNoteTasks).ConfigureAwait(false);
+        await Task.WhenAll(saveNoteTasks).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
     public void EnqueueWidgetWrite(Guid id)
     {
         _unsavedWidgets.Add(id);
+
+        _timer.Stop();
+        _timer.Start();
+    }
+
+    /// <inheritdoc/>
+    public void EnqueueNoteWrite(string path, string text)
+    {
+        if (!_unsavedNotes.TryAdd(path, text))
+        {
+            _unsavedNotes[path] = text;
+        }
 
         _timer.Stop();
         _timer.Start();
@@ -178,7 +195,12 @@ public class StorageService : IStorageService
 
         Directory.Move(StoragePath, storagePath);
 
+        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+        localSettings.Values[nameof(StoragePath)] = storagePath;
+
         StoragePath = storagePath;
+
+        StoragePathChanged?.Invoke(this, new EventArgs());
     }
 
     public void CreateFolder(Guid widgetId, string directory, string name)

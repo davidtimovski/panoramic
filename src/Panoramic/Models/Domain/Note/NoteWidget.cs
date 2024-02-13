@@ -108,10 +108,10 @@ public class NoteWidget : IWidget
         _storageService.SelectNote(Id, previousFilePath, NotePath?.Absolute);
     }
 
-    public static async Task<NoteWidget> LoadAsync(IStorageService storageService, string json)
+    public static Task<NoteWidget> LoadAsync(IStorageService storageService, string json)
     {
         var data = JsonSerializer.Deserialize<NoteData>(json, storageService.SerializerOptions)!;
-        return new(storageService, data);
+        return Task.FromResult<NoteWidget>(new(storageService, data));
     }
 
     public async Task WriteAsync()

@@ -22,6 +22,7 @@ public partial class NoteViewModel : ObservableObject
         _storageService.FileRenamed += FileRenamed;
         _storageService.FileDeleted += FileDeleted;
         _storageService.NoteSelected += NoteSelected;
+        _storageService.StoragePathChanged += StoragePathChanged;
 
         _widget = widget;
 
@@ -42,7 +43,7 @@ public partial class NoteViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(Background))]
     private bool highlighted;
 
-    public string Title => SelectedNote is null ? "Explorer" : SelectedNote.Name;
+    public string Title => SelectedNote is null ? "Notes" : SelectedNote.Name;
     public bool ExplorerVisible => SelectedNote is null;
     public bool NoteVisible => SelectedNote is not null;
 
@@ -63,10 +64,16 @@ public partial class NoteViewModel : ObservableObject
         : (Application.Current.Resources["PanoramicWidgetBackgroundBrush"] as SolidColorBrush)!;
 
     public void SelectNote(string notePath)
-        => _widget.SetSelectedNote(notePath);
+    {
+        _widget.SetSelectedNote(notePath);
+        _storageService.EnqueueWidgetWrite(_widget.Id);
+    }
 
     public void DeselectNote()
-        => _widget.SetSelectedNote(null);
+    {
+        _widget.SetSelectedNote(null);
+        _storageService.EnqueueWidgetWrite(_widget.Id);
+    }
 
     private void ReloadFiles()
     {
@@ -191,4 +198,7 @@ public partial class NoteViewModel : ObservableObject
     private void FileRenamed(object? _, EventArgs e) => ReloadFiles();
 
     private void FileDeleted(object? _, FileDeletedEventArgs e) => RemoveItem(ExplorerItems, e.Path);
+
+    private void StoragePathChanged(object? _, EventArgs e)
+        => ReloadFiles();
 }

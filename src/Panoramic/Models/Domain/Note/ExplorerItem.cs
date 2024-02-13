@@ -26,17 +26,7 @@ public partial class ExplorerItem : ObservableObject
     public required string Name { get; init; }
     public required FileType Type { get; init; }
     public FileSystemItemPath Path { get; init; }
-
-    private string? text;
-    public string? Text
-    {
-        get => text;
-        set
-        {
-            text = value;
-            LastEdited = DateTime.Now;
-        }
-    }
+    public string? Text { get; set; }
     public ObservableCollection<ExplorerItem> Children = [];
 
     [ObservableProperty]
@@ -49,6 +39,4 @@ public partial class ExplorerItem : ObservableObject
     public Visibility RenameDeleteVisible { get; }
 
     public double Opacity => IsEnabled ? 1 : 0.5;
-
-    public DateTime? LastEdited { get; private set; }
 }

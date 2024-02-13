@@ -10,6 +10,7 @@ public interface IStorageService
 {
     event EventHandler<WidgetUpdatedEventArgs>? WidgetUpdated;
     event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
+    event EventHandler<EventArgs>? StoragePathChanged;
     event EventHandler<FileCreatedEventArgs>? FileCreated;
     event EventHandler<EventArgs>? FileRenamed;
     event EventHandler<FileDeletedEventArgs>? FileDeleted;
@@ -30,6 +31,12 @@ public interface IStorageService
     /// Will reset the timer if other changes have been scheduled.
     /// </summary>
     void EnqueueWidgetWrite(Guid id);
+
+    /// <summary>
+    /// Schedules a note save to disk.
+    /// Will reset the timer if other changes have been scheduled.
+    /// </summary>
+    void EnqueueNoteWrite(string path, string text);
 
     void DeleteWidget(IWidget widget);
     Task AddNewWidgetAsync(IWidget widget);

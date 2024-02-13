@@ -36,6 +36,7 @@ public sealed partial class NoteWidgetPage : Page
     private void Editor_TextChanged(object _, TextChangedEventArgs e)
     {
         _widget.SelectedNote!.Text = ViewModel.SelectedNote!.Text;
+        _storageService.EnqueueNoteWrite(_widget.SelectedNote.Path.Absolute, _widget.SelectedNote!.Text!);
     }
 
     private void SetPresenterContent()

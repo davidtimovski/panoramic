@@ -124,7 +124,7 @@ public sealed partial class MainWindow : Window
             Content = content,
             PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(content.Submit)
+            PrimaryButtonCommand = new RelayCommand(content.ViewModel.Submit)
         };
 
         content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
