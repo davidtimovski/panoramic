@@ -123,11 +123,14 @@
                                      Text="{x:Bind ViewModel.SelectedNote.Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      TextChanged="Editor_TextChanged"
                                      Visibility="{x:Bind ViewModel.EditorVisibility, Mode=OneWay}"
+                                     FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}"
+                                     FontSize="{x:Bind ViewModel.FontSize, Mode=OneWay}"
                                      AcceptsReturn="True" />
                             <RichTextBlock Grid.Row="0"
                                            Grid.Column="0"
                                            x:Name="Presenter"
-                                           Visibility="{x:Bind ViewModel.PresenterVisibility, Mode=OneWay}" />
+                                           Visibility="{x:Bind ViewModel.PresenterVisibility, Mode=OneWay}"
+                                           FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}" />
                         </Grid>
                     </ScrollView>
                 </Grid>

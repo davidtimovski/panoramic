@@ -17,15 +17,16 @@ public class NoteWidget : IWidget
     /// <summary>
     /// Constructs a new note widget.
     /// </summary>
-    public NoteWidget(IStorageService storageService, Area area)
+    public NoteWidget(IStorageService storageService, Area area, string fontFamily, double fontSize)
     {
         _storageService = storageService;
 
         Id = Guid.NewGuid();
         _dataFileName = $"{Id}.json";
 
-        Type = WidgetType.Note;
         Area = area;
+        FontFamily = fontFamily;
+        FontSize = fontSize;
     }
 
     /// <summary>
@@ -37,16 +38,19 @@ public class NoteWidget : IWidget
         _dataFileName = $"{data.Id}.json";
 
         Id = data.Id;
-        Type = WidgetType.Note;
         Area = data.Area;
+        FontFamily = data.FontFamily;
+        FontSize = data.FontSize;
 
         var notePath = data.RelativeFilePath is null ? null : Path.Combine(_storageService.StoragePath, data.RelativeFilePath);
         SetSelectedNote(notePath);
     }
 
     public Guid Id { get; }
-    public WidgetType Type { get; }
+    public WidgetType Type { get; } = WidgetType.Note;
     public Area Area { get; set; }
+    public string FontFamily { get; set; }
+    public double FontSize { get; set; }
     public FileSystemItemPath? NotePath { get; private set; }
     public ExplorerItem? SelectedNote { get; private set; }
 
@@ -54,8 +58,9 @@ public class NoteWidget : IWidget
         new()
         {
             Id = Id,
-            Type = WidgetType.Note,
             Area = Area,
+            FontFamily = FontFamily,
+            FontSize = FontSize,
             RelativeFilePath = NotePath?.Relative
         };
 

@@ -23,7 +23,6 @@ public class RecentLinksWidget : IWidget
         Id = Guid.NewGuid();
         _dataFileName = $"{Id}.json";
 
-        Type = WidgetType.RecentLinks;
         Area = area;
         Title = title;
         Capacity = capacity;
@@ -40,7 +39,6 @@ public class RecentLinksWidget : IWidget
         _dataFileName = $"{data.Id}.json";
 
         Id = data.Id;
-        Type = WidgetType.RecentLinks;
         Area = data.Area;
         Title = data.Title;
         Capacity = data.Capacity;
@@ -49,7 +47,7 @@ public class RecentLinksWidget : IWidget
     }
 
     public Guid Id { get; }
-    public WidgetType Type { get; }
+    public WidgetType Type { get; } = WidgetType.RecentLinks;
     public Area Area { get; set; }
     public string Title { get; set; }
     public int Capacity { get; set; }
@@ -70,10 +68,12 @@ public class RecentLinksWidget : IWidget
 
     public void HyperlinkClicked(string title, Uri uri, DateTime clicked)
     {
-        var link = Links.FirstOrDefault(x => string.Equals(x.Uri.ToString(), uri.ToString(), StringComparison.OrdinalIgnoreCase));
+        var clickedLink = new RecentLink { Title = title, Uri = uri, Clicked = clicked };
+
+        var link = Links.FirstOrDefault(x => x.Uri.Equals(uri));
         if (link is null)
         {
-            links.Add(new RecentLink { Title = title, Uri = uri, Clicked = clicked });
+            links.Add(clickedLink);
 
             if (Links.Count > Capacity)
             {
@@ -82,7 +82,7 @@ public class RecentLinksWidget : IWidget
         }
         else
         {
-            link.Clicked = clicked;
+            links[links.IndexOf(link)] = clickedLink;
         }
 
         var query = Links.AsEnumerable();
@@ -101,7 +101,6 @@ public class RecentLinksWidget : IWidget
         new()
         {
             Id = Id,
-            Type = WidgetType.RecentLinks,
             Area = Area,
             Title = Title,
             Capacity = Capacity,

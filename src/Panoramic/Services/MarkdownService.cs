@@ -10,7 +10,7 @@ namespace Panoramic.Services;
 
 public interface IMarkdownService
 {
-    IReadOnlyList<Paragraph> TextToMarkdownParagraphs(string text, string noteName);
+    IReadOnlyList<Paragraph> TextToMarkdownParagraphs(string text, string noteName, double fontSize);
 }
 
 public partial class MarkdownService : IMarkdownService
@@ -30,7 +30,7 @@ public partial class MarkdownService : IMarkdownService
         _eventHub = eventHub;
     }
 
-    public IReadOnlyList<Paragraph> TextToMarkdownParagraphs(string text, string noteName)
+    public IReadOnlyList<Paragraph> TextToMarkdownParagraphs(string text, string noteName, double fontSize)
     {
         var lines = text.Split('\r').Where(x => x.Trim().Length > 0).ToList();
         var result = new List<Paragraph>(lines.Count);
@@ -41,27 +41,27 @@ public partial class MarkdownService : IMarkdownService
 
             if (IsHeader1(line))
             {
-                result.Add(ToHeader1(line, noteName));
+                result.Add(ToHeader1(line, noteName, fontSize));
             }
             else if (IsHeader2(line))
             {
-                result.Add(ToHeader2(line, noteName));
+                result.Add(ToHeader2(line, noteName, fontSize));
             }
             else if (IsHeader3(line))
             {
-                result.Add(ToHeader3(line, noteName));
+                result.Add(ToHeader3(line, noteName, fontSize));
             }
             else if (IsHeader4(line))
             {
-                result.Add(ToHeader4(line, noteName));
+                result.Add(ToHeader4(line, noteName, fontSize));
             }
             else if (IsHeader5(line))
             {
-                result.Add(ToHeader5(line, noteName));
+                result.Add(ToHeader5(line, noteName, fontSize));
             }
             else if (IsHeader6(line))
             {
-                result.Add(ToHeader6(line, noteName));
+                result.Add(ToHeader6(line, noteName, fontSize));
             }
             else if (IsBulletPoint(line))
             {
@@ -72,7 +72,7 @@ public partial class MarkdownService : IMarkdownService
                     lastBulletPoint = !(IsBulletPoint(nextLine) || IsNestedBulletPoint(nextLine));
                 }
 
-                result.Add(ToBulletPoint(line, lastBulletPoint, noteName));
+                result.Add(ToBulletPoint(line, lastBulletPoint, noteName, fontSize));
             }
             else if (IsNestedBulletPoint(line))
             {
@@ -83,129 +83,131 @@ public partial class MarkdownService : IMarkdownService
                     lastBulletPoint = !(IsBulletPoint(nextLine) || IsNestedBulletPoint(nextLine));
                 }
 
-                result.Add(ToNestedBulletPoint(line, lastBulletPoint, noteName));
+                result.Add(ToNestedBulletPoint(line, lastBulletPoint, noteName, fontSize));
             }
             else
             {
-                result.Add(ToNormalText(line, noteName));
+                result.Add(ToNormalText(line, noteName, fontSize));
             }
         }
 
         return result;
     }
 
-    private Paragraph ToNormalText(string text, string noteName)
+    private Paragraph ToNormalText(string text, string noteName, double fontSize)
     {
         var paragraph = new Paragraph
         {
+            FontSize = fontSize,
             Margin = new Thickness(0, 0, 0, ParagraphMarginBottom)
         };
 
-        ParseUrisAndAddToParagraph(text, paragraph, noteName);
+        ParseUrisAndAddToParagraph(text, paragraph, noteName, fontSize);
         return paragraph;
     }
 
-    private Paragraph ToHeader1(string text, string noteName)
+    private Paragraph ToHeader1(string text, string noteName, double fontSize)
     {
         var paragraph = new Paragraph
         {
-            FontSize = 26,
+            FontSize = fontSize + 10,
             FontWeight = FontWeights.Bold,
             Margin = new Thickness(0, 0, 0, HeaderMarginBottom)
         };
 
         var formattedText = text[2..];
 
-        ParseUrisAndAddToParagraph(formattedText, paragraph, noteName);
+        ParseUrisAndAddToParagraph(formattedText, paragraph, noteName, fontSize);
         return paragraph;
     }
 
-    private Paragraph ToHeader2(string text, string noteName)
+    private Paragraph ToHeader2(string text, string noteName, double fontSize)
     {
         var paragraph = new Paragraph
         {
-            FontSize = 24,
+            FontSize = fontSize + 8,
             FontWeight = FontWeights.Bold,
             Margin = new Thickness(0, 0, 0, HeaderMarginBottom)
         };
 
         var formattedText = text[3..];
 
-        ParseUrisAndAddToParagraph(formattedText, paragraph, noteName);
+        ParseUrisAndAddToParagraph(formattedText, paragraph, noteName, fontSize);
         return paragraph;
     }
 
-    private Paragraph ToHeader3(string text, string noteName)
+    private Paragraph ToHeader3(string text, string noteName, double fontSize)
     {
         var paragraph = new Paragraph
         {
-            FontSize = 22,
+            FontSize = fontSize + 6,
             FontWeight = FontWeights.Bold,
             Margin = new Thickness(0, 0, 0, HeaderMarginBottom)
         };
 
         var formattedText = text[4..];
 
-        ParseUrisAndAddToParagraph(formattedText, paragraph, noteName);
+        ParseUrisAndAddToParagraph(formattedText, paragraph, noteName, fontSize);
         return paragraph;
     }
 
-    private Paragraph ToHeader4(string text, string noteName)
+    private Paragraph ToHeader4(string text, string noteName, double fontSize)
     {
         var paragraph = new Paragraph
         {
-            FontSize = 20,
+            FontSize = fontSize + 4,
             FontWeight = FontWeights.Bold,
             Margin = new Thickness(0, 0, 0, HeaderMarginBottom)
         };
 
         var formattedText = text[5..];
 
-        ParseUrisAndAddToParagraph(formattedText, paragraph, noteName);
+        ParseUrisAndAddToParagraph(formattedText, paragraph, noteName, fontSize);
         return paragraph;
     }
 
-    private Paragraph ToHeader5(string text, string noteName)
+    private Paragraph ToHeader5(string text, string noteName, double fontSize)
     {
         var paragraph = new Paragraph
         {
-            FontSize = 18,
+            FontSize = fontSize + 2,
             FontWeight = FontWeights.Bold,
             Margin = new Thickness(0, 0, 0, HeaderMarginBottom)
         };
 
         var formattedText = text[6..];
 
-        ParseUrisAndAddToParagraph(formattedText, paragraph, noteName);
+        ParseUrisAndAddToParagraph(formattedText, paragraph, noteName, fontSize);
         return paragraph;
     }
 
-    private Paragraph ToHeader6(string text, string noteName)
+    private Paragraph ToHeader6(string text, string noteName, double fontSize)
     {
         var paragraph = new Paragraph
         {
-            FontSize = 16,
+            FontSize = fontSize,
             FontWeight = FontWeights.Bold,
             Margin = new Thickness(0, 0, 0, HeaderMarginBottom)
         };
 
         var formattedText = text[7..];
 
-        ParseUrisAndAddToParagraph(formattedText, paragraph, noteName);
+        ParseUrisAndAddToParagraph(formattedText, paragraph, noteName, fontSize);
         return paragraph;
     }
 
-    private Paragraph ToBulletPoint(string text, bool isLast, string noteName)
+    private Paragraph ToBulletPoint(string text, bool isLast, string noteName, double fontSize)
     {
         var marginBottom = isLast ? ParagraphMarginBottom : BulletPointMarginBottom;
         var paragraph = new Paragraph
         {
+            FontSize = fontSize,
             Margin = new Thickness(BulletPointMarginLeft, 0, 0, marginBottom)
         };
 
         var formattedText = "• " + text[2..];
 
-        ParseUrisAndAddToParagraph(formattedText, paragraph, noteName);
+        ParseUrisAndAddToParagraph(formattedText, paragraph, noteName, fontSize);
         return paragraph;
     }
 
@@ -218,17 +220,18 @@ public partial class MarkdownService : IMarkdownService
     private static bool IsBulletPoint(string text) => text.StartsWith("- ") || text.StartsWith("* ") || text.StartsWith("+ ");
     private static bool IsNestedBulletPoint(string text) => text.StartsWith("  - ") || text.StartsWith("  * ") || text.StartsWith("  + ");
 
-    private Paragraph ToNestedBulletPoint(string text, bool isLast, string noteName)
+    private Paragraph ToNestedBulletPoint(string text, bool isLast, string noteName, double fontSize)
     {
         var marginBottom = isLast ? ParagraphMarginBottom : BulletPointMarginBottom;
         var paragraph = new Paragraph
         {
+            FontSize = fontSize,
             Margin = new Thickness(NestedBulletPointMarginLeft, 0, 0, marginBottom)
         };
 
         var formattedText = "◦ " + text[4..];
 
-        ParseUrisAndAddToParagraph(formattedText, paragraph, noteName);
+        ParseUrisAndAddToParagraph(formattedText, paragraph, noteName, fontSize);
         return paragraph;
     }
 
@@ -257,7 +260,7 @@ public partial class MarkdownService : IMarkdownService
         return result;
     }
 
-    private void ParseUrisAndAddToParagraph(string text, Paragraph paragraph, string noteName)
+    private void ParseUrisAndAddToParagraph(string text, Paragraph paragraph, string noteName, double fontSize)
     {
         var uris = FindUris(text);
         if (uris.Count == 0)
@@ -277,6 +280,7 @@ public partial class MarkdownService : IMarkdownService
 
             var hyperlink = new Hyperlink
             {
+                FontSize = fontSize,
                 NavigateUri = uri.Uri
             };
             hyperlink.Click += (_, _) => { _eventHub.RaiseHyperlinkClicked($"{noteName} - {uri.Text}", uri.Uri, DateTime.Now); };

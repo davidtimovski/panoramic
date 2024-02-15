@@ -23,7 +23,6 @@ public class LinkCollectionWidget : IWidget
         Id = Guid.NewGuid();
         _dataFileName = $"{Id}.json";
 
-        Type = WidgetType.LinkCollection;
         Area = area;
         Title = title;
         links = [];
@@ -38,14 +37,13 @@ public class LinkCollectionWidget : IWidget
         _dataFileName = $"{data.Id}.json";
 
         Id = data.Id;
-        Type = WidgetType.LinkCollection;
         Area = data.Area;
         Title = data.Title;
         links = data.Links.Select(x => new LinkCollectionItem { Title = x.Title, Uri = x.Uri, Order = x.Order }).ToList();
     }
 
     public Guid Id { get; }
-    public WidgetType Type { get; }
+    public WidgetType Type { get; } = WidgetType.LinkCollection;
     public Area Area { get; set; }
     public string Title { get; set; }
 
@@ -63,7 +61,6 @@ public class LinkCollectionWidget : IWidget
         new()
         {
             Id = Id,
-            Type = WidgetType.LinkCollection,
             Area = Area,
             Title = Title,
             Links = links.Select(x => new LinkCollectionItemData { Title = x.Title, Uri = x.Uri, Order = x.Order }).ToList()

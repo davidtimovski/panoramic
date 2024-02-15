@@ -15,6 +15,7 @@
             <SolidColorBrush x:Key="PanoramicWidgetHighlightedBackgroundBrush" Color="#234" />
             <SolidColorBrush x:Key="PanoramicBlueForeground" Color="#8DD7E9" />
             <CornerRadius x:Key="PanoramicWidgetCornerRadius">5</CornerRadius>
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

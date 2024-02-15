@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Media;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Services;
 using Panoramic.Services.Storage;
+using Panoramic.Utils;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 
@@ -28,10 +29,18 @@ public partial class NoteViewModel : ObservableObject
 
         ReloadFiles();
 
-        SelectedNote = _widget.SelectedNote;
+        fontFamily = FontFamilyHelper.Get(_widget.FontFamily);
+        fontSize = _widget.FontSize;
+        selectedNote = _widget.SelectedNote;
     }
 
     public ObservableCollection<ExplorerItem> ExplorerItems { get; } = [];
+
+    [ObservableProperty]
+    private FontFamily fontFamily;
+
+    [ObservableProperty]
+    private double fontSize;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Title))]

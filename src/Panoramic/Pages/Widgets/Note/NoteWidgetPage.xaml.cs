@@ -46,7 +46,7 @@ public sealed partial class NoteWidgetPage : Page
             return;
         }
 
-        var paragraphs = _markdownService.TextToMarkdownParagraphs(ViewModel.SelectedNote.Text, ViewModel.Title);
+        var paragraphs = _markdownService.TextToMarkdownParagraphs(ViewModel.SelectedNote.Text, ViewModel.Title, ViewModel.FontSize);
         Presenter.Blocks.Clear();
 
         foreach (var paragraph in paragraphs)
