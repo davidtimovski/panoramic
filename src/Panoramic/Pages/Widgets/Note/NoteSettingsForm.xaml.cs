@@ -15,7 +15,7 @@ public sealed partial class NoteSettingsForm : Page, IWidgetForm
 
         ViewModel = viewModel;
 
-        TitleTextBox.Loaded += TitleTextBox_Loaded;
+        //TitleTextBox.Loaded += TitleTextBox_Loaded;
     }
 
     public NoteSettingsViewModel ViewModel { get; }
@@ -25,12 +25,12 @@ public sealed partial class NoteSettingsForm : Page, IWidgetForm
         return ViewModel.SubmitAsync();
     }
 
-    private void TitleTextBox_Loaded(object sender, RoutedEventArgs e)
-    {
-        if (ViewModel.Id == Guid.Empty)
-        {
-            TitleTextBox.Focus(FocusState.Programmatic);
-            TitleTextBox.SelectAll();
-        }
-    }
+    //private void TitleTextBox_Loaded(object sender, RoutedEventArgs e)
+    //{
+    //    if (ViewModel.Id == Guid.Empty)
+    //    {
+    //        TitleTextBox.Focus(FocusState.Programmatic);
+    //        TitleTextBox.SelectAll();
+    //    }
+    //}
 }

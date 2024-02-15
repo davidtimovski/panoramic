@@ -11,7 +11,7 @@ using Panoramic.Models.Events;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
-using Panoramic.Services;
+using Panoramic.Services.Storage;
 using Panoramic.UserControls;
 using Panoramic.ViewModels.Widgets.LinkCollection;
 using Panoramic.ViewModels.Widgets.Note;
@@ -96,7 +96,6 @@ public sealed partial class AddWidgetDialog : Page
                 var noteVm = new NoteSettingsViewModel(_storageService, new NoteData
                 {
                     Id = Guid.Empty,
-                    Type = WidgetType.Note,
                     Area = selectedArea!
                 });
 
@@ -110,7 +109,6 @@ public sealed partial class AddWidgetDialog : Page
                 var linkCollectionVm = new LinkCollectionSettingsViewModel(_storageService, new LinkCollectionData
                 {
                     Id = Guid.Empty,
-                    Type = WidgetType.LinkCollection,
                     Area = selectedArea!,
                     Links = []
                 });
@@ -125,7 +123,6 @@ public sealed partial class AddWidgetDialog : Page
                 var recentLinksVm = new RecentLinksSettingsViewModel(_storageService, new RecentLinksData
                 {
                     Id = Guid.Empty,
-                    Type = WidgetType.RecentLinks,
                     Area = selectedArea!,
                     Links = []
                 });

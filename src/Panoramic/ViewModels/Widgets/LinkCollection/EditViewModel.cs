@@ -8,7 +8,7 @@ using HtmlAgilityPack;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.LinkCollection;
-using Panoramic.Services;
+using Panoramic.Services.Storage;
 using Panoramic.Utils;
 using Panoramic.ViewModels.Widgets.LinkCollection;
 using Windows.ApplicationModel.DataTransfer;

@@ -9,16 +9,33 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0"
-                 x:Name="TitleTextBox"
-                 Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 TextChanged="{x:Bind ViewModel.ValidateAndEmit}"
-                 Header="Title"
-                 MaxLength="60">
-            <TextBox.Description>
-                <TextBlock TextWrapping="Wrap">Will be used as the name of a markdown file saved on the file system, so naming rules for files will apply.</TextBlock>
-            </TextBox.Description>
-        </TextBox>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <ComboBox Grid.Column="0"
+                      Header="Font family"
+                      ItemsSource="{x:Bind ViewModel.FontFamilyOptions}"
+                      SelectedValue="{x:Bind ViewModel.FontFamily, Mode=TwoWay}" />
+
+            <ComboBox Grid.Column="1" Header="Font size" SelectedValue="{x:Bind ViewModel.FontSize, Mode=TwoWay}" HorizontalAlignment="Right">
+                <x:String>12</x:String>
+                <x:String>13</x:String>
+                <x:String>14</x:String>
+                <x:String>15</x:String>
+                <x:String>16</x:String>
+                <x:String>17</x:String>
+                <x:String>18</x:String>
+                <x:String>19</x:String>
+                <x:String>20</x:String>
+                <x:String>21</x:String>
+                <x:String>22</x:String>
+                <x:String>23</x:String>
+                <x:String>24</x:String>
+            </ComboBox>
+        </Grid>
     </Grid>
 
 </Page>

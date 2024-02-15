@@ -2,7 +2,7 @@ using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Events;
-using Panoramic.Services;
+using Panoramic.Services.Storage;
 using Panoramic.ViewModels;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
@@ -28,11 +28,6 @@ public sealed partial class PreferencesDialog : Page
 
     public event EventHandler<ValidationEventArgs>? Validated;
 
-    public void Submit()
-    {
-        ViewModel.Submit();
-    }
-
     private async void ChangeStoragePathButton_Click(object _, RoutedEventArgs e)
     {
         // Create a folder picker
@@ -57,7 +52,7 @@ public sealed partial class PreferencesDialog : Page
 
         StorageApplicationPermissions.FutureAccessList.AddOrReplace("PanoramicPickedFolderToken", folder);
 
-        ViewModel.StoragePath = folder.Path;
-        Validated?.Invoke(this, new ValidationEventArgs(true));
+        ViewModel.SetFolder(folder.Path);
+        Validated?.Invoke(this, new ValidationEventArgs(ViewModel.FolderIsValid));
     }
 }

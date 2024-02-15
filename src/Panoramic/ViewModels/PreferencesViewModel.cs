@@ -1,5 +1,7 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Panoramic.Services;
+﻿using System.Collections.Generic;
+using System.IO;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Panoramic.Services.Storage;
 
 namespace Panoramic.ViewModels;
 
@@ -17,8 +19,24 @@ public partial class PreferencesViewModel : ObservableObject
     [ObservableProperty]
     private string storagePath;
 
-    public void Submit()
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(InvalidFolder))]
+    private bool folderIsValid;
+
+    public bool InvalidFolder => !FolderIsValid;
+
+    public void SetFolder(string path)
     {
-        _storageService.ChangeStoragePath(StoragePath);
+        FolderIsValid = DirectoryIsEmpty(path);
+        StoragePath = path;
+    }
+
+    public void Submit() => _storageService.ChangeStoragePath(StoragePath);
+
+    private static bool DirectoryIsEmpty(string path)
+    {
+        IEnumerable<string> items = Directory.EnumerateFileSystemEntries(path);
+        using IEnumerator<string> en = items.GetEnumerator();
+        return !en.MoveNext();
     }
 }

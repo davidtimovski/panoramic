@@ -23,6 +23,15 @@
 		<Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Content Update="Assets\Fonts\OpenSans-Regular.ttf">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Assets\Fonts\FiraCode-Regular.ttf">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
 	<!-- 
     Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
     Tools extension to be activated for this project even if the Windows App SDK Nuget

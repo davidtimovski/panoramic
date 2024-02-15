@@ -11,7 +11,7 @@ public class LinkCollectionData : IWidgetData
     public required Guid Id { get; init; }
 
     [JsonPropertyName("type")]
-    public required WidgetType Type { get; init; }
+    public WidgetType Type { get; } = WidgetType.LinkCollection;
 
     [JsonPropertyName("area")]
     [JsonConverter(typeof(AreaJsonConverter))]

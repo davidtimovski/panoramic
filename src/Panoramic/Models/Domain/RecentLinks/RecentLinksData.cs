@@ -11,7 +11,7 @@ public class RecentLinksData : IWidgetData
     public required Guid Id { get; init; }
 
     [JsonPropertyName("type")]
-    public required WidgetType Type { get; init; }
+    public WidgetType Type { get; } = WidgetType.RecentLinks;
 
     [JsonPropertyName("area")]
     [JsonConverter(typeof(AreaJsonConverter))]

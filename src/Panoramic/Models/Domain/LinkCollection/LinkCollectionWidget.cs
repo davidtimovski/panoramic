@@ -4,22 +4,25 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Panoramic.Services.Storage;
 
 namespace Panoramic.Models.Domain.LinkCollection;
 
 public class LinkCollectionWidget : IWidget
 {
-    private readonly string dataFileName;
+    private readonly IStorageService _storageService;
+    private readonly string _dataFileName;
 
     /// <summary>
     /// Constructs a new link collection widget.
     /// </summary>
-    public LinkCollectionWidget(Area area, string title)
+    public LinkCollectionWidget(IStorageService storageService, Area area, string title)
     {
-        Id = Guid.NewGuid();
-        dataFileName = $"{Id}.json";
+        _storageService = storageService;
 
-        Type = WidgetType.LinkCollection;
+        Id = Guid.NewGuid();
+        _dataFileName = $"{Id}.json";
+
         Area = area;
         Title = title;
         links = [];
@@ -28,19 +31,19 @@ public class LinkCollectionWidget : IWidget
     /// <summary>
     /// Constructs a link collection widget based on existing data.
     /// </summary>
-    public LinkCollectionWidget(LinkCollectionData data)
+    public LinkCollectionWidget(IStorageService storageService, LinkCollectionData data)
     {
-        Id = data.Id;
-        dataFileName = $"{Id}.json";
+        _storageService = storageService;
+        _dataFileName = $"{data.Id}.json";
 
-        Type = WidgetType.LinkCollection;
+        Id = data.Id;
         Area = data.Area;
         Title = data.Title;
         links = data.Links.Select(x => new LinkCollectionItem { Title = x.Title, Uri = x.Uri, Order = x.Order }).ToList();
     }
 
     public Guid Id { get; }
-    public WidgetType Type { get; }
+    public WidgetType Type { get; } = WidgetType.LinkCollection;
     public Area Area { get; set; }
     public string Title { get; set; }
 
@@ -58,32 +61,29 @@ public class LinkCollectionWidget : IWidget
         new()
         {
             Id = Id,
-            Type = WidgetType.LinkCollection,
             Area = Area,
             Title = Title,
             Links = links.Select(x => new LinkCollectionItemData { Title = x.Title, Uri = x.Uri, Order = x.Order }).ToList()
         };
 
-    public static LinkCollectionWidget Load(string json, JsonSerializerOptions options)
+    public static LinkCollectionWidget Load(IStorageService storageService, string json)
     {
-        var data = JsonSerializer.Deserialize<LinkCollectionData>(json, options)!;
-        return new(data);
+        var data = JsonSerializer.Deserialize<LinkCollectionData>(json, storageService.SerializerOptions)!;
+        return new(storageService, data);
     }
 
-    public async Task WriteAsync(string storagePath, JsonSerializerOptions options)
+    public async Task WriteAsync()
     {
-        var widgetsDirectory = Path.Combine(storagePath, "widgets");
-
         var data = GetData();
-        var json = JsonSerializer.Serialize(data, options);
+        var json = JsonSerializer.Serialize(data, _storageService.SerializerOptions);
 
-        await File.WriteAllTextAsync(Path.Combine(widgetsDirectory, dataFileName), json);
+        await File.WriteAllTextAsync(Path.Combine(_storageService.WidgetsFolderPath, _dataFileName), json);
     }
 
-    public void Delete(string storagePath)
+    public void Delete()
     {
-        var widgetsDirectory = Path.Combine(storagePath, "widgets");
-        File.Delete(Path.Combine(widgetsDirectory, dataFileName));
+        var dataFilePath = Path.Combine(_storageService.WidgetsFolderPath, _dataFileName);
+        File.Delete(dataFilePath);
     }
 }
 

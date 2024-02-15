@@ -14,9 +14,7 @@ public class EventHub : IEventHub
     public event EventHandler<HyperlinkClickedEventArgs>? HyperlinkClicked;
 
     public void RaiseHyperlinkClicked(string title, Uri uri, DateTime clicked)
-    {
-        HyperlinkClicked?.Invoke(this, new HyperlinkClickedEventArgs(title, uri, clicked));
-    }
+        => HyperlinkClicked?.Invoke(this, new HyperlinkClickedEventArgs(title, uri, clicked));
 }
 
 public class HyperlinkClickedEventArgs(string title, Uri uri, DateTime clicked) : EventArgs

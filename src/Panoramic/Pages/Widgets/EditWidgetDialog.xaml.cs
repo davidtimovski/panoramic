@@ -11,7 +11,7 @@ using Panoramic.Models.Events;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
-using Panoramic.Services;
+using Panoramic.Services.Storage;
 using Panoramic.UserControls;
 using Panoramic.ViewModels.Widgets;
 using Panoramic.ViewModels.Widgets.LinkCollection;
@@ -37,8 +37,8 @@ public sealed partial class EditWidgetDialog : Page
         _widget = widget;
         _storageService = storageService;
 
-        EditSettingsTitle = $"{widget.Title} - settings";
-        EditAreaTitle = $"{widget.Title} - area";
+        EditSettingsTitle = "Settings";
+        EditAreaTitle = "Area";
 
         Initialize();
         _areaPicker = new(_storageService, widget.Id);
