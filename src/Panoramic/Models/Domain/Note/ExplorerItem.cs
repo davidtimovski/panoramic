@@ -8,7 +8,7 @@ using Panoramic.Services.Storage;
 
 namespace Panoramic.Models.Domain.Note;
 
-public partial class ExplorerItem : ObservableObject
+public sealed partial class ExplorerItem : ObservableObject
 {
     public ExplorerItem(FileSystemItemPath path, IReadOnlyList<ExplorerItem> children)
     {

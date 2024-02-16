@@ -7,7 +7,7 @@ using Panoramic.Services;
 
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
-public partial class LinkCollectionViewModel : ObservableObject
+public sealed partial class LinkCollectionViewModel : ObservableObject
 {
     public LinkCollectionViewModel(IEventHub eventHub, LinkCollectionWidget widget)
     {

@@ -56,7 +56,7 @@ public sealed partial class WidgetPicker : UserControl
     }
 }
 
-public class WidgetPickedEventArgs(WidgetType type) : EventArgs
+public sealed class WidgetPickedEventArgs(WidgetType type) : EventArgs
 {
     public WidgetType Type { get; } = type;
 }

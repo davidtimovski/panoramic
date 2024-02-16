@@ -100,7 +100,6 @@ public sealed partial class AddWidgetDialog : Page
                 });
 
                 var noteForm = new NoteSettingsForm(noteVm);
-                noteForm.ViewModel.Validated += Validated;
 
                 widgetForm = noteForm;
                 ContentFrame.Content = noteForm;

@@ -2,7 +2,7 @@
 
 namespace Panoramic.Models.Domain;
 
-public class Area
+public sealed class Area
 {
     public Area(string name)
     {

@@ -12,7 +12,7 @@ using Panoramic.ViewModels;
 
 namespace Panoramic;
 
-public partial class App : Application
+public sealed partial class App : Application
 {
     private readonly ServiceProvider _serviceProvider;
 

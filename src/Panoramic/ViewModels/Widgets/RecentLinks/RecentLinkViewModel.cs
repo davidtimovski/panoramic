@@ -3,7 +3,7 @@ using Panoramic.Services;
 
 namespace Panoramic.ViewModels.Widgets.RecentLinks;
 
-public class RecentLinkViewModel(IEventHub eventHub, string title, Uri uri, DateTime clicked)
+public sealed class RecentLinkViewModel(IEventHub eventHub, string title, Uri uri, DateTime clicked)
 {
     private readonly IEventHub _eventHub = eventHub;
 

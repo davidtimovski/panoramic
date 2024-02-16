@@ -222,7 +222,6 @@ public sealed partial class NoteWidgetPage : Page
         };
 
         content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
-        content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
 
         ViewModel.Highlighted = true;
 

@@ -15,7 +15,7 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace Panoramic.ViewModels;
 
-public partial class EditViewModel : ObservableObject
+public sealed partial class EditViewModel : ObservableObject
 {
     private readonly HttpClient _httpClient;
     private readonly DispatcherQueue _dispatcherQueue;

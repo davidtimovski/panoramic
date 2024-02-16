@@ -8,7 +8,7 @@ using Panoramic.Services.Storage;
 
 namespace Panoramic.Models.Domain.LinkCollection;
 
-public class LinkCollectionWidget : IWidget
+public sealed class LinkCollectionWidget : IWidget
 {
     private readonly IStorageService _storageService;
     private readonly string _dataFileName;
@@ -87,7 +87,7 @@ public class LinkCollectionWidget : IWidget
     }
 }
 
-public class LinkCollectionItem
+public sealed class LinkCollectionItem
 {
     public required string Title { get; init; }
     public required Uri Uri { get; init; }

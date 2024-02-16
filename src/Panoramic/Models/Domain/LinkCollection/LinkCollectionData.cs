@@ -5,7 +5,7 @@ using Panoramic.Utils.Serialization;
 
 namespace Panoramic.Models.Domain.LinkCollection;
 
-public class LinkCollectionData : IWidgetData
+public sealed class LinkCollectionData : IWidgetData
 {
     [JsonPropertyName("id")]
     public required Guid Id { get; init; }
@@ -25,7 +25,7 @@ public class LinkCollectionData : IWidgetData
     public required List<LinkCollectionItemData> Links { get; init; }
 }
 
-public class LinkCollectionItemData
+public sealed class LinkCollectionItemData
 {
     [JsonRequired]
     [JsonPropertyName("title")]

@@ -4,7 +4,7 @@ using Panoramic.Utils;
 
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
-public partial class EditLinkViewModel : ObservableObject
+public sealed partial class EditLinkViewModel : ObservableObject
 {
     public EditLinkViewModel(string title, Uri uri)
     {

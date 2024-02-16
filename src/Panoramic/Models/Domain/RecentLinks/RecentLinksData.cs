@@ -5,7 +5,7 @@ using Panoramic.Utils.Serialization;
 
 namespace Panoramic.Models.Domain.RecentLinks;
 
-public class RecentLinksData : IWidgetData
+public sealed class RecentLinksData : IWidgetData
 {
     [JsonPropertyName("id")]
     public required Guid Id { get; init; }
@@ -33,7 +33,7 @@ public class RecentLinksData : IWidgetData
     public required List<RecentLinkData> Links { get; init; }
 }
 
-public class RecentLinkData
+public sealed class RecentLinkData
 {
     [JsonRequired]
     [JsonPropertyName("title")]

@@ -8,7 +8,7 @@ using Panoramic.Services.Storage;
 
 namespace Panoramic.ViewModels.Widgets.RecentLinks;
 
-public partial class RecentLinksViewModel : ObservableObject
+public sealed partial class RecentLinksViewModel : ObservableObject
 {
     private readonly IStorageService _storageService;
     private readonly IEventHub _eventHub;

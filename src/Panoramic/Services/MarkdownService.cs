@@ -13,7 +13,7 @@ public interface IMarkdownService
     IReadOnlyList<Paragraph> TextToMarkdownParagraphs(string text, string noteName, double fontSize);
 }
 
-public partial class MarkdownService : IMarkdownService
+public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownService
 {
     private const int ParagraphMarginBottom = 20;
     private const int HeaderMarginBottom = 15;
@@ -21,14 +21,7 @@ public partial class MarkdownService : IMarkdownService
     private const int BulletPointMarginBottom = 6;
     private const int NestedBulletPointMarginLeft = 12;
 
-    private static Regex UrlRegex = MyRegex();
-
-    private readonly IEventHub _eventHub;
-
-    public MarkdownService(IEventHub eventHub)
-    {
-        _eventHub = eventHub;
-    }
+    private readonly IEventHub _eventHub = eventHub;
 
     public IReadOnlyList<Paragraph> TextToMarkdownParagraphs(string text, string noteName, double fontSize)
     {
@@ -300,7 +293,7 @@ public partial class MarkdownService : IMarkdownService
     [GeneratedRegex("\\[([^\\[\\]]*)\\]\\((.*?)\\)")]
     private static partial Regex MyRegex();
 
-    private class StringSegment
+    private sealed class StringSegment
     {
         internal required Uri Uri { get; init; }
         internal required string Text { get; init; }

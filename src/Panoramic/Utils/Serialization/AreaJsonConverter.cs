@@ -5,7 +5,7 @@ using Panoramic.Models.Domain;
 
 namespace Panoramic.Utils.Serialization;
 
-public class AreaJsonConverter : JsonConverter<Area>
+public sealed class AreaJsonConverter : JsonConverter<Area>
 {
     public override Area Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

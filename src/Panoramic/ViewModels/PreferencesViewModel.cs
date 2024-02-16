@@ -5,7 +5,7 @@ using Panoramic.Services.Storage;
 
 namespace Panoramic.ViewModels;
 
-public partial class PreferencesViewModel : ObservableObject
+public sealed partial class PreferencesViewModel : ObservableObject
 {
     private readonly IStorageService _storageService;
 

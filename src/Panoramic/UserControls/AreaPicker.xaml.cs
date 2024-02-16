@@ -187,7 +187,7 @@ public sealed partial class AreaPicker : UserControl
     public event EventHandler<EventArgs>? AreaReset;
 }
 
-public class AreaPickedEventArgs(Area area) : EventArgs
+public sealed class AreaPickedEventArgs(Area area) : EventArgs
 {
     public Area Area { get; } = area;
 }

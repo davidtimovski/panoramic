@@ -15,7 +15,7 @@ using Windows.Storage;
 
 namespace Panoramic.Services.Storage;
 
-public class StorageService : IStorageService
+public sealed class StorageService : IStorageService
 {
     private const string PanoramicDirectoryName = "Panoramic";
 

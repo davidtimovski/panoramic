@@ -5,7 +5,7 @@ using Panoramic.Models.Events;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 
-public partial class NewNoteViewModel(string directory) : ObservableObject
+public sealed partial class NewNoteViewModel(string directory) : ObservableObject
 {
     private readonly string _directory = directory;
 

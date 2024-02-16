@@ -3,13 +3,12 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Panoramic.Models.Domain.Note;
-using Panoramic.Models.Events;
 using Panoramic.Services.Storage;
 using Panoramic.Utils;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 
-public partial class NoteSettingsViewModel : SettingsViewModel
+public sealed partial class NoteSettingsViewModel : SettingsViewModel
 {
     public NoteSettingsViewModel(IStorageService storageService, NoteData data) 
         : base(data)
@@ -29,8 +28,6 @@ public partial class NoteSettingsViewModel : SettingsViewModel
 
     private readonly IStorageService _storageService;
     public Guid Id { get; }
-
-    public event EventHandler<ValidationEventArgs>? Validated;
 
     public ObservableCollection<string> FontFamilyOptions { get; } = new();
 

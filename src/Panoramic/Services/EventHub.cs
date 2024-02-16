@@ -9,7 +9,7 @@ public interface IEventHub
     void RaiseHyperlinkClicked(string title, Uri uri, DateTime clicked);
 }
 
-public class EventHub : IEventHub
+public sealed class EventHub : IEventHub
 {
     public event EventHandler<HyperlinkClickedEventArgs>? HyperlinkClicked;
 
@@ -17,7 +17,7 @@ public class EventHub : IEventHub
         => HyperlinkClicked?.Invoke(this, new HyperlinkClickedEventArgs(title, uri, clicked));
 }
 
-public class HyperlinkClickedEventArgs(string title, Uri uri, DateTime clicked) : EventArgs
+public sealed class HyperlinkClickedEventArgs(string title, Uri uri, DateTime clicked) : EventArgs
 {
     public string Title { get; } = title;
     public Uri Uri { get; } = uri;

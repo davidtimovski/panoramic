@@ -2,6 +2,6 @@
 
 namespace Panoramic.ViewModels;
 
-public partial class MainViewModel : ObservableObject
+public sealed partial class MainViewModel : ObservableObject
 {
 }

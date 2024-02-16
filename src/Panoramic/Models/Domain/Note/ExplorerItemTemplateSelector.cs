@@ -4,7 +4,7 @@ using Panoramic.Services.Storage;
 
 namespace Panoramic.Models.Domain.Note;
 
-public class ExplorerItemTemplateSelector : DataTemplateSelector
+public sealed class ExplorerItemTemplateSelector : DataTemplateSelector
 {
     public DataTemplate FolderTemplate { get; set; }
     public DataTemplate FileTemplate { get; set; }

@@ -11,7 +11,7 @@ using Panoramic.Utils;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 
-public partial class NoteViewModel : ObservableObject
+public sealed partial class NoteViewModel : ObservableObject
 {
     private readonly IStorageService _storageService;
     private readonly NoteWidget _widget;

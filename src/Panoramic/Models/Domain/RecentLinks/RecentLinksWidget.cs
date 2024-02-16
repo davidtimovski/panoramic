@@ -8,7 +8,7 @@ using Panoramic.Services.Storage;
 
 namespace Panoramic.Models.Domain.RecentLinks;
 
-public class RecentLinksWidget : IWidget
+public sealed class RecentLinksWidget : IWidget
 {
     private readonly IStorageService _storageService;
     private readonly string _dataFileName;
@@ -129,7 +129,7 @@ public class RecentLinksWidget : IWidget
     }
 }
 
-public class RecentLink
+public sealed class RecentLink
 {
     public required string Title { get; init; }
     public required Uri Uri { get; init; }

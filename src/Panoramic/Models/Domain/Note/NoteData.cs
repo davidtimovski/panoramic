@@ -4,7 +4,7 @@ using Panoramic.Utils.Serialization;
 
 namespace Panoramic.Models.Domain.Note;
 
-public class NoteData : IWidgetData
+public sealed class NoteData : IWidgetData
 {
     [JsonPropertyName("id")]
     public required Guid Id { get; init; }

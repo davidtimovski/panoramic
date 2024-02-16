@@ -3,7 +3,7 @@ using Panoramic.Services;
 
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
-public class LinkViewModel(IEventHub eventHub, string title, Uri uri)
+public sealed class LinkViewModel(IEventHub eventHub, string title, Uri uri)
 {
     private readonly IEventHub _eventHub = eventHub;
 

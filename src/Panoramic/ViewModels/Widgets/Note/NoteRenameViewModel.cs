@@ -6,7 +6,7 @@ using Panoramic.Models.Events;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 
-public partial class NoteRenameViewModel(string path) : ObservableObject
+public sealed partial class NoteRenameViewModel(string path) : ObservableObject
 {
     private readonly string _directory = Path.GetDirectoryName(path)!;
 

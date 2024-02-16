@@ -9,7 +9,7 @@ using Panoramic.Services.Storage;
 
 namespace Panoramic.Models.Domain.Note;
 
-public class NoteWidget : IWidget
+public sealed class NoteWidget : IWidget
 {
     private readonly IStorageService _storageService;
     private readonly string _dataFileName;
