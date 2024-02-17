@@ -209,7 +209,7 @@ public sealed partial class NoteViewModel : ObservableObject
     private void FileCreated(object? _, FileCreatedEventArgs e)
     {
         var path = new FileSystemItemPath(e.Path, _storageService.StoragePath);
-        var explorerItem = new ExplorerItem(path, [])
+        var explorerItem = new ExplorerItem(_storageService, path, [])
         {
             Name = e.Name,
             Type = e.Type

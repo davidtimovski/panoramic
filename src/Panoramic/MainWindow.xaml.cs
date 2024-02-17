@@ -47,7 +47,7 @@ public sealed partial class MainWindow : Window
 
     private async void WindowClosed(object _, WindowEventArgs args)
     {
-        await _storageService.WriteAsync();
+        await _storageService.WriteUnsavedChangesAsync();
     }
 
     private void LoadWidgets()

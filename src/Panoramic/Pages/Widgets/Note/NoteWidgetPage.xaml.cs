@@ -36,20 +36,14 @@ public sealed partial class NoteWidgetPage : Page
 
     public NoteViewModel ViewModel { get; }
 
-    private void Editor_TextChanged(object _, TextChangedEventArgs e)
-    {
-        _widget.SelectedNote!.Text = ViewModel.SelectedNote!.Text;
-        _storageService.EnqueueNoteWrite(_widget.SelectedNote.Path.Absolute, _widget.SelectedNote!.Text!);
-    }
-
     private void SetPresenterContent()
     {
-        if (ViewModel.SelectedNote?.Text is null)
+        if (ViewModel.SelectedNote is null)
         {
             return;
         }
 
-        var paragraphs = _markdownService.TextToMarkdownParagraphs(ViewModel.SelectedNote.Text, ViewModel.Title, ViewModel.FontSize);
+        var paragraphs = _markdownService.TextToMarkdownParagraphs(ViewModel.SelectedNote.Text!, ViewModel.Title, ViewModel.FontSize);
         Presenter.Blocks.Clear();
 
         foreach (var paragraph in paragraphs)
@@ -63,6 +57,7 @@ public sealed partial class NoteWidgetPage : Page
         if (ViewModel.Editing)
         {
             Editor.Focus(FocusState.Programmatic);
+            Editor.SelectionStart = Editor.Text.Length;
         }
         else
         {
@@ -72,7 +67,10 @@ public sealed partial class NoteWidgetPage : Page
 
     private void NoteSelectionChanged(object? _, NoteSelectionChangedEventArgs e)
     {
-        _dispatcherQueue.TryEnqueue(SetPresenterContent);
+        if (e.WidgetId == _widget.Id)
+        {
+            _dispatcherQueue.TryEnqueue(SetPresenterContent);
+        }
     }
 
     private async void AddNote_Click(object _, RoutedEventArgs e)

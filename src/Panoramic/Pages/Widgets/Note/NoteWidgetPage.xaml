@@ -121,7 +121,6 @@
                                      Grid.Column="0"
                                      x:Name="Editor"
                                      Text="{x:Bind ViewModel.SelectedNote.Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                     TextChanged="Editor_TextChanged"
                                      Visibility="{x:Bind ViewModel.EditorVisibility, Mode=OneWay}"
                                      FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}"
                                      FontSize="{x:Bind ViewModel.FontSize, Mode=OneWay}"

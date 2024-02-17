@@ -11,10 +11,10 @@ public interface IStorageService
     event EventHandler<WidgetUpdatedEventArgs>? WidgetUpdated;
     event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
     event EventHandler<EventArgs>? StoragePathChanged;
+    event EventHandler<NoteSelectionChangedEventArgs>? NoteSelectionChanged;
     event EventHandler<FileCreatedEventArgs>? FileCreated;
     event EventHandler<EventArgs>? FileRenamed;
     event EventHandler<FileDeletedEventArgs>? FileDeleted;
-    event EventHandler<NoteSelectionChangedEventArgs>? NoteSelectionChanged;
 
     string WidgetsFolderPath { get; }
     string StoragePath { get; }
@@ -23,8 +23,7 @@ public interface IStorageService
     Dictionary<Guid, IWidget> Widgets { get; }
 
     Task ReadAsync();
-    Task WriteAsync();
-    Task WriteNotesAsync();
+    Task WriteUnsavedChangesAsync();
 
     /// <summary>
     /// Schedules a widget save to disk.

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
@@ -10,8 +9,12 @@ namespace Panoramic.Models.Domain.Note;
 
 public sealed partial class ExplorerItem : ObservableObject
 {
-    public ExplorerItem(FileSystemItemPath path, IReadOnlyList<ExplorerItem> children)
+    private readonly IStorageService _storageService;
+
+    public ExplorerItem(IStorageService storageService, FileSystemItemPath path, IReadOnlyList<ExplorerItem> children)
     {
+        _storageService = storageService;
+
         Path = path;
         RenameDeleteVisible = path.Relative == "." ? Visibility.Collapsed : Visibility.Visible;
 
@@ -26,7 +29,22 @@ public sealed partial class ExplorerItem : ObservableObject
     public required string Name { get; init; }
     public required FileType Type { get; init; }
     public FileSystemItemPath Path { get; init; }
-    public string? Text { get; set; }
+
+    private string? text;
+    public string? Text
+    {
+        get => text;
+        set
+        {
+            if (SetProperty(ref text, value))
+            {
+                OnPropertyChanged(nameof(Text));
+            }
+         
+            _storageService.EnqueueNoteWrite(Path.Absolute, value!);
+        }
+    }
+
     public ObservableCollection<ExplorerItem> Children = [];
 
     [ObservableProperty]

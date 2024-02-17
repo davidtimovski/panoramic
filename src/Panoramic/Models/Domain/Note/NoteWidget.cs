@@ -134,7 +134,7 @@ public sealed class NoteWidget : IWidget
 
     private List<ExplorerItem> ConvertToExplorerItems(IReadOnlyList<FileSystemItem> fileSystemItems)
         => fileSystemItems.Select(x =>
-            new ExplorerItem(x.Path, ConvertToExplorerItems(x.Children))
+            new ExplorerItem(_storageService, x.Path, ConvertToExplorerItems(x.Children))
             {
                 Name = x.Name,
                 Type = x.Type,
@@ -148,7 +148,7 @@ public sealed class NoteWidget : IWidget
         {
             if (item.Type == FileType.Note && item.Path.Equals(NotePath))
             {
-                return new ExplorerItem(item.Path, [])
+                return new ExplorerItem(_storageService, item.Path, [])
                 {
                     Name = item.Name,
                     Type = item.Type,

@@ -50,33 +50,20 @@ public sealed class StorageService : IStorageService
         _timer.Interval = TimeSpan.FromSeconds(15);
         _timer.Tick += async (timer, _) =>
         {
-            var tasks = new List<Task>(_unsavedWidgets.Count + _unsavedNotes.Count);
-
-            foreach (var id in _unsavedWidgets)
-            {
-                tasks.Add(Widgets[id].WriteAsync());
-            }
-
-            foreach (var note in _unsavedNotes)
-            {
-                tasks.Add(File.WriteAllTextAsync(note.Key, note.Value));
-            }
-
-            await Task.WhenAll(tasks).ConfigureAwait(false);
+            await WriteUnsavedChangesAsync();
 
             _unsavedWidgets.Clear();
             _unsavedNotes.Clear();
-            _timer.Stop();
         };
     }
 
     public event EventHandler<WidgetUpdatedEventArgs>? WidgetUpdated;
     public event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
     public event EventHandler<EventArgs>? StoragePathChanged;
+    public event EventHandler<NoteSelectionChangedEventArgs>? NoteSelectionChanged;
     public event EventHandler<FileCreatedEventArgs>? FileCreated;
     public event EventHandler<EventArgs>? FileRenamed;
     public event EventHandler<FileDeletedEventArgs>? FileDeleted;
-    public event EventHandler<NoteSelectionChangedEventArgs>? NoteSelectionChanged;
 
     public string WidgetsFolderPath => Path.Combine(StoragePath, "widgets");
     public string StoragePath { get; private set; }
@@ -108,33 +95,23 @@ public sealed class StorageService : IStorageService
         await Task.WhenAll(tasks).ConfigureAwait(false);
     }
 
-    public async Task WriteAsync()
+    public async Task WriteUnsavedChangesAsync()
     {
-        var widgetKvps = Widgets.Where(x => x.Value is not null).ToList();
+        _timer.Stop();
 
-        var editedNotes = new List<ExplorerItem>();
-        var saveWidgetTasks = new List<Task>(widgetKvps.Count);
+        var tasks = new List<Task>(_unsavedWidgets.Count + _unsavedNotes.Count);
 
-        // Save widgets
-        foreach (var widgetKvp in widgetKvps)
+        foreach (var id in _unsavedWidgets)
         {
-            saveWidgetTasks.Add(widgetKvp.Value.WriteAsync());
+            tasks.Add(Widgets[id].WriteAsync());
         }
 
-        await Task.WhenAll(saveWidgetTasks).ConfigureAwait(false);
-
-        await WriteNotesAsync().ConfigureAwait(false);
-    }
-
-    public async Task WriteNotesAsync()
-    {
-        var saveNoteTasks = new List<Task>(_unsavedNotes.Count);
         foreach (var note in _unsavedNotes)
         {
-            saveNoteTasks.Add(File.WriteAllTextAsync(note.Key, note.Value));
+            tasks.Add(File.WriteAllTextAsync(note.Key, note.Value));
         }
 
-        await Task.WhenAll(saveNoteTasks).ConfigureAwait(false);
+        await Task.WhenAll(tasks).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -160,6 +137,11 @@ public sealed class StorageService : IStorageService
 
     public void DeleteWidget(IWidget widget)
     {
+        if (_unsavedWidgets.Contains(widget.Id))
+        {
+            _unsavedWidgets.Remove(widget.Id);
+        }
+
         widget.Delete();
 
         Widgets.Remove(widget.Id);
