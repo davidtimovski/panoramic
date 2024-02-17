@@ -87,7 +87,7 @@ public sealed partial class AreaPicker : UserControl
     private void CreateSelectionArea(string? section)
     {
         var checkedToggles = availableTogglesLookup!.Where(x => x.Value.IsChecked == true).ToList();
-        if (checkedToggles.Count == 1)
+        if (checkedToggles.Count < 2)
         {
             // Skip if there's only one section toggled
             AreaReset?.Invoke(this, new EventArgs());

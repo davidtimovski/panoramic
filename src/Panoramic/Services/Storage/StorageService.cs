@@ -76,7 +76,7 @@ public sealed class StorageService : IStorageService
     public event EventHandler<FileCreatedEventArgs>? FileCreated;
     public event EventHandler<EventArgs>? FileRenamed;
     public event EventHandler<FileDeletedEventArgs>? FileDeleted;
-    public event EventHandler<NoteSelectedEventArgs>? NoteSelected;
+    public event EventHandler<NoteSelectionChangedEventArgs>? NoteSelectionChanged;
 
     public string WidgetsFolderPath => Path.Combine(StoragePath, "widgets");
     public string StoragePath { get; private set; }
@@ -203,6 +203,12 @@ public sealed class StorageService : IStorageService
         StoragePathChanged?.Invoke(this, new EventArgs());
     }
 
+    public void ChangeNoteSelection(Guid widgetId, string? previousFilePath, string? newFilePath)
+    {
+        UpdateSelectedNote(fileSystemItems, widgetId, previousFilePath, newFilePath);
+        NoteSelectionChanged?.Invoke(this, new NoteSelectionChangedEventArgs(widgetId, previousFilePath, newFilePath));
+    }
+
     public void CreateFolder(Guid widgetId, string directory, string name)
     {
         var path = Path.Combine(directory, name);
@@ -235,12 +241,6 @@ public sealed class StorageService : IStorageService
         Directory.Delete(path, true);
 
         FileDeleted?.Invoke(this, new FileDeletedEventArgs(path));
-    }
-
-    public void SelectNote(Guid widgetId, string? previousFilePath, string? newFilePath)
-    {
-        UpdateSelectedNote(fileSystemItems, widgetId, previousFilePath, newFilePath);
-        NoteSelected?.Invoke(this, new NoteSelectedEventArgs(widgetId, previousFilePath, newFilePath));
     }
 
     public void CreateNote(Guid widgetId, string directory, string name)

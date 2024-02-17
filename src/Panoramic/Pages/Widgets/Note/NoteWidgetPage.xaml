@@ -103,7 +103,7 @@
                     <TreeView ItemsSource="{x:Bind ViewModel.ExplorerItems, Mode=OneWay}"
                               ItemTemplateSelector="{StaticResource ExplorerItemTemplateSelector}"
                               Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}"
-                              SelectionChanged="Explorer_SelectionChanged"
+                              SelectedItem="{x:Bind ViewModel.SelectedNote, Mode=TwoWay}"
                               CanDragItems="False"
                               AllowDrop="False" />
 
@@ -125,7 +125,8 @@
                                      Visibility="{x:Bind ViewModel.EditorVisibility, Mode=OneWay}"
                                      FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}"
                                      FontSize="{x:Bind ViewModel.FontSize, Mode=OneWay}"
-                                     AcceptsReturn="True" />
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap" />
                             <RichTextBlock Grid.Row="0"
                                            Grid.Column="0"
                                            x:Name="Presenter"

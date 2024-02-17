@@ -20,10 +20,7 @@ public sealed partial class LinkCollectionSettingsForm : Page, IWidgetForm
 
     public LinkCollectionSettingsViewModel ViewModel { get; }
 
-    public Task SubmitAsync()
-    {
-        return ViewModel.SubmitAsync();
-    }
+    public Task SubmitAsync() => ViewModel.SubmitAsync();
 
     private void TitleTextBox_Loaded(object sender, RoutedEventArgs e)
     {

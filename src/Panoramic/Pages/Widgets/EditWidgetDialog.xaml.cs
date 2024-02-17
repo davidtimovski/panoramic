@@ -86,6 +86,7 @@ public sealed partial class EditWidgetDialog : Page
                 var noteVm = new NoteSettingsViewModel(_storageService, ((NoteWidget)_widget).GetData());
 
                 var noteForm = new NoteSettingsForm(noteVm);
+                noteForm.ViewModel.Validated += Validated;
 
                 settingsVm = noteVm;
                 widgetForm = noteForm;

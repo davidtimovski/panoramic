@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -15,22 +14,12 @@ public sealed partial class NoteSettingsForm : Page, IWidgetForm
 
         ViewModel = viewModel;
 
-        //TitleTextBox.Loaded += TitleTextBox_Loaded;
+        Loaded += FormLoaded;
     }
+
+    private void FormLoaded(object _, RoutedEventArgs e) => ViewModel.Loaded();
 
     public NoteSettingsViewModel ViewModel { get; }
 
-    public Task SubmitAsync()
-    {
-        return ViewModel.SubmitAsync();
-    }
-
-    //private void TitleTextBox_Loaded(object sender, RoutedEventArgs e)
-    //{
-    //    if (ViewModel.Id == Guid.Empty)
-    //    {
-    //        TitleTextBox.Focus(FocusState.Programmatic);
-    //        TitleTextBox.SelectAll();
-    //    }
-    //}
+    public Task SubmitAsync() => ViewModel.SubmitAsync();
 }

@@ -20,6 +20,7 @@ public sealed class NoteWidget : IWidget
     public NoteWidget(IStorageService storageService, Area area, string fontFamily, double fontSize)
     {
         _storageService = storageService;
+        _storageService.FileCreated += FileCreated;
 
         Id = Guid.NewGuid();
         _dataFileName = $"{Id}.json";
@@ -35,6 +36,8 @@ public sealed class NoteWidget : IWidget
     public NoteWidget(IStorageService storageService, NoteData data)
     {
         _storageService = storageService;
+        _storageService.FileCreated += FileCreated;
+
         _dataFileName = $"{data.Id}.json";
 
         Id = data.Id;
@@ -64,6 +67,29 @@ public sealed class NoteWidget : IWidget
             RelativeFilePath = NotePath?.Relative
         };
 
+    public void SetSelectedNote(string? notePath)
+    {
+        if (notePath is null)
+        {
+            NotePath = null;
+            SelectedNote = null;
+        }
+        else
+        {
+            NotePath = new(notePath, _storageService.StoragePath);
+            SelectedNote = GetSelectedNote(_storageService.FileSystemItems);
+
+            if (SelectedNote is not null)
+            {
+                SelectedNote.Text = File.ReadAllText(NotePath.Absolute);
+            }
+            else
+            {
+                NotePath = null;
+            }
+        }
+    }
+
     public static bool FolderCanBeCreated(string title, string directory)
     {
         if (string.Equals(title, "widgets", StringComparison.OrdinalIgnoreCase))
@@ -85,33 +111,6 @@ public sealed class NoteWidget : IWidget
 
     public IReadOnlyList<ExplorerItem> GetExplorerItems()
         => ConvertToExplorerItems(_storageService.FileSystemItems);
-
-    public void SetSelectedNote(string? notePath)
-    {
-        var previousFilePath = NotePath?.Absolute;
-
-        if (notePath is null)
-        {
-            NotePath = null;
-            SelectedNote = null;
-        }
-        else
-        {
-            NotePath = new(notePath, _storageService.StoragePath);
-            SelectedNote = GetSelectedNote(_storageService.FileSystemItems);
-
-            if (SelectedNote is not null)
-            {
-                SelectedNote.Text = File.ReadAllText(NotePath.Absolute);
-            }
-            else
-            {
-                NotePath = null;
-            }
-        }
-
-        _storageService.SelectNote(Id, previousFilePath, NotePath?.Absolute);
-    }
 
     public static Task<NoteWidget> LoadAsync(IStorageService storageService, string json)
     {
@@ -165,5 +164,13 @@ public sealed class NoteWidget : IWidget
         }
 
         return null;
+    }
+
+    private void FileCreated(object? _, FileCreatedEventArgs e)
+    {
+        if (e.Type == FileType.Note && e.WidgetId == Id)
+        {
+            SetSelectedNote(e.Path);
+        }
     }
 }

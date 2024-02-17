@@ -20,10 +20,7 @@ public sealed partial class RecentLinksSettingsForm : Page, IWidgetForm
 
     public RecentLinksSettingsViewModel ViewModel { get; }
 
-    public Task SubmitAsync()
-    {
-        return ViewModel.SubmitAsync();
-    }
+    public Task SubmitAsync() => ViewModel.SubmitAsync();
 
     private void TitleTextBox_Loaded(object sender, RoutedEventArgs e)
     {

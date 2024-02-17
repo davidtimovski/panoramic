@@ -1,6 +1,7 @@
 using System;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.Note;
@@ -14,6 +15,7 @@ public sealed partial class NoteWidgetPage : Page
 {
     private readonly IStorageService _storageService;
     private readonly IMarkdownService _markdownService;
+    private readonly DispatcherQueue _dispatcherQueue;
     private readonly NoteWidget _widget;
 
     public NoteWidgetPage(IServiceProvider serviceProvider, NoteWidget widget)
@@ -21,9 +23,10 @@ public sealed partial class NoteWidgetPage : Page
         InitializeComponent();
 
         _storageService = serviceProvider.GetRequiredService<IStorageService>();
-
+        _storageService.NoteSelectionChanged += NoteSelectionChanged;
 
         _markdownService = serviceProvider.GetRequiredService<IMarkdownService>();
+        _dispatcherQueue = serviceProvider.GetRequiredService<DispatcherQueue>();
         _widget = widget;
 
         ViewModel = new NoteViewModel(widget, _storageService);
@@ -67,20 +70,9 @@ public sealed partial class NoteWidgetPage : Page
         }
     }
 
-    private void Explorer_SelectionChanged(TreeView _, TreeViewSelectionChangedEventArgs args)
+    private void NoteSelectionChanged(object? _, NoteSelectionChangedEventArgs e)
     {
-        if (args.AddedItems.Count == 0)
-        {
-            return;
-        }
-
-        var item = args.AddedItems[0] as ExplorerItem;
-        if (item!.Type == FileType.Note)
-        {
-            ViewModel.SelectNote(item.Path.Absolute);
-            SetPresenterContent();
-            _storageService.EnqueueWidgetWrite(_widget.Id);
-        }
+        _dispatcherQueue.TryEnqueue(SetPresenterContent);
     }
 
     private async void AddNote_Click(object _, RoutedEventArgs e)
@@ -95,9 +87,10 @@ public sealed partial class NoteWidgetPage : Page
             XamlRoot = Content.XamlRoot,
             Title = "New note",
             Content = content,
-            PrimaryButtonText = "Create",
+            PrimaryButtonText = "Add",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateNote(_widget.Id, item.Path.Absolute, content.ViewModel.Name))
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateNote(_widget.Id, item.Path.Absolute, content.ViewModel.Name)),
+            IsPrimaryButtonEnabled = false
         };
 
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
@@ -117,9 +110,10 @@ public sealed partial class NoteWidgetPage : Page
             XamlRoot = Content.XamlRoot,
             Title = "New folder",
             Content = content,
-            PrimaryButtonText = "Create",
+            PrimaryButtonText = "Add",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateFolder(_widget.Id, item.Path.Absolute, content.ViewModel.Name))
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateFolder(_widget.Id, item.Path.Absolute, content.ViewModel.Name)),
+            IsPrimaryButtonEnabled = false
         };
 
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
@@ -222,6 +216,7 @@ public sealed partial class NoteWidgetPage : Page
         };
 
         content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
+        content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
 
         ViewModel.Highlighted = true;
 

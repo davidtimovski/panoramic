@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Panoramic.Models.Domain.Note;
+using Panoramic.Models.Events;
 using Panoramic.Services.Storage;
 using Panoramic.Utils;
 
@@ -16,7 +17,7 @@ public sealed partial class NoteSettingsViewModel : SettingsViewModel
         _storageService = storageService;
 
         var fontFamilyOptions = FontFamilyHelper.GetAll();
-        foreach (var fontFamilyOption in  fontFamilyOptions)
+        foreach (var fontFamilyOption in fontFamilyOptions)
         {
             FontFamilyOptions.Add(fontFamilyOption);
         }
@@ -24,18 +25,23 @@ public sealed partial class NoteSettingsViewModel : SettingsViewModel
         Id = data.Id;
         fontFamily = data.FontFamily;
         fontSize = data.FontSize.ToString();
+
+        Validated?.Invoke(this, new ValidationEventArgs(true));
     }
 
     private readonly IStorageService _storageService;
+
     public Guid Id { get; }
 
-    public ObservableCollection<string> FontFamilyOptions { get; } = new();
+    public ObservableCollection<string> FontFamilyOptions { get; } = [];
 
     [ObservableProperty]
     private string fontFamily;
 
     [ObservableProperty]
     private string fontSize;
+
+    public event EventHandler<ValidationEventArgs>? Validated;
 
     public async Task SubmitAsync()
     {
@@ -56,4 +62,6 @@ public sealed partial class NoteSettingsViewModel : SettingsViewModel
             await _storageService.SaveWidgetAsync(widget);
         }
     }
+
+    public void Loaded() => Validated?.Invoke(this, new ValidationEventArgs(true));
 }

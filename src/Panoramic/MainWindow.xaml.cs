@@ -69,11 +69,11 @@ public sealed partial class MainWindow : Window
             PrimaryButtonText = "Add",
             CloseButtonText = "Cancel",
             PrimaryButtonCommand = new AsyncRelayCommand(content.SubmitAsync),
-            //IsPrimaryButtonEnabled = false
+            IsPrimaryButtonEnabled = false
         };
 
         content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
-        //content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
 
         await dialog.ShowAsync();
     }

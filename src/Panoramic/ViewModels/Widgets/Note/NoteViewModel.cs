@@ -22,7 +22,7 @@ public sealed partial class NoteViewModel : ObservableObject
         _storageService.FileCreated += FileCreated;
         _storageService.FileRenamed += FileRenamed;
         _storageService.FileDeleted += FileDeleted;
-        _storageService.NoteSelected += NoteSelected;
+        _storageService.NoteSelectionChanged += NoteSelectionChanged;
         _storageService.StoragePathChanged += StoragePathChanged;
 
         _widget = widget;
@@ -31,7 +31,8 @@ public sealed partial class NoteViewModel : ObservableObject
 
         fontFamily = FontFamilyHelper.Get(_widget.FontFamily);
         fontSize = _widget.FontSize;
-        selectedNote = _widget.SelectedNote;
+
+        SelectedNote = _widget.SelectedNote;
     }
 
     public ObservableCollection<ExplorerItem> ExplorerItems { get; } = [];
@@ -42,19 +43,45 @@ public sealed partial class NoteViewModel : ObservableObject
     [ObservableProperty]
     private double fontSize;
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Title))]
-    [NotifyPropertyChangedFor(nameof(ExplorerVisible))]
-    [NotifyPropertyChangedFor(nameof(NoteVisible))]
     private ExplorerItem? selectedNote;
+    public ExplorerItem? SelectedNote
+    {
+        get => selectedNote;
+        set
+        {
+            if (value is not null && value.Type == FileType.Folder)
+            {
+                return;
+            }
+
+            var previousPath = _widget.NotePath?.Absolute;
+
+            _widget.SetSelectedNote(value?.Path.Absolute);
+
+            SetProperty(ref selectedNote, value);
+            OnPropertyChanged(nameof(SelectedNote));
+
+            _storageService.ChangeNoteSelection(_widget.Id, previousPath, _widget.SelectedNote?.Path.Absolute);
+            _storageService.EnqueueWidgetWrite(_widget.Id);
+
+            Title = selectedNote is null ? "Notes" : selectedNote.Name;
+            ExplorerVisible = selectedNote is null;
+            NoteVisible = selectedNote is not null;
+        }
+    }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Background))]
     private bool highlighted;
 
-    public string Title => SelectedNote is null ? "Notes" : SelectedNote.Name;
-    public bool ExplorerVisible => SelectedNote is null;
-    public bool NoteVisible => SelectedNote is not null;
+    [ObservableProperty]
+    private string title;
+
+    [ObservableProperty]
+    private bool explorerVisible;
+
+    [ObservableProperty]
+    private bool noteVisible;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EditorVisibility))]
@@ -72,16 +99,9 @@ public sealed partial class NoteViewModel : ObservableObject
         ? (Application.Current.Resources["PanoramicWidgetHighlightedBackgroundBrush"] as SolidColorBrush)!
         : (Application.Current.Resources["PanoramicWidgetBackgroundBrush"] as SolidColorBrush)!;
 
-    public void SelectNote(string notePath)
-    {
-        _widget.SetSelectedNote(notePath);
-        _storageService.EnqueueWidgetWrite(_widget.Id);
-    }
-
     public void DeselectNote()
     {
-        _widget.SetSelectedNote(null);
-        _storageService.EnqueueWidgetWrite(_widget.Id);
+        SelectedNote = null;
     }
 
     private void ReloadFiles()
@@ -176,11 +196,10 @@ public sealed partial class NoteViewModel : ObservableObject
         return false;
     }
 
-    private void NoteSelected(object? _, NoteSelectedEventArgs e)
+    private void NoteSelectionChanged(object? _, NoteSelectionChangedEventArgs e)
     {
         if (e.WidgetId == _widget.Id)
         {
-            SelectedNote = _widget.SelectedNote;
             return;
         }
 
@@ -198,9 +217,9 @@ public sealed partial class NoteViewModel : ObservableObject
 
         AddItem(ExplorerItems, explorerItem, explorerItem.Path.Parent);
 
-        if (e.WidgetId == _widget.Id && e.Type == FileType.Note)
+        if (e.Type == FileType.Note && e.WidgetId == _widget.Id)
         {
-            SelectNote(e.Path);
+            SelectedNote = _widget.SelectedNote;
         }
     }
 
