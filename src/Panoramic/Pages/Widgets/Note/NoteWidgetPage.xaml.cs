@@ -213,8 +213,8 @@ public sealed partial class NoteWidgetPage : Page
             CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })
         };
 
+        content.AttachSettingsValidationHandler((_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; });
         content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
-        content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
 
         ViewModel.Highlighted = true;
 

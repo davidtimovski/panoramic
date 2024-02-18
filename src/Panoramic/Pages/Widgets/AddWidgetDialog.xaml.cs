@@ -98,10 +98,10 @@ public sealed partial class AddWidgetDialog : Page
                     Id = Guid.Empty,
                     Area = selectedArea!
                 });
+                noteVm.AttachValidationHandler(Validated!);
 
                 var noteForm = new NoteSettingsForm(noteVm);
-                noteForm.ViewModel.Validated += Validated;
-
+          
                 widgetForm = noteForm;
                 ContentFrame.Content = noteForm;
                 break;
@@ -112,9 +112,9 @@ public sealed partial class AddWidgetDialog : Page
                     Area = selectedArea!,
                     Links = []
                 });
+                linkCollectionVm.AttachValidationHandler(Validated!);
 
                 var linkCollectionForm = new LinkCollectionSettingsForm(linkCollectionVm);
-                linkCollectionForm.ViewModel.Validated += Validated;
 
                 widgetForm = linkCollectionForm;
                 ContentFrame.Content = linkCollectionForm;
@@ -126,9 +126,9 @@ public sealed partial class AddWidgetDialog : Page
                     Area = selectedArea!,
                     Links = []
                 });
+                recentLinksVm.AttachValidationHandler(Validated!);
 
                 var recentLinksForm = new RecentLinksSettingsForm(recentLinksVm);
-                recentLinksForm.ViewModel.Validated += Validated;
 
                 widgetForm = recentLinksForm;
                 ContentFrame.Content = recentLinksForm;

@@ -28,7 +28,7 @@ public sealed partial class EditWidgetDialog : Page
 
     private IWidgetForm? widgetForm;
     private Page? settingsContent;
-    private SettingsViewModel? settingsVm;
+    private ISettingsViewModel? settingsVm;
 
     public EditWidgetDialog(IWidget widget, IStorageService storageService)
     {
@@ -41,6 +41,7 @@ public sealed partial class EditWidgetDialog : Page
         EditAreaTitle = "Area";
 
         Initialize();
+
         _areaPicker = new(_storageService, widget.Id);
         _areaPicker.AreaReset += AreaReset;
         _areaPicker.AreaPicked += AreaPicked;
@@ -51,6 +52,9 @@ public sealed partial class EditWidgetDialog : Page
 
     public event EventHandler<DialogStepChangedEventArgs>? StepChanged;
     public event EventHandler<ValidationEventArgs>? Validated;
+
+    public void AttachSettingsValidationHandler(EventHandler<ValidationEventArgs> handler)
+        => settingsVm!.AttachValidationHandler(handler);
 
     public async Task SubmitAsync()
     {
@@ -84,9 +88,7 @@ public sealed partial class EditWidgetDialog : Page
         {
             case WidgetType.Note:
                 var noteVm = new NoteSettingsViewModel(_storageService, ((NoteWidget)_widget).GetData());
-
                 var noteForm = new NoteSettingsForm(noteVm);
-                noteForm.ViewModel.Validated += Validated;
 
                 settingsVm = noteVm;
                 widgetForm = noteForm;
@@ -94,9 +96,7 @@ public sealed partial class EditWidgetDialog : Page
                 break;
             case WidgetType.LinkCollection:
                 var linkCollectionVm = new LinkCollectionSettingsViewModel(_storageService, ((LinkCollectionWidget)_widget).GetData());
-
                 var linkCollectionForm = new LinkCollectionSettingsForm(linkCollectionVm);
-                linkCollectionForm.ViewModel.Validated += Validated;
 
                 settingsVm = linkCollectionVm;
                 widgetForm = linkCollectionForm;
@@ -104,9 +104,7 @@ public sealed partial class EditWidgetDialog : Page
                 break;
             case WidgetType.RecentLinks:
                 var recentLinksVm = new RecentLinksSettingsViewModel(_storageService, ((RecentLinksWidget)_widget).GetData());
-
                 var recentLinksForm = new RecentLinksSettingsForm(recentLinksVm);
-                recentLinksForm.ViewModel.Validated += Validated;
 
                 settingsVm = recentLinksVm;
                 widgetForm = recentLinksForm;

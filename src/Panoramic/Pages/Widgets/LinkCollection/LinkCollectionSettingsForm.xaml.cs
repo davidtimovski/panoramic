@@ -22,12 +22,12 @@ public sealed partial class LinkCollectionSettingsForm : Page, IWidgetForm
 
     public Task SubmitAsync() => ViewModel.SubmitAsync();
 
-    private void TitleTextBox_Loaded(object sender, RoutedEventArgs e)
+    private void TitleTextBox_Loaded(object _, RoutedEventArgs e)
     {
         if (ViewModel.Id == Guid.Empty)
         {
             TitleTextBox.Focus(FocusState.Programmatic);
-            TitleTextBox.SelectAll();
+            TitleTextBox.SelectionStart = TitleTextBox.Text.Length;
         }
     }
 }

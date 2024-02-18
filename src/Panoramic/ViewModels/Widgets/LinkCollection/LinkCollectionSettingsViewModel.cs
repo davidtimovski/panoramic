@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Events;
 using Panoramic.Services.Storage;
@@ -8,17 +9,35 @@ using Panoramic.Services.Storage;
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
 public sealed partial class LinkCollectionSettingsViewModel(IStorageService storageService, LinkCollectionData data)
-    : SettingsViewModel(data)
+    : ObservableObject, ISettingsViewModel
 {
     private readonly IStorageService _storageService = storageService;
+    private event EventHandler<ValidationEventArgs>? Validated;
+
     public Guid Id { get; } = data.Id;
 
     [ObservableProperty]
+    private Area area = data.Area;
+
     private string title = data.Title;
+    public string Title
+    {
+        get => title;
+        set
+        {
+            if (SetProperty(ref title, value))
+            {
+                OnPropertyChanged(nameof(Title));
+                Validate();
+            }
+        }
+    }
 
-    public event EventHandler<ValidationEventArgs>? Validated;
-
-    public void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs(Title.Trim().Length > 0));
+    public void AttachValidationHandler(EventHandler<ValidationEventArgs> handler)
+    {
+        Validated += handler;
+        Validate();
+    }
 
     public async Task SubmitAsync()
     {
@@ -36,4 +55,6 @@ public sealed partial class LinkCollectionSettingsViewModel(IStorageService stor
             await _storageService.SaveWidgetAsync(widget);
         }
     }
+
+    private void Validate() => Validated?.Invoke(this, new ValidationEventArgs(Title.Trim().Length > 0));
 }

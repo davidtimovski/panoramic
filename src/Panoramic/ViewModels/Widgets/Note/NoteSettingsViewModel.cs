@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Events;
 using Panoramic.Services.Storage;
@@ -9,10 +10,10 @@ using Panoramic.Utils;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 
-public sealed partial class NoteSettingsViewModel : SettingsViewModel
+public sealed partial class NoteSettingsViewModel
+    : ObservableObject, ISettingsViewModel
 {
-    public NoteSettingsViewModel(IStorageService storageService, NoteData data) 
-        : base(data)
+    public NoteSettingsViewModel(IStorageService storageService, NoteData data)
     {
         _storageService = storageService;
 
@@ -23,15 +24,18 @@ public sealed partial class NoteSettingsViewModel : SettingsViewModel
         }
 
         Id = data.Id;
+        area = data.Area;
         fontFamily = data.FontFamily;
         fontSize = data.FontSize.ToString();
-
-        Validated?.Invoke(this, new ValidationEventArgs(true));
     }
 
     private readonly IStorageService _storageService;
+    private event EventHandler<ValidationEventArgs>? Validated;
 
     public Guid Id { get; }
+
+    [ObservableProperty]
+    private Area area;
 
     public ObservableCollection<string> FontFamilyOptions { get; } = [];
 
@@ -41,7 +45,11 @@ public sealed partial class NoteSettingsViewModel : SettingsViewModel
     [ObservableProperty]
     private string fontSize;
 
-    public event EventHandler<ValidationEventArgs>? Validated;
+    public void AttachValidationHandler(EventHandler<ValidationEventArgs> handler)
+    {
+        Validated += handler;
+        Validate();
+    }
 
     public async Task SubmitAsync()
     {
@@ -63,5 +71,5 @@ public sealed partial class NoteSettingsViewModel : SettingsViewModel
         }
     }
 
-    public void Loaded() => Validated?.Invoke(this, new ValidationEventArgs(true));
+    private void Validate() => Validated?.Invoke(this, new ValidationEventArgs(true));
 }

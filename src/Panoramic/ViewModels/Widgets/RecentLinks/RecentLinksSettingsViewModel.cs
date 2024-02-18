@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Models.Events;
 using Panoramic.Services.Storage;
@@ -8,15 +9,29 @@ using Panoramic.Services.Storage;
 namespace Panoramic.ViewModels.Widgets.RecentLinks;
 
 public sealed partial class RecentLinksSettingsViewModel(IStorageService storageService, RecentLinksData data)
-    : SettingsViewModel(data)
+    : ObservableObject, ISettingsViewModel
 {
     private readonly IStorageService _storageService = storageService;
+    private event EventHandler<ValidationEventArgs>? Validated;
+
     public Guid Id { get; } = data.Id;
 
-    public event EventHandler<ValidationEventArgs>? Validated;
-
     [ObservableProperty]
+    private Area area = data.Area;
+
     private string title = data.Title;
+    public string Title
+    {
+        get => title;
+        set
+        {
+            if (SetProperty(ref title, value))
+            {
+                OnPropertyChanged(nameof(Title));
+                Validate();
+            }
+        }
+    }
 
     [ObservableProperty]
     private int capacity = data.Capacity;
@@ -24,7 +39,11 @@ public sealed partial class RecentLinksSettingsViewModel(IStorageService storage
     [ObservableProperty]
     private bool onlyFromToday = data.OnlyFromToday;
 
-    public void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs(Title.Trim().Length > 0));
+    public void AttachValidationHandler(EventHandler<ValidationEventArgs> handler)
+    {
+        Validated += handler;
+        Validate();
+    }
 
     public async Task SubmitAsync()
     {
@@ -44,4 +63,6 @@ public sealed partial class RecentLinksSettingsViewModel(IStorageService storage
             await _storageService.SaveWidgetAsync(widget);
         }
     }
+
+    private void Validate() => Validated?.Invoke(this, new ValidationEventArgs(Title.Trim().Length > 0));
 }
