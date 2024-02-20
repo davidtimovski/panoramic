@@ -81,7 +81,7 @@ public sealed class NoteWidget : IWidget
 
             if (SelectedNote is not null)
             {
-                SelectedNote.Text = File.ReadAllText(NotePath.Absolute);
+                SelectedNote.InitializeContent(File.ReadAllText(NotePath.Absolute));
             }
             else
             {

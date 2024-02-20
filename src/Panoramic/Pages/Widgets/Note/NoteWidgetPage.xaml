@@ -42,6 +42,7 @@
                         <DropDownButton.Flyout>
                             <MenuFlyout Placement="Bottom">
                                 <MenuFlyoutItem Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" Click="{x:Bind ViewModel.DeselectNote}">Explore</MenuFlyoutItem>
+                                <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" />
                                 <MenuFlyoutItem Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" Click="DeleteNoteFromContextMenu_Click">Delete note</MenuFlyoutItem>
                                 <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" />
                                 <MenuFlyoutItem Click="SettingsButton_Click">Settings</MenuFlyoutItem>

@@ -18,9 +18,9 @@ public sealed partial class EditDialog : Page
 
     private void AddButton_Click(object sender, RoutedEventArgs e)
     {
-        if (ViewModel.LinkExists())
+        if (ViewModel.UrlExists())
         {
-            AddLinkButton.Flyout.ShowAt(sender as FrameworkElement);
+            DuplicateLinkFlyout.ShowAt(sender as FrameworkElement);
             return;
         }
 

@@ -61,6 +61,7 @@ public sealed class StorageService : IStorageService
     public event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
     public event EventHandler<EventArgs>? StoragePathChanged;
     public event EventHandler<NoteSelectionChangedEventArgs>? NoteSelectionChanged;
+    public event EventHandler<NoteContentChangedEventArgs>? NoteContentChanged;
     public event EventHandler<FileCreatedEventArgs>? FileCreated;
     public event EventHandler<EventArgs>? FileRenamed;
     public event EventHandler<FileDeletedEventArgs>? FileDeleted;
@@ -191,15 +192,20 @@ public sealed class StorageService : IStorageService
         NoteSelectionChanged?.Invoke(this, new NoteSelectionChangedEventArgs(widgetId, previousFilePath, newFilePath));
     }
 
+    public void ChangeNoteContent(Guid widgetId, string path, string content)
+    {
+        UpdateNoteContent(fileSystemItems, path, content);
+        NoteContentChanged?.Invoke(this, new NoteContentChangedEventArgs(widgetId, path, content));
+    }
+
     public void CreateFolder(Guid widgetId, string directory, string name)
     {
         var path = Path.Combine(directory, name);
         Directory.CreateDirectory(path);
 
-        var folder = new FileSystemItem
+        var folder = new FileSystemItem(FileType.Folder)
         {
             Name = name,
-            Type = FileType.Folder,
             Path = new(path, StoragePath)
         };
         AddItem(fileSystemItems, folder, directory);
@@ -230,10 +236,9 @@ public sealed class StorageService : IStorageService
         var path = Path.Combine(directory, $"{name}.md");
         File.Create(path).Dispose();
 
-        var note = new FileSystemItem
+        var note = new FileSystemItem(FileType.Note)
         {
             Name = name,
-            Type = FileType.Note,
             Path = new(path, StoragePath),
             SelectedInWidgetId = widgetId
         };
@@ -331,6 +336,22 @@ public sealed class StorageService : IStorageService
         }
     }
 
+    private static void UpdateNoteContent(List<FileSystemItem> items, string path, string content)
+    {
+        foreach (var item in items)
+        {
+            if (item.Type == FileType.Folder)
+            {
+                UpdateNoteContent(item.Children, path, content);
+            }
+            else if (item.Path.Equals(path))
+            {
+                item.Content = content;
+                return;
+            }
+        }
+    }
+
     private async Task ReadWidgetAsync(string widgetFilePath)
     {
         var json = await File.ReadAllTextAsync(widgetFilePath);
@@ -385,10 +406,9 @@ public sealed class StorageService : IStorageService
 
     private FileSystemItem DirectoryToTreeViewNode(string currentPath, string storagePath)
     {
-        var node = new FileSystemItem
+        var node = new FileSystemItem(FileType.Folder)
         {
             Name = Path.GetFileName(currentPath),
-            Type = FileType.Folder,
             Path = new(currentPath, StoragePath)
         };
 
@@ -396,7 +416,7 @@ public sealed class StorageService : IStorageService
         node.Children = subdirectories.Select(x => DirectoryToTreeViewNode(x, storagePath)).ToList();
 
         var filePaths = Directory.GetFiles(currentPath, "*.md").OrderBy(x => Path.GetFileName(x)).ToList();
-        node.Children.AddRange(filePaths.Select(x => new FileSystemItem { Name = Path.GetFileNameWithoutExtension(x), Type = FileType.Note, Path = new(x, StoragePath) }));
+        node.Children.AddRange(filePaths.Select(x => new FileSystemItem(FileType.Note) { Name = Path.GetFileNameWithoutExtension(x), Path = new(x, StoragePath) }));
 
         return node;
     }

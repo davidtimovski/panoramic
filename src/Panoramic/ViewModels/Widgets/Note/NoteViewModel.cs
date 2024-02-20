@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Xml.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
@@ -24,6 +23,7 @@ public sealed partial class NoteViewModel : ObservableObject
         _storageService.FileRenamed += FileRenamed;
         _storageService.FileDeleted += FileDeleted;
         _storageService.NoteSelectionChanged += NoteSelectionChanged;
+        _storageService.NoteContentChanged += NoteContentChanged;
         _storageService.StoragePathChanged += StoragePathChanged;
 
         _widget = widget;
@@ -32,6 +32,7 @@ public sealed partial class NoteViewModel : ObservableObject
 
         fontFamily = FontFamilyHelper.Get(_widget.FontFamily);
         fontSize = _widget.FontSize;
+        title = "Notes";
 
         SelectedNote = _widget.SelectedNote;
     }
@@ -102,6 +103,8 @@ public sealed partial class NoteViewModel : ObservableObject
 
     public void DeselectNote()
     {
+        _storageService.ChangeNoteContent(_widget.Id, SelectedNote!.Path.Absolute, SelectedNote!.Text!);
+
         SelectedNote = null;
     }
 
@@ -131,6 +134,22 @@ public sealed partial class NoteViewModel : ObservableObject
                 {
                     item.IsEnabled = true;
                 }
+            }
+        }
+    }
+
+    private static void UpdateNoteContent(ObservableCollection<ExplorerItem> items, string path, string content)
+    {
+        foreach (var item in items)
+        {
+            if (item.Type == FileType.Folder)
+            {
+                UpdateNoteContent(item.Children, path, content);
+            }
+            else if (item.Path.Equals(path))
+            {
+                item.InitializeContent(content);
+                return;
             }
         }
     }
@@ -207,14 +226,29 @@ public sealed partial class NoteViewModel : ObservableObject
         UpdateNoteSelection(ExplorerItems, e.PreviousFilePath, e.NewFilePath);
     }
 
+    private void NoteContentChanged(object? _, NoteContentChangedEventArgs e)
+    {
+        if (e.WidgetId == _widget.Id)
+        {
+            return;
+        }
+
+        UpdateNoteContent(ExplorerItems, e.Path, e.Content);
+    }
+
     private void FileCreated(object? _, FileCreatedEventArgs e)
     {
+        var noteCreatedInThisWidget = e.Type == FileType.Note && e.WidgetId == _widget.Id;
+
         var path = new FileSystemItemPath(e.Path, _storageService.StoragePath);
-        var explorerItem = new ExplorerItem(_storageService, e.Name, e.Type, path, []);
+        var explorerItem = new ExplorerItem(_storageService, e.Name, e.Type, path, [])
+        {
+            IsEnabled = noteCreatedInThisWidget
+        };
 
         AddItem(ExplorerItems, explorerItem, explorerItem.Path.Parent);
 
-        if (e.Type == FileType.Note && e.WidgetId == _widget.Id)
+        if (noteCreatedInThisWidget)
         {
             SelectedNote = _widget.SelectedNote;
         }

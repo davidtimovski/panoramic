@@ -12,6 +12,7 @@ public interface IStorageService
     event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
     event EventHandler<EventArgs>? StoragePathChanged;
     event EventHandler<NoteSelectionChangedEventArgs>? NoteSelectionChanged;
+    event EventHandler<NoteContentChangedEventArgs>? NoteContentChanged;
     event EventHandler<FileCreatedEventArgs>? FileCreated;
     event EventHandler<EventArgs>? FileRenamed;
     event EventHandler<FileDeletedEventArgs>? FileDeleted;
@@ -44,6 +45,7 @@ public interface IStorageService
     void ChangeStoragePath(string storagePath);
 
     void ChangeNoteSelection(Guid widgetId, string? previousFilePath, string? newFilePath);
+    void ChangeNoteContent(Guid widgetId, string path, string content);
 
     void CreateFolder(Guid widgetId, string directory, string name);
     void RenameFolder(string path, string newName);

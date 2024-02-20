@@ -42,9 +42,8 @@ public sealed partial class ExplorerItem : ObservableObject
             if (SetProperty(ref text, value))
             {
                 OnPropertyChanged(nameof(Text));
+                _storageService.EnqueueNoteWrite(Path.Absolute, value!);
             }
-         
-            _storageService.EnqueueNoteWrite(Path.Absolute, value!);
         }
     }
 
@@ -60,4 +59,15 @@ public sealed partial class ExplorerItem : ObservableObject
     public Visibility RenameDeleteVisible { get; }
 
     public double Opacity => IsEnabled ? 1 : 0.5;
+
+    /// <summary>
+    /// Used to update the <see cref="Text"/> without raising an event.
+    /// </summary>
+    public void InitializeContent(string content)
+    {
+        if (SetProperty(ref text, content))
+        {
+            OnPropertyChanged(nameof(Text));
+        }
+    }
 }

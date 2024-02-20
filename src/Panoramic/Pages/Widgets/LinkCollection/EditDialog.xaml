@@ -62,7 +62,7 @@
         <Border Grid.Row="0" Padding="0 10 0 20" BorderThickness="0 0 0 1" BorderBrush="#666">
             <StackPanel>
                 <TextBlock Margin="0 0 0 15" FontWeight="SemiBold">Add a new link</TextBlock>
-                
+
                 <TextBox Text="{x:Bind ViewModel.NewLinkTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          IsReadOnly="{x:Bind ViewModel.NewLinkTitleIsReadOnly, Mode=OneWay}"
                          PlaceholderText="{x:Bind ViewModel.NewLinkTitlePlaceholder, Mode=OneWay}"
@@ -74,22 +74,22 @@
                          Margin="0 10 0 0"
                          PlaceholderText="URL" />
 
-                <Button x:Name="AddLinkButton"
-                        Content="Add"
+                <Button Content="Add"
                         Click="AddButton_Click"
                         IsEnabled="{x:Bind ViewModel.NewLinkFormValid, Mode=OneWay}"
                         Margin="0 10 0 0"
                         HorizontalAlignment="Right">
-                    <Button.Flyout>
-                        <Flyout>
-                            <TextBlock TextWrapping="Wrap">
-                                <Run>The link already exists in the collection:</Run>
-                                <LineBreak/>
-                                <Run Text="{x:Bind ViewModel.DuplicateLinkTitle, Mode=OneWay}" />
-                            </TextBlock>
-                        </Flyout>
-                    </Button.Flyout>
                 </Button>
+
+                <FlyoutBase.AttachedFlyout>
+                    <Flyout x:Name="DuplicateLinkFlyout">
+                        <TextBlock TextWrapping="Wrap">
+                            <Run>The URL already exists in the collection as:</Run>
+                            <LineBreak/>
+                            <Run Text="{x:Bind ViewModel.DuplicateLinkTitle, Mode=OneWay}" />
+                        </TextBlock>
+                    </Flyout>
+                </FlyoutBase.AttachedFlyout>
             </StackPanel>
         </Border>
 

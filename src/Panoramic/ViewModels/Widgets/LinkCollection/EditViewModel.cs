@@ -103,7 +103,7 @@ public sealed partial class EditViewModel : ObservableObject
         }
     }
 
-    public bool LinkExists()
+    public bool UrlExists()
     {
         var existing = Links.FirstOrDefault(x => string.Equals(x.Url, NewLinkUrl, StringComparison.Ordinal));
         if (existing is null)
