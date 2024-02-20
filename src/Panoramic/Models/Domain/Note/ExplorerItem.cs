@@ -11,11 +11,14 @@ public sealed partial class ExplorerItem : ObservableObject
 {
     private readonly IStorageService _storageService;
 
-    public ExplorerItem(IStorageService storageService, FileSystemItemPath path, IReadOnlyList<ExplorerItem> children)
+    public ExplorerItem(IStorageService storageService, string name, FileType type, FileSystemItemPath path, IReadOnlyList<ExplorerItem> children)
     {
         _storageService = storageService;
 
+        Name = name;
+        Type = type;
         Path = path;
+        text = type == FileType.Note ? string.Empty : null;
         RenameDeleteVisible = path.Relative == "." ? Visibility.Collapsed : Visibility.Visible;
 
         foreach (var item in children)
@@ -26,9 +29,9 @@ public sealed partial class ExplorerItem : ObservableObject
         IsEnabled = isEnabled;
     }
 
-    public required string Name { get; init; }
-    public required FileType Type { get; init; }
-    public FileSystemItemPath Path { get; init; }
+    public string Name { get; }
+    public FileType Type { get; }
+    public FileSystemItemPath Path { get; }
 
     private string? text;
     public string? Text

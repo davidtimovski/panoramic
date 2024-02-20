@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Xml.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
@@ -209,11 +210,7 @@ public sealed partial class NoteViewModel : ObservableObject
     private void FileCreated(object? _, FileCreatedEventArgs e)
     {
         var path = new FileSystemItemPath(e.Path, _storageService.StoragePath);
-        var explorerItem = new ExplorerItem(_storageService, path, [])
-        {
-            Name = e.Name,
-            Type = e.Type
-        };
+        var explorerItem = new ExplorerItem(_storageService, e.Name, e.Type, path, []);
 
         AddItem(ExplorerItems, explorerItem, explorerItem.Path.Parent);
 
@@ -225,7 +222,15 @@ public sealed partial class NoteViewModel : ObservableObject
 
     private void FileRenamed(object? _, EventArgs e) => ReloadFiles();
 
-    private void FileDeleted(object? _, FileDeletedEventArgs e) => RemoveItem(ExplorerItems, e.Path);
+    private void FileDeleted(object? _, FileDeletedEventArgs e)
+    {
+        if (SelectedNote is not null && SelectedNote.Path.Equals(e.Path))
+        {
+            DeselectNote();
+        }
+
+        RemoveItem(ExplorerItems, e.Path);
+    }
 
     private void StoragePathChanged(object? _, EventArgs e)
         => ReloadFiles();

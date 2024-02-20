@@ -76,10 +76,9 @@ public sealed partial class NoteWidgetPage : Page
     private async void AddNote_Click(object _, RoutedEventArgs e)
     {
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
-        var item = (ExplorerItem)menuItem.DataContext;
+        var folder = (ExplorerItem)menuItem.DataContext;
 
-        var content = new NewNoteForm(item.Path.Parent);
-
+        var content = new NewNoteForm(folder.Path.Parent);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -87,7 +86,7 @@ public sealed partial class NoteWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Add",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateNote(_widget.Id, item.Path.Absolute, content.ViewModel.Name)),
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateNote(_widget.Id, folder.Path.Absolute, content.ViewModel.Name)),
             IsPrimaryButtonEnabled = false
         };
 
@@ -99,10 +98,9 @@ public sealed partial class NoteWidgetPage : Page
     private async void AddFolder_Click(object _, RoutedEventArgs e)
     {
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
-        var item = (ExplorerItem)menuItem.DataContext;
+        var folder = (ExplorerItem)menuItem.DataContext;
 
-        var content = new NewFolderForm(item.Path.Parent);
-
+        var content = new NewFolderForm(folder.Path.Parent);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -110,7 +108,7 @@ public sealed partial class NoteWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Add",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateFolder(_widget.Id, item.Path.Absolute, content.ViewModel.Name)),
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateFolder(_widget.Id, folder.Path.Absolute, content.ViewModel.Name)),
             IsPrimaryButtonEnabled = false
         };
 
@@ -122,10 +120,9 @@ public sealed partial class NoteWidgetPage : Page
     private async void RenameFolder_Click(object _, RoutedEventArgs e)
     {
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
-        var item = (ExplorerItem)menuItem.DataContext;
+        var folder = (ExplorerItem)menuItem.DataContext;
 
-        var content = new FolderRenameForm(item.Path.Absolute);
-
+        var content = new FolderRenameForm(folder.Path.Absolute);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -133,7 +130,7 @@ public sealed partial class NoteWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.RenameFolder(item.Path.Absolute, content.ViewModel.Name))
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.RenameFolder(folder.Path.Absolute, content.ViewModel.Name))
         };
 
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
@@ -144,16 +141,16 @@ public sealed partial class NoteWidgetPage : Page
     private async void DeleteFolder_Click(object _, RoutedEventArgs e)
     {
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
-        var item = (ExplorerItem)menuItem.DataContext;
+        var folder = (ExplorerItem)menuItem.DataContext;
 
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
             Title = "Delete folder",
-            Content = $@"Are you sure want to delete the ""{item.Name}"" folder and everything in it?",
+            Content = $@"Are you sure want to delete the ""{folder.Name}"" folder and everything in it?",
             PrimaryButtonText = "Yes, delete",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.DeleteFolder(item.Path.Absolute))
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.DeleteFolder(folder.Path.Absolute))
         };
 
         await dialog.ShowAsync();
@@ -162,10 +159,9 @@ public sealed partial class NoteWidgetPage : Page
     private async void RenameNote_Click(object _, RoutedEventArgs e)
     {
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
-        var item = (ExplorerItem)menuItem.DataContext;
+        var note = (ExplorerItem)menuItem.DataContext;
 
-        var content = new NoteRenameForm(item.Path.Absolute);
-
+        var content = new NoteRenameForm(note.Path.Absolute);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -173,7 +169,7 @@ public sealed partial class NoteWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.RenameNote(item.Path.Absolute, content.ViewModel.Name))
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.RenameNote(note.Path.Absolute, content.ViewModel.Name))
         };
 
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
@@ -184,16 +180,33 @@ public sealed partial class NoteWidgetPage : Page
     private async void DeleteNote_Click(object _, RoutedEventArgs e)
     {
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
-        var item = (ExplorerItem)menuItem.DataContext;
+        var note = (ExplorerItem)menuItem.DataContext;
 
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
             Title = "Delete note",
-            Content = $@"Are you sure want to delete the ""{item.Name}"" note?",
+            Content = $@"Are you sure want to delete the ""{note.Name}"" note?",
             PrimaryButtonText = "Yes, delete",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.DeleteNote(item.Path.Absolute))
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.DeleteNote(note.Path.Absolute))
+        };
+
+        await dialog.ShowAsync();
+    }
+
+    private async void DeleteNoteFromContextMenu_Click(object _, RoutedEventArgs e)
+    {
+        var note = ViewModel.SelectedNote!;
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            Title = "Delete note",
+            Content = $@"Are you sure want to delete the ""{note.Name}"" note?",
+            PrimaryButtonText = "Yes, delete",
+            CloseButtonText = "Cancel",
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.DeleteNote(note.Path.Absolute))
         };
 
         await dialog.ShowAsync();

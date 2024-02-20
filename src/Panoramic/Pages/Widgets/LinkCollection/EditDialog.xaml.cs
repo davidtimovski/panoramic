@@ -16,6 +16,17 @@ public sealed partial class EditDialog : Page
 
     public EditViewModel ViewModel { get; }
 
+    private void AddButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel.LinkExists())
+        {
+            AddLinkButton.Flyout.ShowAt(sender as FrameworkElement);
+            return;
+        }
+
+        ViewModel.Add();
+    }
+
     private void DeleteLinkClicked(object sender, RoutedEventArgs e)
     {
         var button = (Button)sender;

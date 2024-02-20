@@ -58,7 +58,7 @@ public sealed class RecentLinksWidget : IWidget
     {
         get
         {
-            return links.OrderByDescending(x => x.Clicked).ToList();
+            return links.OrderByDescending(x => x.Clicked).Take(Capacity).ToList();
         }
         private set
         {

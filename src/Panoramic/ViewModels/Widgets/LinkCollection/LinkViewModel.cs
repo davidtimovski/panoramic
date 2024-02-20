@@ -9,6 +9,7 @@ public sealed class LinkViewModel(IEventHub eventHub, string title, Uri uri)
 
     public string Title { get; set; } = title;
     public Uri Uri { get; set; } = uri;
+    public string Tooltip { get; set; } = uri.Host;
     public short Order { get; set; }
 
     public void Clicked()

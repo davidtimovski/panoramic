@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -47,15 +48,32 @@ public sealed partial class EditViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(NewLinkFormValid))]
     private string newLinkUrl = string.Empty;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(NewLinkTitlePlaceholder))]
+    private bool newLinkTitleIsReadOnly;
+
+    [ObservableProperty]
+    private string? duplicateLinkTitle;
+
+    public string NewLinkTitlePlaceholder => NewLinkTitleIsReadOnly ? "Loading.." : "Title";
+
     public bool NewLinkFormValid => NewLinkTitle.Trim().Length > 0 && UriHelper.Create(NewLinkUrl) is not null;
 
     public ObservableCollection<EditLinkViewModel> Links { get; } = [];
 
     public async void PasteNewLinkUrl(object _, TextControlPasteEventArgs e)
     {
+        if (NewLinkTitle.Trim().Length > 0)
+        {
+            return;
+        }
+
+        NewLinkTitleIsReadOnly = true;
+
         var package = Clipboard.GetContent();
         if (!package.Contains(StandardDataFormats.Text))
         {
+            NewLinkTitleIsReadOnly = false;
             return;
         }
 
@@ -75,14 +93,27 @@ public sealed partial class EditViewModel : ObservableObject
 
             _dispatcherQueue.TryEnqueue(() =>
             {
-                if (NewLinkTitle.Length > 0)
-                {
-                    return;
-                }
-
                 NewLinkTitle = node.InnerText;
+                NewLinkTitleIsReadOnly = false;
             });
         }
+        else
+        {
+            NewLinkTitleIsReadOnly = false;
+        }
+    }
+
+    public bool LinkExists()
+    {
+        var existing = Links.FirstOrDefault(x => string.Equals(x.Url, NewLinkUrl, StringComparison.Ordinal));
+        if (existing is null)
+        {
+            DuplicateLinkTitle = null;
+            return false;
+        }
+
+        DuplicateLinkTitle = $@"""{existing.Title}""";
+        return true;
     }
 
     public void Add()
@@ -90,6 +121,7 @@ public sealed partial class EditViewModel : ObservableObject
         Links.Add(new EditLinkViewModel(NewLinkTitle.Trim(), UriHelper.Create(NewLinkUrl.Trim())!));
         NewLinkTitle = string.Empty;
         NewLinkUrl = string.Empty;
+        DuplicateLinkTitle = null;
     }
 
     public void Delete(EditLinkViewModel viewModel)

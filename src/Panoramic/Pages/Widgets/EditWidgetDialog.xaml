@@ -19,7 +19,7 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" x:Name="EditSettingsButton" Click="EditSettingsButton_Click" Visibility="Collapsed">Edit settings</Button>
+                <Button Grid.Column="0" x:Name="EditSettingsButton" Click="EditSettingsButton_Click" Visibility="Collapsed">Back</Button>
 
                 <Button Grid.Column="1" x:Name="EditAreaButton" Click="EditAreaButton_Click" HorizontalAlignment="Right">Edit area</Button>
             </Grid>
