@@ -42,7 +42,7 @@ public sealed partial class MainWindow : Window
 
         _storageService = storageService;
         _storageService.WidgetUpdated += WidgetUpdated;
-        _storageService.WidgetRemoved += WidgetRemoved;
+        _storageService.WidgetDeleted += WidgetDeleted;
 
         _serviceProvider = serviceProvider;
 
@@ -83,7 +83,7 @@ public sealed partial class MainWindow : Window
 
     private void WidgetUpdated(object? _, WidgetUpdatedEventArgs e) => RenderWidget(e.Id);
 
-    private void WidgetRemoved(object? _, WidgetRemovedEventArgs e)
+    private void WidgetDeleted(object? _, WidgetDeletedEventArgs e)
     {
         var widget = Grid.Children.OfType<Page>().FirstOrDefault(x => x.Name == e.Id.ToString("N"));
         Grid.Children.Remove(widget);

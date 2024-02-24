@@ -2,9 +2,9 @@
 
 namespace Panoramic.Services.Storage;
 
-public sealed class NoteContentChangedEventArgs(Guid widgetId, string path, string content) : EventArgs
+public sealed class NoteContentChangedEventArgs : EventArgs
 {
-    public Guid WidgetId { get; } = widgetId;
-    public string Path { get; } = path;
-    public string Content { get; } = content;
+    public required Guid WidgetId { get; init; }
+    public required string Path { get; init; }
+    public required string Content { get; init; }
 }

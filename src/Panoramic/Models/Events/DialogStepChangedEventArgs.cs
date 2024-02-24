@@ -2,7 +2,7 @@
 
 namespace Panoramic.Models.Events;
 
-public sealed class DialogStepChangedEventArgs(string dialogTitle) : EventArgs
+public sealed class DialogStepChangedEventArgs : EventArgs
 {
-    public string DialogTitle { get; } = dialogTitle;
+    public required string DialogTitle { get; init; }
 }

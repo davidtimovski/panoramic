@@ -16,7 +16,7 @@
                     <SolidColorBrush x:Key="PanoramicMainWindowBackgroundBrush" Color="#eee" />
                     
                     <SolidColorBrush x:Key="PanoramicWidgetBackgroundBrush" Color="#e3e3e3" />
-                    <SolidColorBrush x:Key="PanoramicWidgetHighlightedBackgroundBrush" Color="#fff" />
+                    <SolidColorBrush x:Key="PanoramicWidgetHighlightedBackgroundBrush" Color="#c3d3e3" />
 
                     <SolidColorBrush x:Key="PanoramicWidgetForegroundBrush" Color="#333" />
 

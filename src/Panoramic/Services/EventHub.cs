@@ -14,12 +14,17 @@ public sealed class EventHub : IEventHub
     public event EventHandler<HyperlinkClickedEventArgs>? HyperlinkClicked;
 
     public void RaiseHyperlinkClicked(string title, Uri uri, DateTime clicked)
-        => HyperlinkClicked?.Invoke(this, new HyperlinkClickedEventArgs(title, uri, clicked));
+        => HyperlinkClicked?.Invoke(this, new HyperlinkClickedEventArgs
+        {
+            Title = title,
+            Uri = uri,
+            Clicked = clicked
+        });
 }
 
-public sealed class HyperlinkClickedEventArgs(string title, Uri uri, DateTime clicked) : EventArgs
+public sealed class HyperlinkClickedEventArgs : EventArgs
 {
-    public string Title { get; } = title;
-    public Uri Uri { get; } = uri;
-    public DateTime Clicked { get; } = clicked;
+    public required string Title { get; init; }
+    public required Uri Uri { get; init; }
+    public required DateTime Clicked { get; init; }
 }

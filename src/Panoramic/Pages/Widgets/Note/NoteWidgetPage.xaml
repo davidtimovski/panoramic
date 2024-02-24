@@ -56,7 +56,7 @@
                                 <MenuFlyoutItem Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" Click="DeleteNoteFromContextMenu_Click">Delete note</MenuFlyoutItem>
                                 <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" />
                                 <MenuFlyoutItem Click="SettingsButton_Click">Settings</MenuFlyoutItem>
-                                <MenuFlyoutItem Click="RemoveButton_Click">Remove</MenuFlyoutItem>
+                                <MenuFlyoutItem Click="DeleteButton_Click">Delete</MenuFlyoutItem>
                             </MenuFlyout>
                         </DropDownButton.Flyout>
                     </DropDownButton>

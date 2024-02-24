@@ -15,7 +15,7 @@ public sealed partial class NoteRenameViewModel(string path) : ObservableObject
 
     public event EventHandler<ValidationEventArgs>? Validated;
 
-    public void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs(CanBeCreated()));
+    public void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
 
     private bool CanBeCreated() => Name.Trim().Length > 0 && NoteWidget.NoteCanBeCreated(Name.Trim(), _directory);
 }

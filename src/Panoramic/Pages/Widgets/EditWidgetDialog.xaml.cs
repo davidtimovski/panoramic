@@ -68,7 +68,7 @@ public sealed partial class EditWidgetDialog : Page
 
     private void ShowSettings()
     {
-        StepChanged?.Invoke(this, new DialogStepChangedEventArgs(EditSettingsTitle));
+        StepChanged?.Invoke(this, new DialogStepChangedEventArgs { DialogTitle = EditSettingsTitle });
         EditSettingsButton.Visibility = Visibility.Collapsed;
         EditAreaButton.Visibility = Visibility.Visible;
         ContentFrame.Content = settingsContent;
@@ -76,7 +76,7 @@ public sealed partial class EditWidgetDialog : Page
 
     private void ShowAreaPicker()
     {
-        StepChanged?.Invoke(this, new DialogStepChangedEventArgs(EditAreaTitle));
+        StepChanged?.Invoke(this, new DialogStepChangedEventArgs { DialogTitle = EditAreaTitle });
         EditAreaButton.Visibility = Visibility.Collapsed;
         EditSettingsButton.Visibility = Visibility.Visible;
         ContentFrame.Content = _areaPicker;
@@ -120,10 +120,10 @@ public sealed partial class EditWidgetDialog : Page
     private void AreaPicked(object? _, AreaPickedEventArgs e)
     {
         settingsVm!.Area = e.Area;
-        Validated?.Invoke(this, new ValidationEventArgs(true));
+        Validated?.Invoke(this, new ValidationEventArgs { Valid = true });
     }
 
-    private void AreaReset(object? _, EventArgs e) => Validated?.Invoke(this, new ValidationEventArgs(false));
+    private void AreaReset(object? _, EventArgs e) => Validated?.Invoke(this, new ValidationEventArgs { Valid = false });
 
     private void EditSettingsButton_Click(object _, RoutedEventArgs e) => ShowSettings();
 

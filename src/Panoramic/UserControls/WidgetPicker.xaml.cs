@@ -47,7 +47,7 @@ public sealed partial class WidgetPicker : UserControl
                 toggle.IsChecked = false;
             }
 
-            WidgetPicked?.Invoke(this, new WidgetPickedEventArgs(type));
+            WidgetPicked?.Invoke(this, new WidgetPickedEventArgs { Type = type });
         }
         else
         {
@@ -56,7 +56,7 @@ public sealed partial class WidgetPicker : UserControl
     }
 }
 
-public sealed class WidgetPickedEventArgs(WidgetType type) : EventArgs
+public sealed class WidgetPickedEventArgs : EventArgs
 {
-    public WidgetType Type { get; } = type;
+    public required WidgetType Type { get; init; }
 }

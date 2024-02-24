@@ -2,10 +2,10 @@
 
 namespace Panoramic.Services.Storage;
 
-public sealed class FileCreatedEventArgs(Guid widgetId, string name, FileType type, string path) : EventArgs
+public sealed class FileCreatedEventArgs : EventArgs
 {
-    public Guid WidgetId { get; } = widgetId;
-    public string Name { get; } = name;
-    public FileType Type { get; } = type;
-    public string Path { get; } = path;
+    public required Guid WidgetId { get; init; }
+    public required string Name { get; init; }
+    public required FileType Type { get; init; }
+    public required string Path { get; init; }
 }

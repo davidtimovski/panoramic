@@ -64,5 +64,5 @@ public sealed partial class RecentLinksSettingsViewModel(IStorageService storage
         }
     }
 
-    private void Validate() => Validated?.Invoke(this, new ValidationEventArgs(Title.Trim().Length > 0));
+    private void Validate() => Validated?.Invoke(this, new ValidationEventArgs { Valid = Title.Trim().Length > 0 });
 }

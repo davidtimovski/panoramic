@@ -2,7 +2,7 @@
 
 namespace Panoramic.Services.Storage;
 
-public sealed class FileDeletedEventArgs(string path) : EventArgs
+public sealed class FileDeletedEventArgs : EventArgs
 {
-    public string Path { get; } = path;
+    public required string Path { get; init; }
 }

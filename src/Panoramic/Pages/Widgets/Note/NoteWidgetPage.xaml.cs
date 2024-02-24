@@ -234,16 +234,16 @@ public sealed partial class NoteWidgetPage : Page
         await dialog.ShowAsync();
     }
 
-    private async void RemoveButton_Click(object _, RoutedEventArgs e)
+    private async void DeleteButton_Click(object _, RoutedEventArgs e)
     {
         ViewModel.Highlighted = true;
 
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
-            Title = "Remove widget",
-            Content = "Are you sure want to remove this widget?\n\nAny notes that you have will remain on the file system.",
-            PrimaryButtonText = "Yes, remove",
+            Title = "Delete widget",
+            Content = "Are you sure want to delete this widget?\n\nAny notes that you have will remain on the file system.",
+            PrimaryButtonText = "Yes, delete",
             CloseButtonText = "Cancel",
             PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_widget); }),
             CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })

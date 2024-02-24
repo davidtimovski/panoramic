@@ -2,9 +2,9 @@
 
 namespace Panoramic.Services.Storage;
 
-public sealed class NoteSelectionChangedEventArgs(Guid widgetId, string? previousFilePath, string? newFilePath) : EventArgs
+public sealed class NoteSelectionChangedEventArgs : EventArgs
 {
-    public Guid WidgetId { get; } = widgetId;
-    public string? PreviousFilePath { get; } = previousFilePath;
-    public string? NewFilePath { get; } = newFilePath;
+    public required Guid WidgetId { get; init; }
+    public required string? PreviousFilePath { get; init; }
+    public required string? NewFilePath { get; init; }
 }

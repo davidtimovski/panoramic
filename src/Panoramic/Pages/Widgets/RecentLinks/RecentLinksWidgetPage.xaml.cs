@@ -50,16 +50,16 @@ public sealed partial class RecentLinksWidgetPage : Page
         await dialog.ShowAsync();
     }
 
-    private async void RemoveButton_Click(object _, RoutedEventArgs e)
+    private async void DeleteButton_Click(object _, RoutedEventArgs e)
     {
         ViewModel.Highlighted = true;
 
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
-            Title = "Remove widget",
-            Content = $"Are you sure want to remove {_widget.Title}?\n\nAny data that it holds will also be deleted permanently.",
-            PrimaryButtonText = "Yes, remove",
+            Title = "Delete widget",
+            Content = $"Are you sure want to delete {_widget.Title}?\n\nAny data that it holds will also be deleted permanently.",
+            PrimaryButtonText = "Yes, delete",
             CloseButtonText = "Cancel",
             PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_widget); }),
             CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })

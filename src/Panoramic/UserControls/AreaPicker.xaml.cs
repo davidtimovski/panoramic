@@ -177,7 +177,7 @@ public sealed partial class AreaPicker : UserControl
         }
 
         var selectedArea = new Area($"{yStart}{xStart}-{yEnd}{xEnd}");
-        AreaPicked?.Invoke(this, new AreaPickedEventArgs(selectedArea));
+        AreaPicked?.Invoke(this, new AreaPickedEventArgs { Area = selectedArea });
     }
 
     public RelayCommand<string> SectionToggled { get; }
@@ -187,7 +187,7 @@ public sealed partial class AreaPicker : UserControl
     public event EventHandler<EventArgs>? AreaReset;
 }
 
-public sealed class AreaPickedEventArgs(Area area) : EventArgs
+public sealed class AreaPickedEventArgs : EventArgs
 {
-    public Area Area { get; } = area;
+    public required Area Area { get; init; }
 }

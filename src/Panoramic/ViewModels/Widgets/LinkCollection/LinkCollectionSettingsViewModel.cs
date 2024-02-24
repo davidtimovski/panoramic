@@ -56,5 +56,5 @@ public sealed partial class LinkCollectionSettingsViewModel(IStorageService stor
         }
     }
 
-    private void Validate() => Validated?.Invoke(this, new ValidationEventArgs(Title.Trim().Length > 0));
+    private void Validate() => Validated?.Invoke(this, new ValidationEventArgs { Valid = Title.Trim().Length > 0 });
 }

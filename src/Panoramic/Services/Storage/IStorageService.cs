@@ -9,7 +9,7 @@ namespace Panoramic.Services.Storage;
 public interface IStorageService
 {
     event EventHandler<WidgetUpdatedEventArgs>? WidgetUpdated;
-    event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
+    event EventHandler<WidgetDeletedEventArgs>? WidgetDeleted;
     event EventHandler<EventArgs>? StoragePathChanged;
     event EventHandler<NoteSelectionChangedEventArgs>? NoteSelectionChanged;
     event EventHandler<NoteContentChangedEventArgs>? NoteContentChanged;

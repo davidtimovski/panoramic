@@ -54,6 +54,6 @@ public sealed partial class PreferencesDialog : Page
         StorageApplicationPermissions.FutureAccessList.AddOrReplace("PanoramicPickedFolderToken", folder);
 
         ViewModel.SetFolder(folder.Path);
-        Validated?.Invoke(this, new ValidationEventArgs(ViewModel.FolderIsValid));
+        Validated?.Invoke(this, new ValidationEventArgs { Valid = ViewModel.FolderIsValid });
     }
 }

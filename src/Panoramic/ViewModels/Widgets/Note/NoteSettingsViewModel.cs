@@ -71,5 +71,5 @@ public sealed partial class NoteSettingsViewModel
         }
     }
 
-    private void Validate() => Validated?.Invoke(this, new ValidationEventArgs(true));
+    private void Validate() => Validated?.Invoke(this, new ValidationEventArgs { Valid = true });
 }

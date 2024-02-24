@@ -62,7 +62,7 @@ public sealed partial class AddWidgetDialog : Page
 
     private void ShowAreaPicker()
     {
-        StepChanged?.Invoke(this, new DialogStepChangedEventArgs(AreaPickerTitle));
+        StepChanged?.Invoke(this, new DialogStepChangedEventArgs { DialogTitle = AreaPickerTitle });
         ContentFrame.Content = _areaPicker;
 
         PreviousButton.Visibility = Visibility.Collapsed;
@@ -72,7 +72,7 @@ public sealed partial class AddWidgetDialog : Page
 
     private void ShowWidgetPicker()
     {
-        StepChanged?.Invoke(this, new DialogStepChangedEventArgs(WidgetPickerTitle));
+        StepChanged?.Invoke(this, new DialogStepChangedEventArgs { DialogTitle = WidgetPickerTitle });
 
         var widgetPicker = new WidgetPicker(selectedWidgetType);
         widgetPicker.WidgetPicked += WidgetPicked;
@@ -83,12 +83,12 @@ public sealed partial class AddWidgetDialog : Page
         PreviousButton.Visibility = Visibility.Visible;
         NextButton.Visibility = Visibility.Visible;
         NextButton.IsEnabled = selectedWidgetType is not null;
-        Validated?.Invoke(this, new ValidationEventArgs(false));
+        Validated?.Invoke(this, new ValidationEventArgs { Valid = false });
     }
 
     private void ShowSettingsForm()
     {
-        StepChanged?.Invoke(this, new DialogStepChangedEventArgs(WidgetSettingsTitle));
+        StepChanged?.Invoke(this, new DialogStepChangedEventArgs { DialogTitle = WidgetSettingsTitle });
 
         switch (selectedWidgetType)
         {

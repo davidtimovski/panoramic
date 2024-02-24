@@ -2,7 +2,7 @@
 
 namespace Panoramic.Models.Events;
 
-public sealed class ValidationEventArgs(bool valid) : EventArgs
+public sealed class ValidationEventArgs : EventArgs
 {
-    public bool Valid { get; } = valid;
+    public required bool Valid { get; init; }
 }

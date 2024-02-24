@@ -58,7 +58,7 @@ public sealed class StorageService : IStorageService
     }
 
     public event EventHandler<WidgetUpdatedEventArgs>? WidgetUpdated;
-    public event EventHandler<WidgetRemovedEventArgs>? WidgetRemoved;
+    public event EventHandler<WidgetDeletedEventArgs>? WidgetDeleted;
     public event EventHandler<EventArgs>? StoragePathChanged;
     public event EventHandler<NoteSelectionChangedEventArgs>? NoteSelectionChanged;
     public event EventHandler<NoteContentChangedEventArgs>? NoteContentChanged;
@@ -148,7 +148,7 @@ public sealed class StorageService : IStorageService
 
         Widgets.Remove(widget.Id);
 
-        WidgetRemoved?.Invoke(this, new WidgetRemovedEventArgs(widget.Id));
+        WidgetDeleted?.Invoke(this, new WidgetDeletedEventArgs { Id = widget.Id });
     }
 
     public async Task AddNewWidgetAsync(IWidget widget)
@@ -160,14 +160,14 @@ public sealed class StorageService : IStorageService
             Widgets[widget.Id] = widget;
         }
 
-        WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(widget.Id));
+        WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs { Id = widget.Id });
     }
 
     public async Task SaveWidgetAsync(IWidget widget)
     {
         await widget.WriteAsync();
 
-        WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs(widget.Id));
+        WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs { Id = widget.Id });
     }
 
     public void ChangeStoragePath(string storagePath)
@@ -204,13 +204,23 @@ public sealed class StorageService : IStorageService
             fileSystemItems[newFilePath].SelectedInWidgetId = widgetId;
         }
 
-        NoteSelectionChanged?.Invoke(this, new NoteSelectionChangedEventArgs(widgetId, previousFilePath, newFilePath));
+        NoteSelectionChanged?.Invoke(this, new NoteSelectionChangedEventArgs
+        {
+            WidgetId = widgetId,
+            PreviousFilePath = previousFilePath,
+            NewFilePath = newFilePath
+        });
     }
 
     public void ChangeNoteContent(Guid widgetId, string path, string content)
     {
         fileSystemItems[path].Content = content;
-        NoteContentChanged?.Invoke(this, new NoteContentChangedEventArgs(widgetId, path, content));
+        NoteContentChanged?.Invoke(this, new NoteContentChangedEventArgs
+        {
+            WidgetId = widgetId,
+            Path = path,
+            Content = content
+        });
     }
 
     public void CreateFolder(Guid widgetId, string directory, string name)
@@ -225,7 +235,13 @@ public sealed class StorageService : IStorageService
         };
         fileSystemItems.Add(folder.Path.Absolute, folder);
 
-        FileCreated?.Invoke(this, new FileCreatedEventArgs(widgetId, name, FileType.Folder, path));
+        FileCreated?.Invoke(this, new FileCreatedEventArgs
+        {
+            WidgetId = widgetId,
+            Name = name,
+            Type = FileType.Folder,
+            Path = path
+        });
     }
 
     public void RenameFolder(string path, string newName)
@@ -243,7 +259,7 @@ public sealed class StorageService : IStorageService
     {
         Directory.Delete(path, true);
 
-        FileDeleted?.Invoke(this, new FileDeletedEventArgs(path));
+        FileDeleted?.Invoke(this, new FileDeletedEventArgs { Path = path });
     }
 
     public void CreateNote(Guid widgetId, string directory, string name)
@@ -259,7 +275,13 @@ public sealed class StorageService : IStorageService
         };
         fileSystemItems.Add(note.Path.Absolute, note);
 
-        FileCreated?.Invoke(this, new FileCreatedEventArgs(widgetId, name, FileType.Note, path));
+        FileCreated?.Invoke(this, new FileCreatedEventArgs
+        {
+            WidgetId = widgetId,
+            Name = name,
+            Type = FileType.Note,
+            Path = path
+        });
     }
 
     public void RenameNote(string path, string newName)
@@ -277,7 +299,7 @@ public sealed class StorageService : IStorageService
     {
         File.Delete(path);
 
-        FileDeleted?.Invoke(this, new FileDeletedEventArgs(path));
+        FileDeleted?.Invoke(this, new FileDeletedEventArgs { Path = path });
     }
 
     private async Task ReadWidgetAsync(string widgetFilePath)

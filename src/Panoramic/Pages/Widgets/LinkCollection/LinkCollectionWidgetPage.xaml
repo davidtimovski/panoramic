@@ -30,7 +30,7 @@
                                 <MenuFlyoutItem Click="EditButton_Click">Edit</MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
                                 <MenuFlyoutItem Click="SettingsButton_Click">Settings</MenuFlyoutItem>
-                                <MenuFlyoutItem Click="RemoveButton_Click">Remove</MenuFlyoutItem>
+                                <MenuFlyoutItem Click="DeleteButton_Click">Delete</MenuFlyoutItem>
                             </MenuFlyout>
                         </DropDownButton.Flyout>
                     </DropDownButton>
