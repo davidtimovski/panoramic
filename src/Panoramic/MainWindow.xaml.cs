@@ -40,7 +40,10 @@ public sealed partial class MainWindow : Window
 
         ViewModel = viewModel;
 
-        LoadWidgets();
+        foreach (var id in _storageService.Widgets.Keys)
+        {
+            RenderWidget(id);
+        }
     }
 
     public MainViewModel ViewModel { get; }
@@ -48,14 +51,6 @@ public sealed partial class MainWindow : Window
     private async void WindowClosed(object _, WindowEventArgs args)
     {
         await _storageService.WriteUnsavedChangesAsync();
-    }
-
-    private void LoadWidgets()
-    {
-        foreach (var id in _storageService.Widgets.Keys)
-        {
-            LoadWidget(id);
-        }
     }
 
     private async void AddWidgetButton_Click(object _, RoutedEventArgs e)
@@ -78,7 +73,7 @@ public sealed partial class MainWindow : Window
         await dialog.ShowAsync();
     }
 
-    private void WidgetUpdated(object? _, WidgetUpdatedEventArgs e) => LoadWidget(e.Id);
+    private void WidgetUpdated(object? _, WidgetUpdatedEventArgs e) => RenderWidget(e.Id);
 
     private void WidgetRemoved(object? _, WidgetRemovedEventArgs e)
     {
@@ -86,7 +81,7 @@ public sealed partial class MainWindow : Window
         Grid.Children.Remove(widget);
     }
 
-    private void LoadWidget(Guid id)
+    private void RenderWidget(Guid id)
     {
         var widget = _storageService.Widgets[id];
         Page content = widget.Type switch

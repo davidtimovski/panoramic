@@ -30,6 +30,8 @@ public sealed partial class RecentLinksWidgetPage : Page
 
     private async void SettingsButton_Click(object _, RoutedEventArgs e)
     {
+        ViewModel.Highlighted = true;
+
         var content = new EditWidgetDialog(_widget, _storageService);
         var dialog = new ContentDialog
         {
@@ -45,13 +47,13 @@ public sealed partial class RecentLinksWidgetPage : Page
         content.AttachSettingsValidationHandler((_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; });
         content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
 
-        ViewModel.Highlighted = true;
-
         await dialog.ShowAsync();
     }
 
     private async void RemoveButton_Click(object _, RoutedEventArgs e)
     {
+        ViewModel.Highlighted = true;
+
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -62,8 +64,6 @@ public sealed partial class RecentLinksWidgetPage : Page
             PrimaryButtonCommand = new RelayCommand(() => { _storageService.DeleteWidget(_widget); }),
             CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })
         };
-
-        ViewModel.Highlighted = true;
 
         await dialog.ShowAsync();
     }

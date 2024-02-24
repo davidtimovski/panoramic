@@ -110,7 +110,30 @@ public sealed class NoteWidget : IWidget
     }
 
     public IReadOnlyList<ExplorerItem> GetExplorerItems()
-        => ConvertToExplorerItems(_storageService.FileSystemItems);
+    {
+        var items = DirectoryToTreeViewNode(_storageService.FileSystemItems, _storageService.StoragePath);
+
+        var rootPath = new FileSystemItemPath(_storageService.StoragePath, _storageService.StoragePath);
+        var root = new ExplorerItem(_storageService, Path.GetFileName(rootPath.Absolute), FileType.Folder, rootPath, items);
+
+        return [root];
+    }
+
+    private List<ExplorerItem> DirectoryToTreeViewNode(IReadOnlyList<FileSystemItem> fileSystemItems, string currentPath)
+    {
+        var folders = fileSystemItems
+            .Where(x => x.Type == FileType.Folder && x.Path.Parent.Equals(currentPath, StringComparison.OrdinalIgnoreCase))
+            .Select(x => new ExplorerItem(_storageService, x.Name, FileType.Folder, x.Path, DirectoryToTreeViewNode(fileSystemItems, x.Path.Absolute)));
+
+        var notes = fileSystemItems
+            .Where(x => x.Type == FileType.Note && x.Path.Parent.Equals(currentPath, StringComparison.OrdinalIgnoreCase))
+            .Select(x => new ExplorerItem(_storageService, x.Name, FileType.Note, x.Path, [])
+            {
+                IsEnabled = x.SelectedInWidgetId is null || x.SelectedInWidgetId == Id
+            });
+
+        return folders.Concat(notes).ToList();
+    }
 
     public static Task<NoteWidget> LoadAsync(IStorageService storageService, string json)
     {
@@ -131,14 +154,6 @@ public sealed class NoteWidget : IWidget
         var dataFilePath = Path.Combine(_storageService.WidgetsFolderPath, _dataFileName);
         File.Delete(dataFilePath);
     }
-
-    private List<ExplorerItem> ConvertToExplorerItems(IReadOnlyList<FileSystemItem> fileSystemItems)
-        => fileSystemItems.Select(x =>
-            new ExplorerItem(_storageService, x.Name, x.Type, x.Path, ConvertToExplorerItems(x.Children))
-            {
-                IsEnabled = x.SelectedInWidgetId is null || x.SelectedInWidgetId == Id
-            }
-        ).ToList();
 
     private ExplorerItem? GetSelectedNote(IReadOnlyList<FileSystemItem> fileSystemItems)
     {

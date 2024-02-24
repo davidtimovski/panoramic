@@ -17,7 +17,7 @@ namespace Panoramic.Services.Storage;
 
 public sealed class StorageService : IStorageService
 {
-    private const string PanoramicDirectoryName = "Panoramic";
+    private const string DefaultDirectoryName = "Panoramic";
 
     /// <summary>
     /// Used to write changed sections widget data to disk.
@@ -74,20 +74,21 @@ public sealed class StorageService : IStorageService
         Converters = { new JsonStringEnumConverter() }
     };
 
-    private List<FileSystemItem> fileSystemItems = [];
+    private Dictionary<string, FileSystemItem> fileSystemItems = [];
     public IReadOnlyList<FileSystemItem> FileSystemItems
     {
-        get => fileSystemItems;
+        get => fileSystemItems.Values.ToList();
         private set
         {
-            fileSystemItems = [.. value];
+            fileSystemItems = value.ToDictionary(x => x.Path.Absolute, x => x);
         }
     }
+
     public Dictionary<Guid, IWidget> Widgets { get; } = [];
 
     public async Task ReadAsync()
     {
-        LoadFileSystemItems();
+        LoadFileSystemItemsRecursive(StoragePath, StoragePath);
 
         var widgetFilePaths = Directory.GetFiles(WidgetsFolderPath, "*.json");
 
@@ -188,13 +189,22 @@ public sealed class StorageService : IStorageService
 
     public void ChangeNoteSelection(Guid widgetId, string? previousFilePath, string? newFilePath)
     {
-        UpdateSelectedNote(fileSystemItems, widgetId, previousFilePath, newFilePath);
+        if (previousFilePath is not null)
+        {
+            fileSystemItems[previousFilePath].SelectedInWidgetId = null;
+        }
+
+        if (newFilePath is not null)
+        {
+            fileSystemItems[newFilePath].SelectedInWidgetId = widgetId;
+        }
+
         NoteSelectionChanged?.Invoke(this, new NoteSelectionChangedEventArgs(widgetId, previousFilePath, newFilePath));
     }
 
     public void ChangeNoteContent(Guid widgetId, string path, string content)
     {
-        UpdateNoteContent(fileSystemItems, path, content);
+        fileSystemItems[path].Content = content;
         NoteContentChanged?.Invoke(this, new NoteContentChangedEventArgs(widgetId, path, content));
     }
 
@@ -208,7 +218,7 @@ public sealed class StorageService : IStorageService
             Name = name,
             Path = new(path, StoragePath)
         };
-        AddItem(fileSystemItems, folder, directory);
+        fileSystemItems.Add(folder.Path.Absolute, folder);
 
         FileCreated?.Invoke(this, new FileCreatedEventArgs(widgetId, name, FileType.Folder, path));
     }
@@ -219,7 +229,7 @@ public sealed class StorageService : IStorageService
         var destinationPath = Path.Combine(directory, newName);
         Directory.Move(path, destinationPath);
 
-        LoadFileSystemItems();
+        LoadFileSystemItemsRecursive(StoragePath, StoragePath);
 
         FileRenamed?.Invoke(this, new EventArgs());
     }
@@ -242,7 +252,7 @@ public sealed class StorageService : IStorageService
             Path = new(path, StoragePath),
             SelectedInWidgetId = widgetId
         };
-        AddItem(fileSystemItems, note, directory);
+        fileSystemItems.Add(note.Path.Absolute, note);
 
         FileCreated?.Invoke(this, new FileCreatedEventArgs(widgetId, name, FileType.Note, path));
     }
@@ -253,7 +263,7 @@ public sealed class StorageService : IStorageService
         var destinationPath = Path.Combine(directory, $"{newName}.md");
         File.Move(path, destinationPath);
 
-        LoadFileSystemItems();
+        LoadFileSystemItemsRecursive(StoragePath, StoragePath);
 
         FileRenamed?.Invoke(this, new EventArgs());
     }
@@ -263,93 +273,6 @@ public sealed class StorageService : IStorageService
         File.Delete(path);
 
         FileDeleted?.Invoke(this, new FileDeletedEventArgs(path));
-    }
-
-    private static void SetSelectedNote(List<FileSystemItem> items, string path, Guid widgetId)
-    {
-        foreach (var item in items)
-        {
-            if (item.Type == FileType.Folder)
-            {
-                SetSelectedNote(item.Children, path, widgetId);
-            }
-            else
-            {
-                if (item.Path.Equals(path))
-                {
-                    item.SelectedInWidgetId = widgetId;
-                }
-                else if (item.SelectedInWidgetId == widgetId)
-                {
-                    item.SelectedInWidgetId = null;
-                }
-            }
-        }
-    }
-
-    private static bool AddItem(List<FileSystemItem> items, FileSystemItem item, string directory)
-    {
-        for (var i = 0; i < items.Count; i++)
-        {
-            if (items[i].Type == FileType.Note)
-            {
-                continue;
-            }
-
-            if (items[i].Path.Equals(item.Path.Parent))
-            {
-                items[i].Children.Add(item);
-                return true;
-            }
-
-            for (var j = 0; j < items[i].Children.Count; j++)
-            {
-                if (AddItem(items[i].Children, item, directory))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private static void UpdateSelectedNote(List<FileSystemItem> items, Guid widgetId, string? previousFilePath, string? newFilePath)
-    {
-        foreach (var item in items)
-        {
-            if (item.Type == FileType.Folder)
-            {
-                UpdateSelectedNote(item.Children, widgetId, previousFilePath, newFilePath);
-            }
-            else
-            {
-                if (item.Path.Equals(newFilePath))
-                {
-                    item.SelectedInWidgetId = widgetId;
-                }
-                else if (previousFilePath is not null && item.Path.Equals(previousFilePath))
-                {
-                    item.SelectedInWidgetId = null;
-                }
-            }
-        }
-    }
-
-    private static void UpdateNoteContent(List<FileSystemItem> items, string path, string content)
-    {
-        foreach (var item in items)
-        {
-            if (item.Type == FileType.Folder)
-            {
-                UpdateNoteContent(item.Children, path, content);
-            }
-            else if (item.Path.Equals(path))
-            {
-                item.Content = content;
-                return;
-            }
-        }
     }
 
     private async Task ReadWidgetAsync(string widgetFilePath)
@@ -386,7 +309,7 @@ public sealed class StorageService : IStorageService
 
         if (storagePathValue is null)
         {
-            var defaultPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), PanoramicDirectoryName);
+            var defaultPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), DefaultDirectoryName);
             if (!Directory.Exists(defaultPath))
             {
                 Directory.CreateDirectory(defaultPath);
@@ -398,26 +321,30 @@ public sealed class StorageService : IStorageService
         return (string)storagePathValue;
     }
 
-    private void LoadFileSystemItems()
+    private void LoadFileSystemItemsRecursive(string currentPath, string storagePath)
     {
-        var rootNode = DirectoryToTreeViewNode(StoragePath, StoragePath);
-        fileSystemItems = [rootNode];
-    }
-
-    private FileSystemItem DirectoryToTreeViewNode(string currentPath, string storagePath)
-    {
-        var node = new FileSystemItem(FileType.Folder)
-        {
-            Name = Path.GetFileName(currentPath),
-            Path = new(currentPath, StoragePath)
-        };
-
         var subdirectories = Directory.GetDirectories(currentPath).Where(x => !Equals(x, WidgetsFolderPath)).OrderBy(x => x).ToList();
-        node.Children = subdirectories.Select(x => DirectoryToTreeViewNode(x, storagePath)).ToList();
+        foreach (var subdirectory in subdirectories)
+        {
+            var item = new FileSystemItem(FileType.Folder)
+            {
+                Name = Path.GetFileName(subdirectory),
+                Path = new(subdirectory, StoragePath)
+            };
+            fileSystemItems.Add(item.Path.Absolute, item);
+
+            LoadFileSystemItemsRecursive(subdirectory, storagePath);
+        }
 
         var filePaths = Directory.GetFiles(currentPath, "*.md").OrderBy(x => Path.GetFileName(x)).ToList();
-        node.Children.AddRange(filePaths.Select(x => new FileSystemItem(FileType.Note) { Name = Path.GetFileNameWithoutExtension(x), Path = new(x, StoragePath) }));
-
-        return node;
+        foreach (var filePath in filePaths)
+        {
+            var note = new FileSystemItem(FileType.Note)
+            {
+                Name = Path.GetFileNameWithoutExtension(filePath),
+                Path = new(filePath, StoragePath)
+            };
+            fileSystemItems.Add(note.Path.Absolute, note);
+        }
     }
 }
