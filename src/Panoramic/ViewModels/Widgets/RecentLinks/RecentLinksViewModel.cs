@@ -1,14 +1,13 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Services;
 using Panoramic.Services.Storage;
+using Panoramic.ViewModels.Widgets.LinkCollection;
 
 namespace Panoramic.ViewModels.Widgets.RecentLinks;
 
-public sealed partial class RecentLinksViewModel : ObservableObject
+public sealed partial class RecentLinksViewModel : WidgetViewModel
 {
     private readonly IStorageService _storageService;
     private readonly IEventHub _eventHub;
@@ -35,14 +34,6 @@ public sealed partial class RecentLinksViewModel : ObservableObject
     private string title;
 
     public ObservableCollection<RecentLinkViewModel> Recent { get; } = [];
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Background))]
-    private bool highlighted;
-
-    public SolidColorBrush Background => Highlighted
-        ? (Application.Current.Resources["PanoramicWidgetHighlightedBackgroundBrush"] as SolidColorBrush)!
-        : (Application.Current.Resources["PanoramicWidgetBackgroundBrush"] as SolidColorBrush)!;
 
     public void ClearRecent()
     {

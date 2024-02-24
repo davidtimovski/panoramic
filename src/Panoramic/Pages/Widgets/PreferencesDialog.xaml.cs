@@ -2,6 +2,7 @@ using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Events;
+using Panoramic.Services.Preferences;
 using Panoramic.Services.Storage;
 using Panoramic.ViewModels;
 using Windows.Storage;
@@ -15,13 +16,13 @@ public sealed partial class PreferencesDialog : Page
 {
     private readonly Window _window;
 
-    public PreferencesDialog(IStorageService storageService, Window window)
+    public PreferencesDialog(IPreferencesService preferencesService, IStorageService storageService, Window window)
     {
         InitializeComponent();
 
         _window = window;
 
-        ViewModel = new PreferencesViewModel(storageService);
+        ViewModel = new PreferencesViewModel(preferencesService, storageService);
     }
 
     public PreferencesViewModel ViewModel { get; }

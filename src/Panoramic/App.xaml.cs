@@ -7,8 +7,11 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
 using Panoramic.Services;
+using Panoramic.Services.Markdown;
+using Panoramic.Services.Preferences;
 using Panoramic.Services.Storage;
 using Panoramic.ViewModels;
+using Windows.Storage;
 
 namespace Panoramic;
 
@@ -20,6 +23,8 @@ public sealed partial class App : Application
     {
         InitializeComponent();
 
+        InitializeTheme();
+
         ServiceCollection services = new();
 
         ConfigureServices(services);
@@ -28,6 +33,7 @@ public sealed partial class App : Application
 
     private static void ConfigureServices(ServiceCollection services)
     {
+        services.AddSingleton<IPreferencesService, PreferencesService>();
         services.AddSingleton<IStorageService, StorageService>();
         services.AddSingleton(new HttpClient());
 
@@ -55,6 +61,19 @@ public sealed partial class App : Application
 
         var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
         mainWindow.Activate();
+    }
+
+    private static void InitializeTheme()
+    {
+        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+        object? themeValue = localSettings.Values[nameof(IPreferencesService.Theme)];
+
+        if (themeValue is null)
+        {
+            return;
+        }
+
+        Current.RequestedTheme = (ApplicationTheme)themeValue;
     }
 
     /// <summary>

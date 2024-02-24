@@ -8,15 +8,16 @@ using Panoramic.Models.Domain.Note;
 using Panoramic.Services;
 using Panoramic.Services.Storage;
 using Panoramic.Utils;
+using Panoramic.ViewModels.Widgets.LinkCollection;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 
-public sealed partial class NoteViewModel : ObservableObject
+public sealed partial class NoteViewModel : WidgetViewModel
 {
     private readonly IStorageService _storageService;
     private readonly NoteWidget _widget;
 
-    public NoteViewModel(NoteWidget widget, IStorageService storageService)
+    public NoteViewModel(IStorageService storageService, NoteWidget widget)
     {
         _storageService = storageService;
         _storageService.FileCreated += FileCreated;
@@ -73,10 +74,6 @@ public sealed partial class NoteViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Background))]
-    private bool highlighted;
-
-    [ObservableProperty]
     private string title;
 
     [ObservableProperty]
@@ -96,10 +93,6 @@ public sealed partial class NoteViewModel : ObservableObject
     public Visibility PresenterVisibility => Editing ? Visibility.Collapsed : Visibility.Visible;
 
     public string EditToggleTooltip => Editing ? "Stop editing" : "Edit";
-
-    public SolidColorBrush Background => Highlighted
-        ? (Application.Current.Resources["PanoramicWidgetHighlightedBackgroundBrush"] as SolidColorBrush)!
-        : (Application.Current.Resources["PanoramicWidgetBackgroundBrush"] as SolidColorBrush)!;
 
     public void DeselectNote()
     {

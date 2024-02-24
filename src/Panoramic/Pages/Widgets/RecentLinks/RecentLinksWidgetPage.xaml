@@ -19,7 +19,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="{x:Bind ViewModel.Title, Mode=OneWay}" FontSize="16" Foreground="#ddd" TextWrapping="Wrap" />
+                    <TextBlock Text="{x:Bind ViewModel.Title, Mode=OneWay}" FontSize="16" Foreground="{StaticResource PanoramicWidgetForegroundBrush}" TextWrapping="Wrap" />
 
                     <DropDownButton Grid.Column="1" AutomationProperties.Name="Setting">
                         <DropDownButton.Content>

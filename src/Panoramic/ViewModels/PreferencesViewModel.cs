@@ -1,20 +1,47 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using Panoramic.Services.Preferences;
 using Panoramic.Services.Storage;
 
 namespace Panoramic.ViewModels;
 
 public sealed partial class PreferencesViewModel : ObservableObject
 {
-    private readonly IStorageService _storageService;
+    private readonly SolidColorBrush ThemeInfoLabelForegroundBrush;
+    private readonly SolidColorBrush ThemeInfoLabelForegroundHighlightedBrush;
 
-    public PreferencesViewModel(IStorageService storageService)
+    private readonly IPreferencesService _preferencesService;
+    private readonly IStorageService _storageService;
+    private readonly string originalTheme;
+
+    public PreferencesViewModel(IPreferencesService preferencesService, IStorageService storageService)
     {
+        var currentTheme = Application.Current.RequestedTheme.ToString();
+        var currentThemeDict = (ResourceDictionary)Application.Current.Resources.ThemeDictionaries[currentTheme];
+        ThemeInfoLabelForegroundBrush = (currentThemeDict["PanoramicPaleTextForeground"] as SolidColorBrush)!;
+        ThemeInfoLabelForegroundHighlightedBrush = (currentThemeDict["PanoramicBlueForeground"] as SolidColorBrush)!;
+
+        _preferencesService = preferencesService;
+
+        selectedTheme = _preferencesService.Theme.ToString();
+        originalTheme = SelectedTheme;
+
         _storageService = storageService;
 
         storagePath = _storageService.StoragePath;
     }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ThemeInfoLabelForeground))]
+    private string selectedTheme;
+
+    public SolidColorBrush ThemeInfoLabelForeground => SelectedTheme != originalTheme
+        ? ThemeInfoLabelForegroundHighlightedBrush
+        : ThemeInfoLabelForegroundBrush;
 
     [ObservableProperty]
     private string storagePath;
@@ -31,7 +58,13 @@ public sealed partial class PreferencesViewModel : ObservableObject
         StoragePath = path;
     }
 
-    public void Submit() => _storageService.ChangeStoragePath(StoragePath);
+    public void Submit()
+    {
+        _preferencesService.Theme = Enum.Parse<ApplicationTheme>(SelectedTheme);
+        _preferencesService.Save();
+
+        _storageService.ChangeStoragePath(StoragePath);
+    }
 
     private static bool DirectoryIsEmpty(string path)
     {

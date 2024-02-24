@@ -12,6 +12,7 @@ using Panoramic.Pages.Widgets;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
+using Panoramic.Services.Preferences;
 using Panoramic.Services.Storage;
 using Panoramic.ViewModels;
 
@@ -19,10 +20,15 @@ namespace Panoramic;
 
 public sealed partial class MainWindow : Window
 {
+    private readonly IPreferencesService _preferencesService;
     private readonly IStorageService _storageService;
     private readonly IServiceProvider _serviceProvider;
 
-    public MainWindow(IStorageService storageService, IServiceProvider serviceProvider, MainViewModel viewModel)
+    public MainWindow(
+        IPreferencesService preferencesService,
+        IStorageService storageService,
+        IServiceProvider serviceProvider,
+        MainViewModel viewModel)
     {
         InitializeComponent();
 
@@ -31,6 +37,8 @@ public sealed partial class MainWindow : Window
         SetTitleBar(AppTitleBar);
 
         Closed += WindowClosed;
+
+        _preferencesService = preferencesService;
 
         _storageService = storageService;
         _storageService.WidgetUpdated += WidgetUpdated;
@@ -111,7 +119,7 @@ public sealed partial class MainWindow : Window
 
     private async void PreferencesButton_Click(object _, RoutedEventArgs e)
     {
-        var content = new PreferencesDialog(_storageService, this);
+        var content = new PreferencesDialog(_preferencesService, _storageService, this);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,

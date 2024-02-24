@@ -11,9 +11,32 @@
             </ResourceDictionary.MergedDictionaries>
             <!-- Other app resources here -->
 
-            <SolidColorBrush x:Key="PanoramicWidgetBackgroundBrush" Color="#222" />
-            <SolidColorBrush x:Key="PanoramicWidgetHighlightedBackgroundBrush" Color="#234" />
-            <SolidColorBrush x:Key="PanoramicBlueForeground" Color="#8DD7E9" />
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="PanoramicMainWindowBackgroundBrush" Color="#eee" />
+                    
+                    <SolidColorBrush x:Key="PanoramicWidgetBackgroundBrush" Color="#e3e3e3" />
+                    <SolidColorBrush x:Key="PanoramicWidgetHighlightedBackgroundBrush" Color="#fff" />
+
+                    <SolidColorBrush x:Key="PanoramicWidgetForegroundBrush" Color="#333" />
+
+                    <SolidColorBrush x:Key="PanoramicBlueForeground" Color="#003E92" />
+                    <SolidColorBrush x:Key="PanoramicPaleTextForeground" Color="#888" />
+                </ResourceDictionary>
+
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="PanoramicMainWindowBackgroundBrush" Color="#151515" />
+                    
+                    <SolidColorBrush x:Key="PanoramicWidgetBackgroundBrush" Color="#222" />
+                    <SolidColorBrush x:Key="PanoramicWidgetHighlightedBackgroundBrush" Color="#234" />
+
+                    <SolidColorBrush x:Key="PanoramicWidgetForegroundBrush" Color="#ddd" />
+
+                    <SolidColorBrush x:Key="PanoramicBlueForeground" Color="#8DD7E9" />
+                    <SolidColorBrush x:Key="PanoramicPaleTextForeground" Color="#aaa" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
             <CornerRadius x:Key="PanoramicWidgetCornerRadius">5</CornerRadius>
             
         </ResourceDictionary>

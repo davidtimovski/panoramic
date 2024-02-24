@@ -172,6 +172,11 @@ public sealed class StorageService : IStorageService
 
     public void ChangeStoragePath(string storagePath)
     {
+        if (string.Equals(StoragePath, storagePath, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
         if (Directory.Exists(storagePath))
         {
             Directory.Delete(storagePath, true);

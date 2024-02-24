@@ -5,7 +5,7 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.Note;
-using Panoramic.Services;
+using Panoramic.Services.Markdown;
 using Panoramic.Services.Storage;
 using Panoramic.ViewModels.Widgets.Note;
 
@@ -29,7 +29,7 @@ public sealed partial class NoteWidgetPage : Page
         _dispatcherQueue = serviceProvider.GetRequiredService<DispatcherQueue>();
         _widget = widget;
 
-        ViewModel = new NoteViewModel(widget, _storageService);
+        ViewModel = new NoteViewModel(_storageService, widget);
 
         SetPresenterContent();
     }

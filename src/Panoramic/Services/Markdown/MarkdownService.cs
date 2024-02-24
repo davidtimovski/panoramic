@@ -6,12 +6,7 @@ using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Documents;
 
-namespace Panoramic.Services;
-
-public interface IMarkdownService
-{
-    IReadOnlyList<Paragraph> TextToMarkdownParagraphs(string text, string noteName, double fontSize);
-}
+namespace Panoramic.Services.Markdown;
 
 public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownService
 {
