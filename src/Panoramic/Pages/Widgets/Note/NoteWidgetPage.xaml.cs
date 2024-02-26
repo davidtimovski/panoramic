@@ -78,7 +78,7 @@ public sealed partial class NoteWidgetPage : Page
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
         var folder = (ExplorerItem)menuItem.DataContext;
 
-        var content = new NewNoteForm(folder.Path.Parent);
+        var content = new NewNoteForm(folder.Path.Absolute);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -100,7 +100,7 @@ public sealed partial class NoteWidgetPage : Page
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
         var folder = (ExplorerItem)menuItem.DataContext;
 
-        var content = new NewFolderForm(folder.Path.Parent);
+        var content = new NewFolderForm(folder.Path.Absolute);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,

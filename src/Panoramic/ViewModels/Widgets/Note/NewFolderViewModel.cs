@@ -16,5 +16,5 @@ public sealed partial class NewFolderViewModel(string directory) : ObservableObj
 
     public void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
 
-    private bool CanBeCreated() => Name.Trim().Length > 0 && NoteWidget.FolderCanBeCreated(Name.Trim(), _directory);
+    private bool CanBeCreated() => Name.Trim().Length > 0 && NoteWidget.FolderCanBeCreated(Name, _directory);
 }

@@ -20,7 +20,6 @@ public sealed class NoteWidget : IWidget
     public NoteWidget(IStorageService storageService, Area area, string fontFamily, double fontSize)
     {
         _storageService = storageService;
-        _storageService.FileCreated += FileCreated;
 
         Id = Guid.NewGuid();
         _dataFileName = $"{Id}.json";
@@ -36,7 +35,6 @@ public sealed class NoteWidget : IWidget
     public NoteWidget(IStorageService storageService, NoteData data)
     {
         _storageService = storageService;
-        _storageService.FileCreated += FileCreated;
 
         _dataFileName = $"{data.Id}.json";
 
@@ -46,7 +44,10 @@ public sealed class NoteWidget : IWidget
         FontSize = data.FontSize;
 
         var notePath = data.RelativeFilePath is null ? null : Path.Combine(_storageService.StoragePath, data.RelativeFilePath);
-        SetSelectedNote(notePath);
+        if (notePath is not null)
+        {
+            NotePath = new(notePath, _storageService.StoragePath);
+        }
     }
 
     public Guid Id { get; }
@@ -54,8 +55,7 @@ public sealed class NoteWidget : IWidget
     public Area Area { get; set; }
     public string FontFamily { get; set; }
     public double FontSize { get; set; }
-    public FileSystemItemPath? NotePath { get; private set; }
-    public ExplorerItem? SelectedNote { get; private set; }
+    public FileSystemItemPath? NotePath { get; set; }
 
     public NoteData GetData() =>
         new()
@@ -67,45 +67,24 @@ public sealed class NoteWidget : IWidget
             RelativeFilePath = NotePath?.Relative
         };
 
-    public void SetSelectedNote(string? notePath)
-    {
-        if (notePath is null)
-        {
-            NotePath = null;
-            SelectedNote = null;
-        }
-        else
-        {
-            NotePath = new(notePath, _storageService.StoragePath);
-            SelectedNote = GetSelectedNote(_storageService.FileSystemItems);
-
-            if (SelectedNote is not null)
-            {
-                SelectedNote.InitializeContent(File.ReadAllText(NotePath.Absolute));
-            }
-            else
-            {
-                NotePath = null;
-            }
-        }
-    }
-
     public static bool FolderCanBeCreated(string title, string directory)
     {
+        title = title.Trim();
+
         if (string.Equals(title, "widgets", StringComparison.OrdinalIgnoreCase))
         {
             return false;
         }
 
-        var parentDirectory = Path.GetDirectoryName(directory)!;
-        var path = Path.Combine(parentDirectory, title);
+        var path = Path.Combine(directory, title);
         return !Directory.Exists(path);
     }
 
     public static bool NoteCanBeCreated(string title, string directory)
     {
-        var parentDirectory = Path.GetDirectoryName(directory)!;
-        var path = Path.Combine(parentDirectory, $"{title}.md");
+        title = title.Trim();
+
+        var path = Path.Combine(directory, $"{title}.md");
         return !File.Exists(path);
     }
 
@@ -123,10 +102,12 @@ public sealed class NoteWidget : IWidget
     {
         var folders = fileSystemItems
             .Where(x => x.Type == FileType.Folder && x.Path.Parent.Equals(currentPath, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(x => x.Name)
             .Select(x => new ExplorerItem(_storageService, x.Name, FileType.Folder, x.Path, DirectoryToTreeViewNode(fileSystemItems, x.Path.Absolute)));
 
         var notes = fileSystemItems
             .Where(x => x.Type == FileType.Note && x.Path.Parent.Equals(currentPath, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(x => x.Name)
             .Select(x => new ExplorerItem(_storageService, x.Name, FileType.Note, x.Path, [])
             {
                 IsEnabled = x.SelectedInWidgetId is null || x.SelectedInWidgetId == Id
@@ -153,35 +134,5 @@ public sealed class NoteWidget : IWidget
     {
         var dataFilePath = Path.Combine(_storageService.WidgetsFolderPath, _dataFileName);
         File.Delete(dataFilePath);
-    }
-
-    private ExplorerItem? GetSelectedNote(IReadOnlyList<FileSystemItem> fileSystemItems)
-    {
-        foreach (var item in fileSystemItems)
-        {
-            if (item.Type == FileType.Note && item.Path.Equals(NotePath))
-            {
-                return new ExplorerItem(_storageService, item.Name, item.Type, item.Path, [])
-                {
-                    IsEnabled = item.SelectedInWidgetId is null || item.SelectedInWidgetId == Id
-                };
-            }
-
-            var found = GetSelectedNote(item.Children);
-            if (found is not null)
-            {
-                return found;
-            }
-        }
-
-        return null;
-    }
-
-    private void FileCreated(object? _, FileCreatedEventArgs e)
-    {
-        if (e.Type == FileType.Note && e.WidgetId == Id)
-        {
-            SetSelectedNote(e.Path);
-        }
     }
 }

@@ -230,17 +230,21 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
         var match = MyRegex().Match(text);
         while (match.Success)
         {
-            var fullGroup = match.Groups[0]!;
-            var textGroup = match.Groups[1]!;
             var uriGroup = match.Groups[2]!;
 
-            result.Enqueue(new StringSegment
+            if (Uri.TryCreate(uriGroup.Value, UriKind.Absolute, out var uri))
             {
-                Uri = new Uri(uriGroup.Value, UriKind.Absolute),
-                Text = textGroup.Value,
-                StartIndex = fullGroup.Index,
-                Length = fullGroup.Length
-            });
+                var fullGroup = match.Groups[0]!;
+                var textGroup = match.Groups[1]!;
+
+                result.Enqueue(new StringSegment
+                {
+                    Uri = uri,
+                    Text = textGroup.Value,
+                    StartIndex = fullGroup.Index,
+                    Length = fullGroup.Length
+                });
+            }
 
             match = match.NextMatch();
         }

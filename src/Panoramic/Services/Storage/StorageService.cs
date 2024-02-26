@@ -63,8 +63,8 @@ public sealed class StorageService : IStorageService
     public event EventHandler<NoteSelectionChangedEventArgs>? NoteSelectionChanged;
     public event EventHandler<NoteContentChangedEventArgs>? NoteContentChanged;
     public event EventHandler<FileCreatedEventArgs>? FileCreated;
-    public event EventHandler<EventArgs>? FileRenamed;
     public event EventHandler<FileDeletedEventArgs>? FileDeleted;
+    public event EventHandler<EventArgs>? ItemRenamed;
 
     public string WidgetsFolderPath => Path.Combine(StoragePath, "widgets");
     public string StoragePath { get; private set; }
@@ -88,13 +88,15 @@ public sealed class StorageService : IStorageService
 
     public async Task ReadAsync()
     {
-        LoadFileSystemItemsRecursive(StoragePath, StoragePath);
+        LoadFileSystemItems();
 
         var widgetFilePaths = Directory.GetFiles(WidgetsFolderPath, "*.json");
 
         var tasks = widgetFilePaths.Select(ReadWidgetAsync);
 
         await Task.WhenAll(tasks).ConfigureAwait(false);
+
+        SetSelectedNotes();
     }
 
     public async Task WriteUnsavedChangesAsync()
@@ -194,9 +196,9 @@ public sealed class StorageService : IStorageService
 
     public void ChangeNoteSelection(Guid widgetId, string? previousFilePath, string? newFilePath)
     {
-        if (previousFilePath is not null)
+        if (previousFilePath is not null && fileSystemItems.TryGetValue(previousFilePath, out FileSystemItem? value))
         {
-            fileSystemItems[previousFilePath].SelectedInWidgetId = null;
+            value.SelectedInWidgetId = null;
         }
 
         if (newFilePath is not null)
@@ -214,17 +216,23 @@ public sealed class StorageService : IStorageService
 
     public void ChangeNoteContent(Guid widgetId, string path, string content)
     {
-        fileSystemItems[path].Content = content;
-        NoteContentChanged?.Invoke(this, new NoteContentChangedEventArgs
+        if (fileSystemItems.TryGetValue(path, out FileSystemItem? value))
         {
-            WidgetId = widgetId,
-            Path = path,
-            Content = content
-        });
+            value.Content = content;
+
+            NoteContentChanged?.Invoke(this, new NoteContentChangedEventArgs
+            {
+                WidgetId = widgetId,
+                Path = path,
+                Content = content
+            });
+        }
     }
 
     public void CreateFolder(Guid widgetId, string directory, string name)
     {
+        name = name.Trim();
+
         var path = Path.Combine(directory, name);
         Directory.CreateDirectory(path);
 
@@ -246,24 +254,34 @@ public sealed class StorageService : IStorageService
 
     public void RenameFolder(string path, string newName)
     {
+        newName = newName.Trim();
+
         var directory = Path.GetDirectoryName(path)!;
         var destinationPath = Path.Combine(directory, newName);
         Directory.Move(path, destinationPath);
 
-        LoadFileSystemItemsRecursive(StoragePath, StoragePath);
+        fileSystemItems.Clear();
+        LoadFileSystemItems();
+        SetSelectedNotes();
 
-        FileRenamed?.Invoke(this, new EventArgs());
+        ItemRenamed?.Invoke(this, new EventArgs());
     }
 
     public void DeleteFolder(string path)
     {
         Directory.Delete(path, true);
 
+        fileSystemItems.Clear();
+        LoadFileSystemItems();
+        SetSelectedNotes();
+
         FileDeleted?.Invoke(this, new FileDeletedEventArgs { Path = path });
     }
 
     public void CreateNote(Guid widgetId, string directory, string name)
     {
+        name = name.Trim();
+
         var path = Path.Combine(directory, $"{name}.md");
         File.Create(path).Dispose();
 
@@ -286,18 +304,35 @@ public sealed class StorageService : IStorageService
 
     public void RenameNote(string path, string newName)
     {
+        newName = newName.Trim();
+
         var directory = Path.GetDirectoryName(path)!;
-        var destinationPath = Path.Combine(directory, $"{newName}.md");
-        File.Move(path, destinationPath);
+        var newPath = Path.Combine(directory, $"{newName}.md");
 
-        LoadFileSystemItemsRecursive(StoragePath, StoragePath);
+        if (_unsavedNotes.TryGetValue(path, out string? value))
+        {
+            _unsavedNotes.Remove(path);
+            _unsavedNotes.Add(newPath, value);
+        }
 
-        FileRenamed?.Invoke(this, new EventArgs());
+        File.Move(path, newPath);
+
+        var item = fileSystemItems[path];
+        item.Name = newName;
+        item.Path = new(newPath, StoragePath);
+        fileSystemItems.Remove(path);
+        fileSystemItems.Add(newPath, item);
+
+        ItemRenamed?.Invoke(this, new EventArgs());
     }
 
     public void DeleteNote(string path)
     {
+        _unsavedNotes.Remove(path);
+
         File.Delete(path);
+
+        fileSystemItems.Remove(path);
 
         FileDeleted?.Invoke(this, new FileDeletedEventArgs { Path = path });
     }
@@ -348,6 +383,8 @@ public sealed class StorageService : IStorageService
         return (string)storagePathValue;
     }
 
+    private void LoadFileSystemItems() => LoadFileSystemItemsRecursive(StoragePath, StoragePath);
+
     private void LoadFileSystemItemsRecursive(string currentPath, string storagePath)
     {
         var subdirectories = Directory.GetDirectories(currentPath).Where(x => !Equals(x, WidgetsFolderPath)).OrderBy(x => x).ToList();
@@ -371,7 +408,22 @@ public sealed class StorageService : IStorageService
                 Name = Path.GetFileNameWithoutExtension(filePath),
                 Path = new(filePath, StoragePath)
             };
+
             fileSystemItems.Add(note.Path.Absolute, note);
+        }
+    }
+
+    private void SetSelectedNotes()
+    {
+        var selectedNotesLookup = Widgets
+            .Where(x => x.Value.Type == WidgetType.Note)
+            .Select(x => x.Value).OfType<NoteWidget>()
+            .Where(x => x.NotePath is not null)
+            .ToDictionary(x => x.NotePath!.Absolute, x => x.Id);
+
+        foreach (var selectedNote in  selectedNotesLookup)
+        {
+            fileSystemItems[selectedNote.Key].SelectedInWidgetId = selectedNote.Value;
         }
     }
 }

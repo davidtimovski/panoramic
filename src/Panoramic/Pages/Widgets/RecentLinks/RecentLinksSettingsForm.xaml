@@ -22,7 +22,7 @@
                    Header="Capacity"
                    Description="The maximum amount of links it will hold."
                    SpinButtonPlacementMode="Compact"
-                   Minimum="5"
+                   Minimum="3"
                    Maximum="100" />
 
         <ToggleSwitch Grid.Row="2"

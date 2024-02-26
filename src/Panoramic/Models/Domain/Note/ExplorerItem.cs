@@ -18,7 +18,6 @@ public sealed partial class ExplorerItem : ObservableObject
         Name = name;
         Type = type;
         Path = path;
-        text = type == FileType.Note ? string.Empty : null;
         RenameDeleteVisible = path.Relative == "." ? Visibility.Collapsed : Visibility.Visible;
 
         foreach (var item in children)

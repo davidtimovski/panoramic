@@ -14,8 +14,8 @@ public interface IStorageService
     event EventHandler<NoteSelectionChangedEventArgs>? NoteSelectionChanged;
     event EventHandler<NoteContentChangedEventArgs>? NoteContentChanged;
     event EventHandler<FileCreatedEventArgs>? FileCreated;
-    event EventHandler<EventArgs>? FileRenamed;
     event EventHandler<FileDeletedEventArgs>? FileDeleted;
+    event EventHandler<EventArgs>? ItemRenamed;
 
     string WidgetsFolderPath { get; }
     string StoragePath { get; }

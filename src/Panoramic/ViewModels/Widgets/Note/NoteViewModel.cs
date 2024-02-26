@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
@@ -16,13 +17,14 @@ public sealed partial class NoteViewModel : WidgetViewModel
 {
     private readonly IStorageService _storageService;
     private readonly NoteWidget _widget;
+    private readonly bool _initialized;
 
     public NoteViewModel(IStorageService storageService, NoteWidget widget)
     {
         _storageService = storageService;
         _storageService.FileCreated += FileCreated;
-        _storageService.FileRenamed += FileRenamed;
         _storageService.FileDeleted += FileDeleted;
+        _storageService.ItemRenamed += ItemRenamed;
         _storageService.NoteSelectionChanged += NoteSelectionChanged;
         _storageService.NoteContentChanged += NoteContentChanged;
         _storageService.StoragePathChanged += StoragePathChanged;
@@ -35,7 +37,9 @@ public sealed partial class NoteViewModel : WidgetViewModel
         fontSize = _widget.FontSize;
         title = "Notes";
 
-        SelectedNote = _widget.SelectedNote;
+        SelectedNote = GetSelectedNote(ExplorerItems);
+
+        _initialized = true;
     }
 
     public ObservableCollection<ExplorerItem> ExplorerItems { get; } = [];
@@ -59,17 +63,25 @@ public sealed partial class NoteViewModel : WidgetViewModel
 
             var previousPath = _widget.NotePath?.Absolute;
 
-            _widget.SetSelectedNote(value?.Path.Absolute);
+            if (value is not null && value.Text is null)
+            {
+                value.InitializeContent(File.ReadAllText(value.Path!.Absolute));
+            }
+
+            if (_initialized)
+            {
+                _widget.NotePath = value?.Path;
+
+                _storageService.ChangeNoteSelection(_widget.Id, previousPath, value?.Path.Absolute);
+                _storageService.EnqueueWidgetWrite(_widget.Id);
+            }
 
             SetProperty(ref selectedNote, value);
             OnPropertyChanged(nameof(SelectedNote));
 
-            _storageService.ChangeNoteSelection(_widget.Id, previousPath, _widget.SelectedNote?.Path.Absolute);
-            _storageService.EnqueueWidgetWrite(_widget.Id);
-
-            Title = selectedNote is null ? "Notes" : selectedNote.Name;
-            ExplorerVisible = selectedNote is null;
-            NoteVisible = selectedNote is not null;
+            Title = value is null ? "Notes" : value.Name;
+            ExplorerVisible = value is null;
+            NoteVisible = value is not null;
         }
     }
 
@@ -107,6 +119,33 @@ public sealed partial class NoteViewModel : WidgetViewModel
 
         var root = _widget.GetExplorerItems()[0];
         ExplorerItems.Add(root);
+    }
+
+    private ExplorerItem? GetSelectedNote(ObservableCollection<ExplorerItem> items)
+    {
+        if (_widget.NotePath is null)
+        {
+            return null;
+        }
+
+        foreach (var item in items)
+        {
+            if (item.Type == FileType.Folder)
+            {
+                var found = GetSelectedNote(item.Children);
+                if (found is not null)
+                {
+                    return found;
+                }
+            }
+
+            if (item.Path.Equals(_widget.NotePath))
+            {
+                return item;
+            }
+        }
+
+        return null;
     }
 
     private static void UpdateNoteSelection(ObservableCollection<ExplorerItem> items, string? previousFilePath, string? newFilePath)
@@ -243,11 +282,10 @@ public sealed partial class NoteViewModel : WidgetViewModel
 
         if (noteCreatedInThisWidget)
         {
-            SelectedNote = _widget.SelectedNote;
+            _widget.NotePath = new(e.Path, _storageService.StoragePath);
+            SelectedNote = GetSelectedNote(ExplorerItems);
         }
     }
-
-    private void FileRenamed(object? _, EventArgs e) => ReloadFiles();
 
     private void FileDeleted(object? _, FileDeletedEventArgs e)
     {
@@ -259,6 +297,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
         RemoveItem(ExplorerItems, e.Path);
     }
 
-    private void StoragePathChanged(object? _, EventArgs e)
-        => ReloadFiles();
+    private void ItemRenamed(object? _, EventArgs e) => ReloadFiles();
+
+    private void StoragePathChanged(object? _, EventArgs e) => ReloadFiles();
 }
