@@ -8,15 +8,15 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="7e0665a0-20a8-45e3-bc5f-94a4c8d93ba1"
-    Publisher="CN=david"
+    Name="606DavidTimovski.Panoramic"
+    Publisher="CN=43B6C682-5195-4A6E-9EE9-F644821A02C8"
     Version="0.1.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="7e0665a0-20a8-45e3-bc5f-94a4c8d93ba1" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="f76620e6-6c53-4771-80d2-572ec6868e4b" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>Panoramic</DisplayName>
-    <PublisherDisplayName>david</PublisherDisplayName>
+    <PublisherDisplayName>David Timovski</PublisherDisplayName>
     <Logo>Assets\Images\StoreLogo.png</Logo>
   </Properties>
 
@@ -35,7 +35,7 @@
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
         DisplayName="Panoramic"
-        Description="Panoramic"
+        Description="Notes and bookmarks"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Images\Square150x150Logo.png"
         Square44x44Logo="Assets\Images\Square44x44Logo.png">
