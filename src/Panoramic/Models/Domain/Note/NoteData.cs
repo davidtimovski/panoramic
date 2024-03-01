@@ -20,7 +20,7 @@ public sealed class NoteData : IWidgetData
     public string FontFamily { get; set; } = "Default";
 
     [JsonPropertyName("fontSize")]
-    public double FontSize { get; set; } = 14;
+    public double FontSize { get; set; } = 15;
 
     [JsonPropertyName("relativeFilePath")]
     public string? RelativeFilePath { get; set; }

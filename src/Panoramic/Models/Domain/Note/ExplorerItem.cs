@@ -32,19 +32,10 @@ public sealed partial class ExplorerItem : ObservableObject
     public FileType Type { get; }
     public FileSystemItemPath Path { get; }
 
+    [ObservableProperty]
     private string? text;
-    public string? Text
-    {
-        get => text;
-        set
-        {
-            if (SetProperty(ref text, value))
-            {
-                OnPropertyChanged(nameof(Text));
-                _storageService.EnqueueNoteWrite(Path.Absolute, value!);
-            }
-        }
-    }
+
+    partial void OnTextChanged(string? oldValue, string? newValue) => _storageService.EnqueueNoteWrite(Path.Absolute, newValue!);
 
     public ObservableCollection<ExplorerItem> Children = [];
 

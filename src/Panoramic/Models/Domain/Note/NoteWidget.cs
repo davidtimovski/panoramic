@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Panoramic.Services;
 using Panoramic.Services.Storage;
+using Panoramic.Utils;
 
 namespace Panoramic.Models.Domain.Note;
 
@@ -89,14 +90,7 @@ public sealed class NoteWidget : IWidget
     }
 
     public IReadOnlyList<ExplorerItem> GetExplorerItems()
-    {
-        var items = DirectoryToTreeViewNode(_storageService.FileSystemItems, _storageService.StoragePath);
-
-        var rootPath = new FileSystemItemPath(_storageService.StoragePath, _storageService.StoragePath);
-        var root = new ExplorerItem(_storageService, Path.GetFileName(rootPath.Absolute), FileType.Folder, rootPath, items);
-
-        return [root];
-    }
+        => DirectoryToTreeViewNode(_storageService.FileSystemItems, _storageService.StoragePath);
 
     private List<ExplorerItem> DirectoryToTreeViewNode(IReadOnlyList<FileSystemItem> fileSystemItems, string currentPath)
     {
@@ -124,6 +118,8 @@ public sealed class NoteWidget : IWidget
 
     public async Task WriteAsync()
     {
+        Logger.LogDebug($"Writing {Type} widget with ID: {Id}");
+
         var data = GetData();
         var json = JsonSerializer.Serialize(data, _storageService.SerializerOptions);
 

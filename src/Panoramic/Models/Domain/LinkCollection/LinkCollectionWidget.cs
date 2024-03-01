@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Panoramic.Services.Storage;
+using Panoramic.Utils;
 
 namespace Panoramic.Models.Domain.LinkCollection;
 
@@ -74,6 +75,8 @@ public sealed class LinkCollectionWidget : IWidget
 
     public async Task WriteAsync()
     {
+        Logger.LogDebug($"Writing {Type} widget with ID: {Id}");
+
         var data = GetData();
         var json = JsonSerializer.Serialize(data, _storageService.SerializerOptions);
 

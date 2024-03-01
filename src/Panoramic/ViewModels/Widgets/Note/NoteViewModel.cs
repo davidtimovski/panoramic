@@ -100,6 +100,9 @@ public sealed partial class NoteViewModel : WidgetViewModel
     [NotifyPropertyChangedFor(nameof(EditToggleTooltip))]
     private bool editing;
 
+    [ObservableProperty]
+    public Visibility tipVisibility;
+
     public Visibility EditorVisibility => Editing ? Visibility.Visible : Visibility.Collapsed;
 
     public Visibility PresenterVisibility => Editing ? Visibility.Collapsed : Visibility.Visible;
@@ -117,8 +120,13 @@ public sealed partial class NoteViewModel : WidgetViewModel
     {
         ExplorerItems.Clear();
 
-        var root = _widget.GetExplorerItems()[0];
-        ExplorerItems.Add(root);
+        var items = _widget.GetExplorerItems();
+        foreach (var item in items)
+        {
+            ExplorerItems.Add(item);
+        }
+
+        TipVisibility = ExplorerItems.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private ExplorerItem? GetSelectedNote(ObservableCollection<ExplorerItem> items)
@@ -272,19 +280,36 @@ public sealed partial class NoteViewModel : WidgetViewModel
     {
         var noteCreatedInThisWidget = e.Type == FileType.Note && e.WidgetId == _widget.Id;
 
-        var path = new FileSystemItemPath(e.Path, _storageService.StoragePath);
-        var explorerItem = new ExplorerItem(_storageService, e.Name, e.Type, path, [])
+        var explorerItem = new ExplorerItem(_storageService, e.Name, e.Type, e.Path, [])
         {
             IsEnabled = noteCreatedInThisWidget
         };
 
-        AddItem(ExplorerItems, explorerItem, explorerItem.Path.Parent);
+        // Add to root level
+        if (e.Path.Parent.Equals(_storageService.StoragePath))
+        {
+            var itemsCopy = ExplorerItems.ToList();
+            itemsCopy.Add(explorerItem);
+            var ordered = itemsCopy.OrderBy(x => x.Type).ThenBy(x => x.Name).ToList();
 
+            ExplorerItems.Clear();
+            foreach (var child in ordered)
+            {
+                ExplorerItems.Add(child);
+            }
+        }
+        else
+        {
+            AddItem(ExplorerItems, explorerItem, explorerItem.Path.Parent);
+        }
+     
         if (noteCreatedInThisWidget)
         {
-            _widget.NotePath = new(e.Path, _storageService.StoragePath);
+            _widget.NotePath = e.Path;
             SelectedNote = GetSelectedNote(ExplorerItems);
         }
+
+        TipVisibility = ExplorerItems.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void FileDeleted(object? _, FileDeletedEventArgs e)
@@ -295,6 +320,8 @@ public sealed partial class NoteViewModel : WidgetViewModel
         }
 
         RemoveItem(ExplorerItems, e.Path);
+
+        TipVisibility = ExplorerItems.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void ItemRenamed(object? _, EventArgs e) => ReloadFiles();

@@ -95,6 +95,25 @@ public sealed partial class NoteWidgetPage : Page
         await dialog.ShowAsync();
     }
 
+    private async void AddNoteFromContextMenu_Click(object _, RoutedEventArgs e)
+    {
+        var content = new NewNoteForm(_storageService.StoragePath);
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            Title = "New note",
+            Content = content,
+            PrimaryButtonText = "Add",
+            CloseButtonText = "Cancel",
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateNote(_widget.Id, _storageService.StoragePath, content.ViewModel.Name)),
+            IsPrimaryButtonEnabled = false
+        };
+
+        content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+
+        await dialog.ShowAsync();
+    }
+
     private async void AddFolder_Click(object _, RoutedEventArgs e)
     {
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
@@ -109,6 +128,25 @@ public sealed partial class NoteWidgetPage : Page
             PrimaryButtonText = "Add",
             CloseButtonText = "Cancel",
             PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateFolder(_widget.Id, folder.Path.Absolute, content.ViewModel.Name)),
+            IsPrimaryButtonEnabled = false
+        };
+
+        content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+
+        await dialog.ShowAsync();
+    }
+
+    private async void AddFolderFromContextMenu_Click(object _, RoutedEventArgs e)
+    {
+        var content = new NewFolderForm(_storageService.StoragePath);
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            Title = "New folder",
+            Content = content,
+            PrimaryButtonText = "Add",
+            CloseButtonText = "Cancel",
+            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateFolder(_widget.Id, _storageService.StoragePath, content.ViewModel.Name)),
             IsPrimaryButtonEnabled = false
         };
 

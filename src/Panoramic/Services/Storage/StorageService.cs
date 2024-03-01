@@ -11,6 +11,7 @@ using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Domain.RecentLinks;
+using Panoramic.Utils;
 using Windows.Storage;
 
 namespace Panoramic.Services.Storage;
@@ -50,10 +51,9 @@ public sealed class StorageService : IStorageService
         _timer.Interval = TimeSpan.FromSeconds(15);
         _timer.Tick += async (timer, _) =>
         {
-            await WriteUnsavedChangesAsync();
+            Logger.LogDebug("Running auto save..");
 
-            _unsavedWidgets.Clear();
-            _unsavedNotes.Clear();
+            await WriteUnsavedChangesAsync();
         };
     }
 
@@ -112,10 +112,13 @@ public sealed class StorageService : IStorageService
 
         foreach (var note in _unsavedNotes)
         {
-            tasks.Add(File.WriteAllTextAsync(note.Key, note.Value));
+            tasks.Add(WriteNoteAsync(note.Key, note.Value));
         }
 
         await Task.WhenAll(tasks).ConfigureAwait(false);
+
+        _unsavedWidgets.Clear();
+        _unsavedNotes.Clear();
     }
 
     /// <inheritdoc/>
@@ -167,6 +170,19 @@ public sealed class StorageService : IStorageService
 
     public async Task SaveWidgetAsync(IWidget widget)
     {
+        // Write out any unsaved note content changes
+        if (widget is NoteWidget noteWidget
+            && noteWidget.NotePath is not null
+            && _unsavedNotes.TryGetValue(noteWidget.NotePath.Absolute, out string? content))
+        {
+            await WriteNoteAsync(noteWidget.NotePath.Absolute, content);
+        }
+
+        if (_unsavedWidgets.Contains(widget.Id))
+        {
+            _unsavedWidgets.Remove(widget.Id);
+        }
+
         await widget.WriteAsync();
 
         WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs { Id = widget.Id });
@@ -248,7 +264,7 @@ public sealed class StorageService : IStorageService
             WidgetId = widgetId,
             Name = name,
             Type = FileType.Folder,
-            Path = path
+            Path = new(path, StoragePath)
         });
     }
 
@@ -298,7 +314,7 @@ public sealed class StorageService : IStorageService
             WidgetId = widgetId,
             Name = name,
             Type = FileType.Note,
-            Path = path
+            Path = new(path, StoragePath)
         });
     }
 
@@ -309,10 +325,10 @@ public sealed class StorageService : IStorageService
         var directory = Path.GetDirectoryName(path)!;
         var newPath = Path.Combine(directory, $"{newName}.md");
 
-        if (_unsavedNotes.TryGetValue(path, out string? value))
+        if (_unsavedNotes.TryGetValue(path, out string? content))
         {
             _unsavedNotes.Remove(path);
-            _unsavedNotes.Add(newPath, value);
+            _unsavedNotes.Add(newPath, content);
         }
 
         File.Move(path, newPath);
@@ -425,5 +441,12 @@ public sealed class StorageService : IStorageService
         {
             fileSystemItems[selectedNote.Key].SelectedInWidgetId = selectedNote.Value;
         }
+    }
+
+    private static async Task WriteNoteAsync(string path, string content)
+    {
+        Logger.LogDebug($"Writing note content: {path}");
+
+        await File.WriteAllTextAsync(path, content);
     }
 }

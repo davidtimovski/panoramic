@@ -34,4 +34,6 @@ public sealed class FileSystemItemPath(string path, string storagePath)
 
         throw new ArgumentException($"Cannot compare {nameof(FileSystemItemPath)} to {obj.GetType()}", nameof(obj));
     }
+
+    public override int GetHashCode() => Absolute.GetHashCode();
 }

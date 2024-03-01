@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Services;
 using Panoramic.Services.Storage;
@@ -30,8 +29,7 @@ public sealed partial class RecentLinksViewModel : WidgetViewModel
         SetViewModel();
     }
 
-    [ObservableProperty]
-    private string title;
+    public string Title { get; }
 
     public ObservableCollection<RecentLinkViewModel> Recent { get; } = [];
 

@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Services;
 
@@ -13,12 +12,11 @@ public sealed partial class LinkCollectionViewModel : WidgetViewModel
 
         foreach (var item in widget.Links)
         {
-            Links.Add(new LinkViewModel(eventHub, item.Title, item.Uri));
+            Links.Add(new LinkViewModel(eventHub, Title, item.Title, item.Uri));
         }
     }
 
-    [ObservableProperty]
-    private string title;
+    public string Title { get; }
 
     public ObservableCollection<LinkViewModel> Links = [];
 }

@@ -55,6 +55,9 @@
                                 <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" />
                                 <MenuFlyoutItem Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" Click="DeleteNoteFromContextMenu_Click">Delete note</MenuFlyoutItem>
                                 <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" />
+                                <MenuFlyoutItem Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}" Click="AddNoteFromContextMenu_Click">Add note</MenuFlyoutItem>
+                                <MenuFlyoutItem Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}" Click="AddFolderFromContextMenu_Click">Add folder</MenuFlyoutItem>
+                                <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}" />
                                 <MenuFlyoutItem Click="SettingsButton_Click">Settings</MenuFlyoutItem>
                                 <MenuFlyoutItem Click="DeleteButton_Click">Delete</MenuFlyoutItem>
                             </MenuFlyout>
@@ -138,6 +141,14 @@
                                            FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}" />
                         </Grid>
                     </ScrollView>
+
+                    <TextBlock Visibility="{x:Bind ViewModel.TipVisibility, Mode=OneWay}"
+                               Foreground="{StaticResource PanoramicPaleTextForeground}"
+                               MaxWidth="400"
+                               HorizontalTextAlignment="Center"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap"
+                               LineHeight="22">This is your explorer view. Use the top-right menu "..." to add notes or folders to the root level. Right-click on folders to add files inside. Newly added notes will open automatically. Use the same top-right menu to switch back to this view.</TextBlock>
                 </Grid>
             </Border>
 
