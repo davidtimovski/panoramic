@@ -117,7 +117,7 @@ public sealed class RecentLinksWidget : IWidget
 
     public async Task WriteAsync()
     {
-        Logger.LogDebug($"Writing {Type} widget with ID: {Id}");
+        DebugLogger.Log($"Writing {Type} widget with ID: {Id}");
 
         var data = GetData();
         var json = JsonSerializer.Serialize(data, _storageService.SerializerOptions);

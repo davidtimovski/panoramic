@@ -6,7 +6,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Panoramic.Models.Domain.Note;
-using Panoramic.Services;
 using Panoramic.Services.Storage;
 using Panoramic.Utils;
 using Panoramic.ViewModels.Widgets.LinkCollection;
@@ -65,7 +64,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
 
             if (value is not null && value.Text is null)
             {
-                value.InitializeContent(File.ReadAllText(value.Path!.Absolute));
+                value.Text = File.ReadAllText(value.Path!.Absolute);
             }
 
             if (_initialized)
@@ -188,7 +187,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
             }
             else if (item.Path.Equals(path))
             {
-                item.InitializeContent(content);
+                item.Text = content;
                 return;
             }
         }

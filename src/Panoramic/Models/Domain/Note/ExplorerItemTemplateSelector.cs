@@ -6,10 +6,10 @@ namespace Panoramic.Models.Domain.Note;
 
 public sealed class ExplorerItemTemplateSelector : DataTemplateSelector
 {
-    public DataTemplate FolderTemplate { get; set; }
-    public DataTemplate FileTemplate { get; set; }
+    public DataTemplate? FolderTemplate { get; set; }
+    public DataTemplate? FileTemplate { get; set; }
 
-    protected override DataTemplate SelectTemplateCore(object item)
+    protected override DataTemplate? SelectTemplateCore(object item)
     {
         var explorerItem = (ExplorerItem)item;
         return explorerItem.Type == FileType.Folder ? FolderTemplate : FileTemplate;

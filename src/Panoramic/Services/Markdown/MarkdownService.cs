@@ -275,7 +275,7 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
                 FontSize = fontSize,
                 NavigateUri = uri.Uri
             };
-            hyperlink.Click += (_, _) => { _eventHub.RaiseHyperlinkClicked($"{noteName} - {uri.Text}", uri.Uri, DateTime.Now); };
+            hyperlink.Click += (_, _) => _eventHub.RaiseHyperlinkClicked($"{uri.Text} - {noteName}", uri.Uri, DateTime.Now);
             hyperlink.Inlines.Add(new Run { Text = uri.Text });
             paragraph.Inlines.Add(hyperlink);
 

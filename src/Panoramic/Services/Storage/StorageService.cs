@@ -51,7 +51,7 @@ public sealed class StorageService : IStorageService
         _timer.Interval = TimeSpan.FromSeconds(15);
         _timer.Tick += async (timer, _) =>
         {
-            Logger.LogDebug("Running auto save..");
+            DebugLogger.Log("Running auto save..");
 
             await WriteUnsavedChangesAsync();
         };
@@ -124,6 +124,8 @@ public sealed class StorageService : IStorageService
     /// <inheritdoc/>
     public void EnqueueWidgetWrite(Guid id)
     {
+        DebugLogger.Log($"Enqueuing widget write: {id}");
+
         _unsavedWidgets.Add(id);
 
         _timer.Stop();
@@ -133,6 +135,8 @@ public sealed class StorageService : IStorageService
     /// <inheritdoc/>
     public void EnqueueNoteWrite(string path, string text)
     {
+        DebugLogger.Log($"Enqueuing note content write: {path}");
+
         if (!_unsavedNotes.TryAdd(path, text))
         {
             _unsavedNotes[path] = text;
@@ -445,7 +449,7 @@ public sealed class StorageService : IStorageService
 
     private static async Task WriteNoteAsync(string path, string content)
     {
-        Logger.LogDebug($"Writing note content: {path}");
+        DebugLogger.Log($"Writing note content: {path}");
 
         await File.WriteAllTextAsync(path, content);
     }
