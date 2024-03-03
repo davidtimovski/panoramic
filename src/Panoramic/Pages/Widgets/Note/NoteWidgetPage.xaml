@@ -132,13 +132,15 @@
                                      Visibility="{x:Bind ViewModel.EditorVisibility, Mode=OneWay}"
                                      FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}"
                                      FontSize="{x:Bind ViewModel.FontSize, Mode=OneWay}"
+                                     Foreground="{StaticResource PanoramicWidgetForegroundBrush}"
                                      AcceptsReturn="True"
                                      TextWrapping="Wrap" />
                             <RichTextBlock Grid.Row="0"
                                            Grid.Column="0"
                                            x:Name="Presenter"
                                            Visibility="{x:Bind ViewModel.PresenterVisibility, Mode=OneWay}"
-                                           FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}" />
+                                           FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}"
+                                           Foreground="{StaticResource PanoramicWidgetForegroundBrush}" />
                         </Grid>
                     </ScrollView>
 

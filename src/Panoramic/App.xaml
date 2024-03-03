@@ -13,10 +13,10 @@
 
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="PanoramicMainWindowBackgroundBrush" Color="#eee" />
+                    <SolidColorBrush x:Key="PanoramicMainWindowBackgroundBrush" Color="#fafafa" />
                     
-                    <SolidColorBrush x:Key="PanoramicWidgetBackgroundBrush" Color="#e3e3e3" />
-                    <SolidColorBrush x:Key="PanoramicWidgetHighlightedBackgroundBrush" Color="#c3d3e3" />
+                    <SolidColorBrush x:Key="PanoramicWidgetBackgroundBrush" Color="#eee" />
+                    <SolidColorBrush x:Key="PanoramicWidgetHighlightedBackgroundBrush" Color="#d3e3f3" />
 
                     <SolidColorBrush x:Key="PanoramicWidgetForegroundBrush" Color="#333" />
 
@@ -30,7 +30,7 @@
                     <SolidColorBrush x:Key="PanoramicWidgetBackgroundBrush" Color="#222" />
                     <SolidColorBrush x:Key="PanoramicWidgetHighlightedBackgroundBrush" Color="#234" />
 
-                    <SolidColorBrush x:Key="PanoramicWidgetForegroundBrush" Color="#ddd" />
+                    <SolidColorBrush x:Key="PanoramicWidgetForegroundBrush" Color="#eee" />
 
                     <SolidColorBrush x:Key="PanoramicBlueForeground" Color="#8DD7E9" />
                     <SolidColorBrush x:Key="PanoramicPaleTextForeground" Color="#aaa" />
