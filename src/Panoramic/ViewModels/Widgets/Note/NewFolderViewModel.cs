@@ -9,8 +9,19 @@ public sealed partial class NewFolderViewModel(string directory) : ObservableObj
 {
     private readonly string _directory = directory;
 
-    [ObservableProperty]
     private string name = string.Empty;
+    public string Name
+    {
+        get => name;
+        set
+        {
+            if (SetProperty(ref name, value))
+            {
+                OnPropertyChanged(nameof(Name));
+                ValidateAndEmit();
+            }
+        }
+    }
 
     public event EventHandler<ValidationEventArgs>? Validated;
 

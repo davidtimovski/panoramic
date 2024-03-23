@@ -6,6 +6,11 @@
     xmlns:uc="using:Panoramic.UserControls">
 
     <Grid Background="{StaticResource PanoramicMainWindowBackgroundBrush}">
+        <Grid.KeyboardAccelerators>
+            <KeyboardAccelerator Invoked="ControlSHotkey_Invoked" Key="S" Modifiers="Control" ToolTipService.ToolTip="" />
+            <KeyboardAccelerator Invoked="EscapeHotkey_Invoked" Key="Escape" ToolTipService.ToolTip="" />
+        </Grid.KeyboardAccelerators>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="28" />
             <RowDefinition Height="*" />
@@ -24,10 +29,12 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
                     <Button Grid.Column="0" Click="AddWidgetButton_Click">Add widget</Button>
-                    <Button Grid.Column="1" Click="PreferencesButton_Click" HorizontalAlignment="Right">Preferences</Button>
+                    <TextBox Grid.Column="1" Name="SearchBox" Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button Grid.Column="2" Click="PreferencesButton_Click" HorizontalAlignment="Right">Preferences</Button>
                 </Grid>
 
                 <Grid x:Name="Grid" Grid.Row="1" RowSpacing="10" ColumnSpacing="10">

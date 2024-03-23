@@ -30,7 +30,7 @@ public sealed partial class LinkCollectionWidgetPage : Page
         _widget = widget;
 
         var eventHub = serviceProvider.GetRequiredService<IEventHub>();
-        ViewModel = new LinkCollectionViewModel(eventHub, widget);
+        ViewModel = new LinkCollectionViewModel(eventHub, _dispatcherQueue, widget);
     }
 
     public LinkCollectionViewModel ViewModel { get; }

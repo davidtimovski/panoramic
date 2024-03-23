@@ -131,10 +131,3 @@ public sealed class RecentLinksWidget : IWidget
         File.Delete(dataFilePath);
     }
 }
-
-public sealed class RecentLink
-{
-    public required string Title { get; init; }
-    public required Uri Uri { get; init; }
-    public required DateTime Clicked { get; set; }
-}

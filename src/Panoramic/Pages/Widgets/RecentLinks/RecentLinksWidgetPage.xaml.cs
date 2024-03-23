@@ -1,6 +1,7 @@
 using System;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.RecentLinks;
@@ -23,7 +24,8 @@ public sealed partial class RecentLinksWidgetPage : Page
         _widget = widget;
 
         var eventHub = serviceProvider.GetRequiredService<IEventHub>();
-        ViewModel = new RecentLinksViewModel(_storageService, eventHub, widget);
+        var dispatcherQueue = serviceProvider.GetRequiredService<DispatcherQueue>();
+        ViewModel = new RecentLinksViewModel(_storageService, eventHub, dispatcherQueue, widget);
     }
 
     public RecentLinksViewModel ViewModel { get; }

@@ -11,8 +11,8 @@ Organized as a grid system, it allows you to add widgets in a layout that you pr
 Currently supports 3 types of widgets:
 
 - Note - textual widget that supports simplified markup
-- Link collection - a collection of links ordered to your preference
-- Recent links - links that were recently clicked within the app
+- Link collection - a collection of links ordered to your preference. Searchable through the global search (Ctrl+S).
+- Recent links - links that were recently clicked within the app. Searchable through the global search (Ctrl+S).
 
 ## Storage
 

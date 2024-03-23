@@ -3,6 +3,7 @@ using System.Linq;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Panoramic.Models;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Domain.Note;
@@ -133,5 +134,25 @@ public sealed partial class MainWindow : Window
         content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
 
         await dialog.ShowAsync();
+    }
+
+    private void ControlSHotkey_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        SearchBox.Text = string.Empty;
+        SearchBox.Focus(FocusState.Programmatic);
+
+        args.Handled = true;
+    }
+
+    private void EscapeHotkey_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (SearchBox.FocusState == FocusState.Unfocused)
+        {
+            return;
+        }
+
+        SearchBox.Text = string.Empty;
+
+        args.Handled = true;
     }
 }

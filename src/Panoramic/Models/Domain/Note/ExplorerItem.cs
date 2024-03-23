@@ -44,18 +44,28 @@ public sealed partial class ExplorerItem : ObservableObject
     public FileType Type { get; }
     public FileSystemItemPath Path { get; }
 
-    [ObservableProperty]
     private string? text;
-
-    partial void OnTextChanged(string? oldValue, string? newValue)
+    public string? Text
     {
-        if (!initialized)
+        get => text;
+        set
         {
-            initialized = true;
-            return;
-        }
+            if (!SetProperty(ref text, value))
+            {
+                return;
+            }
 
-        _debounceTimer.Debounce(() => _storageService.EnqueueNoteWrite(Path.Absolute, newValue!), TextChangeEnqueueDebounceInterval);
+            OnPropertyChanged(nameof(Text));
+
+            if (initialized)
+            {
+                _debounceTimer.Debounce(() => _storageService.EnqueueNoteWrite(Path.Absolute, value!), TextChangeEnqueueDebounceInterval);
+            }
+            else
+            {
+                initialized = true;
+            }
+        }
     }
 
     public ObservableCollection<ExplorerItem> Children = [];

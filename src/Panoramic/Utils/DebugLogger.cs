@@ -7,13 +7,13 @@ public static class DebugLogger
 {
     private static readonly ILogger Logger;
 
+#if DEBUG
     static DebugLogger()
     {
-#if DEBUG
         using var provider = new DebugLoggerProvider();
         Logger = provider.CreateLogger("Debug");
-#endif
     }
+#endif
 
     public static void Log(string message)
     {

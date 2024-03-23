@@ -10,8 +10,19 @@ public sealed partial class NoteRenameViewModel(string path) : ObservableObject
 {
     private readonly string _directory = Path.GetDirectoryName(path)!;
 
-    [ObservableProperty]
     private string name = Path.GetFileNameWithoutExtension(path);
+    public string Name
+    {
+        get => name;
+        set
+        {
+            if (SetProperty(ref name, value))
+            {
+                OnPropertyChanged(nameof(Name));
+                ValidateAndEmit();
+            }
+        }
+    }
 
     public event EventHandler<ValidationEventArgs>? Validated;
 
