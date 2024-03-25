@@ -19,7 +19,15 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="{x:Bind ViewModel.Title}" FontSize="16" Foreground="{StaticResource PanoramicWidgetForegroundBrush}" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{x:Bind ViewModel.Title}" FontSize="16" Foreground="{StaticResource PanoramicWidgetForegroundBrush}" TextWrapping="Wrap" />
+
+                        <Border Visibility="{x:Bind ViewModel.FilterIconVisibility, Mode=OneWay}"
+                                Background="{StaticResource PanoramicMainWindowBackgroundBrush}"
+                                Margin="12 0 0 0" Padding="10 0" CornerRadius="6" ToolTipService.ToolTip="Filtered">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE71C;" FontSize="10" />
+                        </Border>
+                    </StackPanel>
 
                     <DropDownButton Grid.Column="1" AutomationProperties.Name="Setting">
                         <DropDownButton.Content>

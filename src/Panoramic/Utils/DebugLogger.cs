@@ -3,22 +3,27 @@ using Microsoft.Extensions.Logging.Debug;
 
 namespace Panoramic.Utils;
 
+#if DEBUG
 public static class DebugLogger
 {
     private static readonly ILogger Logger;
 
-#if DEBUG
     static DebugLogger()
     {
         using var provider = new DebugLoggerProvider();
         Logger = provider.CreateLogger("Debug");
     }
-#endif
 
     public static void Log(string message)
     {
-#if DEBUG
         Logger.LogDebug("{Message}", message);
-#endif
     }
 }
+#else
+public static class DebugLogger
+{
+    public static void Log(string _)
+    {
+    }
+}
+#endif

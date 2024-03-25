@@ -1,19 +1,21 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Services;
 using Panoramic.Services.Storage;
-using Panoramic.ViewModels.Widgets.LinkCollection;
 
 namespace Panoramic.ViewModels.Widgets.RecentLinks;
 
-public sealed class RecentLinksViewModel : WidgetViewModel
+public sealed partial class RecentLinksViewModel : WidgetViewModel
 {
     private readonly IStorageService _storageService;
     private readonly IEventHub _eventHub;
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly RecentLinksWidget _widget;
+    private string searchText = string.Empty;
 
     public RecentLinksViewModel(
         IStorageService storageService,
@@ -40,6 +42,9 @@ public sealed class RecentLinksViewModel : WidgetViewModel
 
     public ObservableCollection<RecentLinkViewModel> Recent { get; } = [];
 
+    [ObservableProperty]
+    private Visibility filterIconVisibility = Visibility.Collapsed;
+
     public void ClearRecent()
     {
         _widget.Clear();
@@ -50,22 +55,8 @@ public sealed class RecentLinksViewModel : WidgetViewModel
 
     private void SearchInvoked(object? _, string searchText)
     {
-        var source = _widget.Links.AsEnumerable();
-        if (searchText.Length > 0)
-        {
-            source = source.Where(x => x.Matches(searchText));
-        }
-
-        var filteredLinkVms = source.Select(MapToViewModel).ToList();
-
-        _dispatcherQueue.TryEnqueue(() =>
-        {
-            Recent.Clear();
-            foreach (var recentLinkVm in filteredLinkVms)
-            {
-                Recent.Add(recentLinkVm);
-            }
-        });
+        this.searchText = searchText;
+        _dispatcherQueue.TryEnqueue(SetViewModel);
     }
 
     private void HyperlinkClicked(object? _, HyperlinkClickedEventArgs e)
@@ -79,11 +70,24 @@ public sealed class RecentLinksViewModel : WidgetViewModel
 
     private void SetViewModel()
     {
-        Recent.Clear();
-
-        foreach (var recentLink in _widget.Links)
+        var source = _widget.Links.AsEnumerable();
+        if (this.searchText.Length > 0)
         {
-            Recent.Add(MapToViewModel(recentLink));
+            source = source.Where(x => x.Matches(this.searchText));
+
+            FilterIconVisibility = Visibility.Visible;
+        }
+        else
+        {
+            FilterIconVisibility = Visibility.Collapsed;
+        }
+
+        var filteredLinkVms = source.Select(MapToViewModel).ToList();
+
+        Recent.Clear();
+        foreach (var recentLinkVm in filteredLinkVms)
+        {
+            Recent.Add(recentLinkVm);
         }
     }
 

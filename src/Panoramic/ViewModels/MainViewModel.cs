@@ -8,7 +8,7 @@ namespace Panoramic.ViewModels;
 
 public sealed class MainViewModel : ObservableObject
 {
-    private static readonly TimeSpan SearchTextChangeDebounceInterval = TimeSpan.FromMilliseconds(200);
+    private static readonly TimeSpan SearchTextChangeDebounceInterval = TimeSpan.FromMilliseconds(250);
 
     private readonly DispatcherQueueTimer _debounceTimer;
     private readonly IEventHub _eventHub;
@@ -36,14 +36,7 @@ public sealed class MainViewModel : ObservableObject
             OnPropertyChanged();
 
             var trimmed = value.Trim();
-            if (trimmed.Length > 0)
-            {
-                _debounceTimer.Debounce(() => _eventHub.RaiseSearchInvoked(trimmed), SearchTextChangeDebounceInterval);
-            }
-            else
-            {
-                _eventHub.RaiseSearchInvoked(trimmed);
-            }
+            _debounceTimer.Debounce(() => _eventHub.RaiseSearchInvoked(trimmed), SearchTextChangeDebounceInterval);
         }
     }
 }

@@ -1,16 +1,19 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Services;
 
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
-public sealed class LinkCollectionViewModel : WidgetViewModel
+public sealed partial class LinkCollectionViewModel : WidgetViewModel
 {
     private readonly IEventHub _eventHub;
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly LinkCollectionWidget _widget;
+    private string searchText = string.Empty;
 
     public LinkCollectionViewModel(IEventHub eventHub, DispatcherQueue dispatcherQueue, LinkCollectionWidget widget)
     {
@@ -23,34 +26,43 @@ public sealed class LinkCollectionViewModel : WidgetViewModel
 
         Title = widget.Title;
 
-        foreach (var item in _widget.Links)
-        {
-            Links.Add(MapToViewModel(item));
-        }
+        SetViewModel();
     }
 
     public string Title { get; }
 
     public ObservableCollection<LinkViewModel> Links = [];
 
+    [ObservableProperty]
+    private Visibility filterIconVisibility = Visibility.Collapsed;
+
     private void SearchInvoked(object? _, string searchText)
     {
+        this.searchText = searchText;
+        _dispatcherQueue.TryEnqueue(SetViewModel);
+    }
+
+    private void SetViewModel()
+    {
         var source = _widget.Links.AsEnumerable();
-        if (searchText.Length > 0)
+        if (this.searchText.Length > 0)
         {
-            source = source.Where(x => x.Matches(searchText));
+            source = source.Where(x => x.Matches(this.searchText));
+
+            FilterIconVisibility = Visibility.Visible;
+        }
+        else
+        {
+            FilterIconVisibility = Visibility.Collapsed;
         }
 
         var filteredLinkVms = source.Select(MapToViewModel).ToList();
 
-        _dispatcherQueue.TryEnqueue(() =>
+        Links.Clear();
+        foreach (var linkVm in filteredLinkVms)
         {
-            Links.Clear();
-            foreach (var recentLinkVm in filteredLinkVms)
-            {
-                Links.Add(recentLinkVm);
-            }
-        });
+            Links.Add(linkVm);
+        }
     }
 
     private LinkViewModel MapToViewModel(LinkCollectionItem item)
