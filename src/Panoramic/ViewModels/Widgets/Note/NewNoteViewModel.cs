@@ -5,10 +5,8 @@ using Panoramic.Models.Events;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 
-public sealed partial class NewNoteViewModel(string directory) : ObservableObject
+public sealed class NewNoteViewModel(string directory) : ObservableObject
 {
-    private readonly string _directory = directory;
-
     private string name = string.Empty;
     public string Name
     {
@@ -17,7 +15,7 @@ public sealed partial class NewNoteViewModel(string directory) : ObservableObjec
         {
             if (SetProperty(ref name, value))
             {
-                OnPropertyChanged(nameof(Name));
+                OnPropertyChanged();
                 ValidateAndEmit();
             }
         }
@@ -25,7 +23,7 @@ public sealed partial class NewNoteViewModel(string directory) : ObservableObjec
 
     public event EventHandler<ValidationEventArgs>? Validated;
 
-    public void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
+    private void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
 
-    private bool CanBeCreated() => Name.Trim().Length > 0 && NoteWidget.NoteCanBeCreated(Name.Trim(), _directory);
+    private bool CanBeCreated() => Name.Trim().Length > 0 && NoteWidget.NoteCanBeCreated(Name.Trim(), directory);
 }

@@ -6,7 +6,7 @@ using Panoramic.Models.Events;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 
-public sealed partial class FolderRenameViewModel(string path) : ObservableObject
+public sealed class FolderRenameViewModel(string path) : ObservableObject
 {
     private readonly string _directory = Path.GetDirectoryName(path)!;
 
@@ -18,7 +18,7 @@ public sealed partial class FolderRenameViewModel(string path) : ObservableObjec
         {
             if (SetProperty(ref name, value))
             {
-                OnPropertyChanged(nameof(Name));
+                OnPropertyChanged();
                 ValidateAndEmit();
             }
         }
@@ -26,7 +26,7 @@ public sealed partial class FolderRenameViewModel(string path) : ObservableObjec
 
     public event EventHandler<ValidationEventArgs>? Validated;
 
-    public void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
+    private void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
 
     private bool CanBeCreated() => Name.Trim().Length > 0 && NoteWidget.FolderCanBeCreated(Name.Trim(), _directory);
 }

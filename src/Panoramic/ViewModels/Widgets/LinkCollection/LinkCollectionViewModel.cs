@@ -6,7 +6,7 @@ using Panoramic.Services;
 
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
-public sealed partial class LinkCollectionViewModel : WidgetViewModel
+public sealed class LinkCollectionViewModel : WidgetViewModel
 {
     private readonly IEventHub _eventHub;
     private readonly DispatcherQueue _dispatcherQueue;

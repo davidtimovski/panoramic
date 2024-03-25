@@ -55,7 +55,7 @@ public sealed partial class ExplorerItem : ObservableObject
                 return;
             }
 
-            OnPropertyChanged(nameof(Text));
+            OnPropertyChanged();
 
             if (initialized)
             {

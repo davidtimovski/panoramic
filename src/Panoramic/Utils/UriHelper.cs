@@ -11,11 +11,6 @@ internal static class UriHelper
             return null;
         }
 
-        if (Uri.TryCreate(url, UriKind.Absolute, out var uri))
-        {
-            return uri;
-        }
-
-        return null;
+        return Uri.TryCreate(url, UriKind.Absolute, out var uri) ? uri : null;
     }
 }

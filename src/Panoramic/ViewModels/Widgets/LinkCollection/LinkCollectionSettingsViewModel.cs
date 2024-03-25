@@ -11,7 +11,6 @@ namespace Panoramic.ViewModels.Widgets.LinkCollection;
 public sealed partial class LinkCollectionSettingsViewModel(IStorageService storageService, LinkCollectionData data)
     : ObservableObject, ISettingsViewModel
 {
-    private readonly IStorageService _storageService = storageService;
     private event EventHandler<ValidationEventArgs>? Validated;
 
     public Guid Id { get; } = data.Id;
@@ -27,7 +26,7 @@ public sealed partial class LinkCollectionSettingsViewModel(IStorageService stor
         {
             if (SetProperty(ref title, value))
             {
-                OnPropertyChanged(nameof(Title));
+                OnPropertyChanged();
                 Validate();
             }
         }
@@ -43,16 +42,16 @@ public sealed partial class LinkCollectionSettingsViewModel(IStorageService stor
     {
         if (Id == Guid.Empty)
         {
-            var widget = new LinkCollectionWidget(_storageService, Area, Title.Trim());
-            await _storageService.AddNewWidgetAsync(widget);
+            var widget = new LinkCollectionWidget(storageService, Area, Title.Trim());
+            await storageService.AddNewWidgetAsync(widget);
         }
         else
         {
-            var widget = (LinkCollectionWidget)_storageService.Widgets[Id];
+            var widget = (LinkCollectionWidget)storageService.Widgets[Id];
             widget.Area = Area;
             widget.Title = Title.Trim();
 
-            await _storageService.SaveWidgetAsync(widget);
+            await storageService.SaveWidgetAsync(widget);
         }
     }
 

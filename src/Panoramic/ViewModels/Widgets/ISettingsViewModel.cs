@@ -6,7 +6,6 @@ namespace Panoramic.ViewModels.Widgets;
 
 public interface ISettingsViewModel
 {
-    Guid Id { get; }
     Area Area { get; set; }
 
     /// <summary>

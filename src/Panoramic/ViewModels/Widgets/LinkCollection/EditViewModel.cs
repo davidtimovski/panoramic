@@ -11,10 +11,9 @@ using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Services.Storage;
 using Panoramic.Utils;
-using Panoramic.ViewModels.Widgets.LinkCollection;
 using Windows.ApplicationModel.DataTransfer;
 
-namespace Panoramic.ViewModels;
+namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
 public sealed partial class EditViewModel : ObservableObject
 {

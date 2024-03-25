@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Panoramic.Models.Domain;
@@ -26,7 +27,7 @@ public sealed partial class NoteSettingsViewModel
         Id = data.Id;
         area = data.Area;
         fontFamily = data.FontFamily;
-        fontSize = data.FontSize.ToString();
+        fontSize = data.FontSize.ToString(CultureInfo.InvariantCulture);
     }
 
     private readonly IStorageService _storageService;
@@ -53,11 +54,11 @@ public sealed partial class NoteSettingsViewModel
 
     public async Task SubmitAsync()
     {
-        var fontSize = double.Parse(FontSize);
+        var size = double.Parse(FontSize);
 
         if (Id == Guid.Empty)
         {
-            var widget = new NoteWidget(_storageService, Area, FontFamily, fontSize);
+            var widget = new NoteWidget(_storageService, Area, FontFamily, size);
             await _storageService.AddNewWidgetAsync(widget);
         }
         else
@@ -65,7 +66,7 @@ public sealed partial class NoteSettingsViewModel
             var widget = (NoteWidget)_storageService.Widgets[Id];
             widget.Area = Area;
             widget.FontFamily = FontFamily;
-            widget.FontSize = fontSize;
+            widget.FontSize = size;
 
             await _storageService.SaveWidgetAsync(widget);
         }

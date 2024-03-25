@@ -1,6 +1,5 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Panoramic.ViewModels;
 using Panoramic.ViewModels.Widgets.LinkCollection;
 
 namespace Panoramic.Pages.Widgets.LinkCollection;

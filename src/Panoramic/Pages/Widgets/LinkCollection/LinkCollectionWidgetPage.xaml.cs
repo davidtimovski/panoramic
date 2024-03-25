@@ -8,7 +8,6 @@ using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Services;
 using Panoramic.Services.Storage;
-using Panoramic.ViewModels;
 using Panoramic.ViewModels.Widgets.LinkCollection;
 
 namespace Panoramic.Pages.Widgets.LinkCollection;

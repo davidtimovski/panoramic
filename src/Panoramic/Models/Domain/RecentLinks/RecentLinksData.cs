@@ -26,7 +26,7 @@ public sealed class RecentLinksData : IWidgetData
 
     [JsonRequired]
     [JsonPropertyName("onlyFromToday")]
-    public bool OnlyFromToday { get; set; } = false;
+    public bool OnlyFromToday { get; set; }
 
     [JsonRequired]
     [JsonPropertyName("links")]

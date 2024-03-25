@@ -33,7 +33,7 @@ public sealed class NoteWidget : IWidget
     /// <summary>
     /// Constructs a note widget based on existing data.
     /// </summary>
-    public NoteWidget(IStorageService storageService, NoteData data)
+    private NoteWidget(IStorageService storageService, NoteData data)
     {
         _storageService = storageService;
 

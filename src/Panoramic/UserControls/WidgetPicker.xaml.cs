@@ -51,7 +51,7 @@ public sealed partial class WidgetPicker : UserControl
         }
         else
         {
-            WidgetDeselected?.Invoke(this, new EventArgs());
+            WidgetDeselected?.Invoke(this, EventArgs.Empty);
         }
     }
 }

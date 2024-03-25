@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Windows.Storage;
 using Microsoft.UI.Dispatching;
 using Panoramic.Models;
 using Panoramic.Models.Domain;
@@ -12,7 +13,6 @@ using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Utils;
-using Windows.Storage;
 
 namespace Panoramic.Services.Storage;
 
@@ -284,7 +284,7 @@ public sealed class StorageService : IStorageService
         LoadFileSystemItems();
         SetSelectedNotes();
 
-        ItemRenamed?.Invoke(this, new EventArgs());
+        ItemRenamed?.Invoke(this, EventArgs.Empty);
     }
 
     public void DeleteFolder(string path)
@@ -420,7 +420,7 @@ public sealed class StorageService : IStorageService
             LoadFileSystemItemsRecursive(subdirectory, storagePath);
         }
 
-        var filePaths = Directory.GetFiles(currentPath, "*.md").OrderBy(x => Path.GetFileName(x)).ToList();
+        var filePaths = Directory.GetFiles(currentPath, "*.md").OrderBy(Path.GetFileName).ToList();
         foreach (var filePath in filePaths)
         {
             var note = new FileSystemItem(FileType.Note)

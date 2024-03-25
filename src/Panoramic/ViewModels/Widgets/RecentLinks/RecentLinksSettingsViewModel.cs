@@ -11,7 +11,6 @@ namespace Panoramic.ViewModels.Widgets.RecentLinks;
 public sealed partial class RecentLinksSettingsViewModel(IStorageService storageService, RecentLinksData data)
     : ObservableObject, ISettingsViewModel
 {
-    private readonly IStorageService _storageService = storageService;
     private event EventHandler<ValidationEventArgs>? Validated;
 
     public Guid Id { get; } = data.Id;
@@ -27,7 +26,7 @@ public sealed partial class RecentLinksSettingsViewModel(IStorageService storage
         {
             if (SetProperty(ref title, value))
             {
-                OnPropertyChanged(nameof(Title));
+                OnPropertyChanged();
                 Validate();
             }
         }
@@ -49,18 +48,18 @@ public sealed partial class RecentLinksSettingsViewModel(IStorageService storage
     {
         if (Id == Guid.Empty)
         {
-            var widget = new RecentLinksWidget(_storageService, Area, Title.Trim(), Capacity, OnlyFromToday);
-            await _storageService.AddNewWidgetAsync(widget);
+            var widget = new RecentLinksWidget(storageService, Area, Title.Trim(), Capacity, OnlyFromToday);
+            await storageService.AddNewWidgetAsync(widget);
         }
         else
         {
-            var widget = (RecentLinksWidget)_storageService.Widgets[Id];
+            var widget = (RecentLinksWidget)storageService.Widgets[Id];
             widget.Area = Area;
             widget.Title = Title;
             widget.Capacity = Capacity;
             widget.OnlyFromToday = OnlyFromToday;
 
-            await _storageService.SaveWidgetAsync(widget);
+            await storageService.SaveWidgetAsync(widget);
         }
     }
 

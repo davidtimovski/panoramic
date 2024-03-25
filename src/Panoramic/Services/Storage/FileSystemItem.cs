@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Panoramic.Services.Storage;
 
-namespace Panoramic.Services;
+namespace Panoramic.Services.Storage;
 
 public sealed class FileSystemItem
 {

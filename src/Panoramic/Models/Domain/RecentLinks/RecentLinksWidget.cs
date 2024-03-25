@@ -34,7 +34,7 @@ public sealed class RecentLinksWidget : IWidget
     /// <summary>
     /// Constructs a recent links widget based on existing data.
     /// </summary>
-    public RecentLinksWidget(IStorageService storageService, RecentLinksData data)
+    private RecentLinksWidget(IStorageService storageService, RecentLinksData data)
     {
         _storageService = storageService;
         _dataFileName = $"{data.Id}.json";

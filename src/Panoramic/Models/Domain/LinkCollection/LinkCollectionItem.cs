@@ -12,7 +12,5 @@ public sealed class LinkCollectionItem
     /// Used for global search functionality.
     /// </summary>
     public bool Matches(string searchText)
-    {
-        return Title.Contains(searchText, StringComparison.OrdinalIgnoreCase) || Uri.Host.Contains(searchText, StringComparison.OrdinalIgnoreCase);
-    }
+        => Title.Contains(searchText, StringComparison.OrdinalIgnoreCase) || Uri.Host.Contains(searchText, StringComparison.OrdinalIgnoreCase);
 }

@@ -32,7 +32,7 @@ public sealed class LinkCollectionWidget : IWidget
     /// <summary>
     /// Constructs a link collection widget based on existing data.
     /// </summary>
-    public LinkCollectionWidget(IStorageService storageService, LinkCollectionData data)
+    private LinkCollectionWidget(IStorageService storageService, LinkCollectionData data)
     {
         _storageService = storageService;
         _dataFileName = $"{data.Id}.json";

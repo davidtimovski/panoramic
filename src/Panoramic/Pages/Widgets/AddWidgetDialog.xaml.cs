@@ -27,7 +27,7 @@ public sealed partial class AddWidgetDialog : Page
     private readonly IStorageService _storageService;
     private readonly AreaPicker _areaPicker;
 
-    private short step = 0;
+    private short step;
     private Area? selectedArea;
     private WidgetType? selectedWidgetType;
     private IWidgetForm? widgetForm;

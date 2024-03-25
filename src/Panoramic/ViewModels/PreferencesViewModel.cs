@@ -11,8 +11,8 @@ namespace Panoramic.ViewModels;
 
 public sealed partial class PreferencesViewModel : ObservableObject
 {
-    private readonly SolidColorBrush ThemeInfoLabelForegroundBrush;
-    private readonly SolidColorBrush ThemeInfoLabelForegroundHighlightedBrush;
+    private readonly SolidColorBrush _themeInfoLabelForegroundBrush;
+    private readonly SolidColorBrush _themeInfoLabelForegroundHighlightedBrush;
 
     private readonly IPreferencesService _preferencesService;
     private readonly IStorageService _storageService;
@@ -22,8 +22,8 @@ public sealed partial class PreferencesViewModel : ObservableObject
     {
         var currentTheme = Application.Current.RequestedTheme.ToString();
         var currentThemeDict = (ResourceDictionary)Application.Current.Resources.ThemeDictionaries[currentTheme];
-        ThemeInfoLabelForegroundBrush = (currentThemeDict["PanoramicPaleTextForeground"] as SolidColorBrush)!;
-        ThemeInfoLabelForegroundHighlightedBrush = (currentThemeDict["PanoramicBlueForeground"] as SolidColorBrush)!;
+        _themeInfoLabelForegroundBrush = (currentThemeDict["PanoramicPaleTextForeground"] as SolidColorBrush)!;
+        _themeInfoLabelForegroundHighlightedBrush = (currentThemeDict["PanoramicBlueForeground"] as SolidColorBrush)!;
 
         _preferencesService = preferencesService;
 
@@ -40,8 +40,8 @@ public sealed partial class PreferencesViewModel : ObservableObject
     private string selectedTheme;
 
     public SolidColorBrush ThemeInfoLabelForeground => SelectedTheme != originalTheme
-        ? ThemeInfoLabelForegroundHighlightedBrush
-        : ThemeInfoLabelForegroundBrush;
+        ? _themeInfoLabelForegroundHighlightedBrush
+        : _themeInfoLabelForegroundBrush;
 
     [ObservableProperty]
     private string storagePath;

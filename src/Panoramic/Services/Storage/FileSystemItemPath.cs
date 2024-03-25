@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Panoramic.Services;
+namespace Panoramic.Services.Storage;
 
 public sealed class FileSystemItemPath(string path, string storagePath)
 {
@@ -22,11 +22,6 @@ public sealed class FileSystemItemPath(string path, string storagePath)
             return false;
         }
 
-        if (obj is string stringPath)
-        {
-            return string.Equals(Absolute, stringPath, StringComparison.OrdinalIgnoreCase);
-        }
-
         if (obj is FileSystemItemPath fileSystemItemPath)
         {
             return string.Equals(Absolute, fileSystemItemPath.Absolute, StringComparison.OrdinalIgnoreCase);
@@ -34,6 +29,9 @@ public sealed class FileSystemItemPath(string path, string storagePath)
 
         throw new ArgumentException($"Cannot compare {nameof(FileSystemItemPath)} to {obj.GetType()}", nameof(obj));
     }
+    
+    public bool Equals(string? stringPath)
+        => stringPath is not null && string.Equals(Absolute, stringPath, StringComparison.OrdinalIgnoreCase);
 
     public override int GetHashCode() => Absolute.GetHashCode();
 }

@@ -76,7 +76,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
             }
 
             SetProperty(ref selectedNote, value);
-            OnPropertyChanged(nameof(SelectedNote));
+            OnPropertyChanged();
 
             Title = value is null ? "Notes" : value.Name;
             ExplorerVisible = value is null;
@@ -100,7 +100,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
     private bool editing;
 
     [ObservableProperty]
-    public Visibility tipVisibility;
+    private Visibility tipVisibility;
 
     public Visibility EditorVisibility => Editing ? Visibility.Visible : Visibility.Collapsed;
 

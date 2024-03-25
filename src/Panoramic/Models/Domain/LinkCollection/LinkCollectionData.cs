@@ -18,7 +18,7 @@ public sealed class LinkCollectionData : IWidgetData
     public required Area Area { get; set; }
 
     [JsonPropertyName("title")]
-    public string Title { get; set; } = "My links";
+    public string Title { get; init; } = "My links";
 
     [JsonRequired]
     [JsonPropertyName("links")]

@@ -10,7 +10,7 @@ public sealed class AreaJsonConverter : JsonConverter<Area>
     public override Area Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var areaName = reader.GetString()!;
-        return new(areaName);
+        return new Area(areaName);
     }
 
     public override void Write(Utf8JsonWriter writer, Area area, JsonSerializerOptions options)

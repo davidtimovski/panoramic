@@ -2,25 +2,25 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 
-namespace Panoramic.ViewModels.Widgets.LinkCollection;
+namespace Panoramic.ViewModels.Widgets;
 
 public partial class WidgetViewModel : ObservableObject
 {
-    private readonly SolidColorBrush BackgroundBrush;
-    private readonly SolidColorBrush BackgroundHighlightedBrush;
+    private readonly SolidColorBrush _backgroundBrush;
+    private readonly SolidColorBrush _backgroundHighlightedBrush;
 
-    public WidgetViewModel()
+    protected WidgetViewModel()
     {
         var currentTheme = Application.Current.RequestedTheme.ToString();
         var currentThemeDict = (ResourceDictionary)Application.Current.Resources.ThemeDictionaries[currentTheme];
 
-        BackgroundBrush = (currentThemeDict["PanoramicWidgetBackgroundBrush"] as SolidColorBrush)!;
-        BackgroundHighlightedBrush = (currentThemeDict["PanoramicWidgetHighlightedBackgroundBrush"] as SolidColorBrush)!;
+        _backgroundBrush = (currentThemeDict["PanoramicWidgetBackgroundBrush"] as SolidColorBrush)!;
+        _backgroundHighlightedBrush = (currentThemeDict["PanoramicWidgetHighlightedBackgroundBrush"] as SolidColorBrush)!;
     }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Background))]
     private bool highlighted;
 
-    public SolidColorBrush Background => Highlighted ? BackgroundHighlightedBrush : BackgroundBrush;
+    public SolidColorBrush Background => Highlighted ? _backgroundHighlightedBrush : _backgroundBrush;
 }

@@ -16,8 +16,6 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
     private const int BulletPointMarginBottom = 6;
     private const int NestedBulletPointMarginLeft = 12;
 
-    private readonly IEventHub _eventHub = eventHub;
-
     public IReadOnlyList<Paragraph> TextToMarkdownParagraphs(string text, string noteName, double fontSize)
     {
         var lines = text.Split('\r').Where(x => x.Trim().Length > 0).ToList();
@@ -275,7 +273,7 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
                 FontSize = fontSize,
                 NavigateUri = uri.Uri
             };
-            hyperlink.Click += (_, _) => _eventHub.RaiseHyperlinkClicked($"{uri.Text} - {noteName}", uri.Uri, DateTime.Now);
+            hyperlink.Click += (_, _) => eventHub.RaiseHyperlinkClicked($"{uri.Text} - {noteName}", uri.Uri, DateTime.Now);
             hyperlink.Inlines.Add(new Run { Text = uri.Text });
             paragraph.Inlines.Add(hyperlink);
 
@@ -289,7 +287,7 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
         }
     }
 
-    [GeneratedRegex("\\[([^\\[\\]]*)\\]\\((.*?)\\)")]
+    [GeneratedRegex(@"\[([^\[\]]*)\]\((.*?)\)")]
     private static partial Regex MyRegex();
 
     private sealed class StringSegment
