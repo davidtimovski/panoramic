@@ -17,7 +17,7 @@ public sealed class RecentLinksWidget : IWidget
     /// <summary>
     /// Constructs a new recent links widget.
     /// </summary>
-    public RecentLinksWidget(IStorageService storageService, Area area, string title, int capacity, bool onlyFromToday)
+    public RecentLinksWidget(IStorageService storageService, Area area, string title, int capacity, bool onlyFromToday, bool searchable)
     {
         _storageService = storageService;
 
@@ -28,6 +28,7 @@ public sealed class RecentLinksWidget : IWidget
         Title = title;
         Capacity = capacity;
         OnlyFromToday = onlyFromToday;
+        Searchable = searchable;
         links = [];
     }
 
@@ -44,6 +45,7 @@ public sealed class RecentLinksWidget : IWidget
         Title = data.Title;
         Capacity = data.Capacity;
         OnlyFromToday = data.OnlyFromToday;
+        Searchable = data.Searchable;
         links = data.Links.Select(x => new RecentLink { Title = x.Title, Uri = x.Uri, Clicked = x.Clicked }).ToList();
     }
 
@@ -53,6 +55,7 @@ public sealed class RecentLinksWidget : IWidget
     public string Title { get; set; }
     public int Capacity { get; set; }
     public bool OnlyFromToday { get; set; }
+    public bool Searchable { get; set; }
 
     private List<RecentLink> links;
     public IReadOnlyList<RecentLink> Links
@@ -106,6 +109,7 @@ public sealed class RecentLinksWidget : IWidget
             Title = Title,
             Capacity = Capacity,
             OnlyFromToday = OnlyFromToday,
+            Searchable = Searchable,
             Links = Links.Select(x => new RecentLinkData { Title = x.Title, Uri = x.Uri, Clicked = x.Clicked }).ToList()
         };
 

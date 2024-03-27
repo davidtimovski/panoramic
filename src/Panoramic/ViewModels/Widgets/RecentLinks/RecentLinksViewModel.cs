@@ -1,10 +1,12 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Services;
+using Panoramic.Services.Search;
 using Panoramic.Services.Storage;
 
 namespace Panoramic.ViewModels.Widgets.RecentLinks;
@@ -13,21 +15,27 @@ public sealed partial class RecentLinksViewModel : WidgetViewModel
 {
     private readonly IStorageService _storageService;
     private readonly IEventHub _eventHub;
+    private readonly ISearchService _searchService;
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly RecentLinksWidget _widget;
-    private string searchText = string.Empty;
 
     public RecentLinksViewModel(
         IStorageService storageService,
         IEventHub eventHub,
+        ISearchService searchService,
         DispatcherQueue dispatcherQueue,
         RecentLinksWidget widget)
     {
         _storageService = storageService;
 
         _eventHub = eventHub;
-        _eventHub.SearchInvoked += SearchInvoked;
         _eventHub.HyperlinkClicked += HyperlinkClicked;
+
+        _searchService = searchService;
+        if (widget.Searchable)
+        {
+            _searchService.SearchInvoked += SearchInvoked;
+        }
 
         _dispatcherQueue = dispatcherQueue;
 
@@ -53,11 +61,7 @@ public sealed partial class RecentLinksViewModel : WidgetViewModel
         Recent.Clear();
     }
 
-    private void SearchInvoked(object? _, string searchText)
-    {
-        this.searchText = searchText;
-        _dispatcherQueue.TryEnqueue(SetViewModel);
-    }
+    private void SearchInvoked(object? _, EventArgs e) => _dispatcherQueue.TryEnqueue(SetViewModel);
 
     private void HyperlinkClicked(object? _, HyperlinkClickedEventArgs e)
     {
@@ -71,9 +75,9 @@ public sealed partial class RecentLinksViewModel : WidgetViewModel
     private void SetViewModel()
     {
         var source = _widget.Links.AsEnumerable();
-        if (this.searchText.Length > 0)
+        if (_searchService.SearchText.Length > 0)
         {
-            source = source.Where(x => x.Matches(this.searchText));
+            source = source.Where(x => x.Matches(_searchService.SearchText));
 
             FilterIconVisibility = Visibility.Visible;
         }

@@ -7,6 +7,7 @@
     <Grid RowSpacing="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
         <TextBox Grid.Row="0"
@@ -14,6 +15,12 @@
                  Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  Header="Title"
                  MaxLength="60" />
+
+        <ToggleSwitch Grid.Row="1"
+                      IsOn="{x:Bind ViewModel.Searchable, Mode=TwoWay}"
+                      Header="Searchability"
+                      OffContent="Links will not be filtered by global search"
+                      OnContent="Links will be filtered by global search" />
     </Grid>
 
 </Page>

@@ -9,6 +9,7 @@ using Microsoft.Windows.AppLifecycle;
 using Panoramic.Services;
 using Panoramic.Services.Markdown;
 using Panoramic.Services.Preferences;
+using Panoramic.Services.Search;
 using Panoramic.Services.Storage;
 using Panoramic.ViewModels;
 using Windows.Storage;
@@ -42,6 +43,7 @@ public sealed partial class App : Application
 
         services.AddSingleton<IEventHub, EventHub>();
         services.AddSingleton<IMarkdownService, MarkdownService>();
+        services.AddSingleton<ISearchService, SearchService>();
 
         services.AddSingleton(DispatcherQueue.GetForCurrentThread());
     }

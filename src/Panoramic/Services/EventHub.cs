@@ -4,19 +4,14 @@ namespace Panoramic.Services;
 
 public interface IEventHub
 {
-    event EventHandler<string>? SearchInvoked;
     event EventHandler<HyperlinkClickedEventArgs>? HyperlinkClicked;
 
-    void RaiseSearchInvoked(string searchText);
     void RaiseHyperlinkClicked(string title, Uri uri, DateTime clicked);
 }
 
 public sealed class EventHub : IEventHub
 {
-    public event EventHandler<string>? SearchInvoked;
     public event EventHandler<HyperlinkClickedEventArgs>? HyperlinkClicked;
-
-    public void RaiseSearchInvoked(string searchText) => SearchInvoked?.Invoke(this, searchText);
 
     public void RaiseHyperlinkClicked(string title, Uri uri, DateTime clicked)
         => HyperlinkClicked?.Invoke(this, new HyperlinkClickedEventArgs

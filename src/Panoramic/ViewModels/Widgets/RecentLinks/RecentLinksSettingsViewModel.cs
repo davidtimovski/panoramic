@@ -38,6 +38,9 @@ public sealed partial class RecentLinksSettingsViewModel(IStorageService storage
     [ObservableProperty]
     private bool onlyFromToday = data.OnlyFromToday;
 
+    [ObservableProperty]
+    private bool searchable = data.Searchable;
+
     public void AttachValidationHandler(EventHandler<ValidationEventArgs> handler)
     {
         Validated += handler;
@@ -48,7 +51,7 @@ public sealed partial class RecentLinksSettingsViewModel(IStorageService storage
     {
         if (Id == Guid.Empty)
         {
-            var widget = new RecentLinksWidget(storageService, Area, Title.Trim(), Capacity, OnlyFromToday);
+            var widget = new RecentLinksWidget(storageService, Area, Title.Trim(), Capacity, OnlyFromToday, Searchable);
             await storageService.AddNewWidgetAsync(widget);
         }
         else
@@ -58,6 +61,7 @@ public sealed partial class RecentLinksSettingsViewModel(IStorageService storage
             widget.Title = Title;
             widget.Capacity = Capacity;
             widget.OnlyFromToday = OnlyFromToday;
+            widget.Searchable = Searchable;
 
             await storageService.SaveWidgetAsync(widget);
         }

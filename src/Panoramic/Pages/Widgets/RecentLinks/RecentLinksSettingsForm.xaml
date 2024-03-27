@@ -9,6 +9,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBox Grid.Row="0"
@@ -20,7 +21,6 @@
         <NumberBox Grid.Row="1"
                    Value="{x:Bind ViewModel.Capacity, Mode=TwoWay}"
                    Header="Capacity"
-                   Description="The maximum amount of links it will hold."
                    SpinButtonPlacementMode="Compact"
                    Minimum="3"
                    Maximum="100" />
@@ -30,6 +30,12 @@
                       Header="Only from today"
                       OffContent="Show all links"
                       OnContent="Show only today's clicked links" />
+
+        <ToggleSwitch Grid.Row="3"
+                      IsOn="{x:Bind ViewModel.Searchable, Mode=TwoWay}"
+                      Header="Searchability"
+                      OffContent="Links will not be filtered by global search"
+                      OnContent="Links will be filtered by global search" />
     </Grid>
 
 </Page>

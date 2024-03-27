@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Services;
+using Panoramic.Services.Search;
 using Panoramic.Services.Storage;
 using Panoramic.ViewModels.Widgets.LinkCollection;
 
@@ -29,7 +30,8 @@ public sealed partial class LinkCollectionWidgetPage : Page
         _widget = widget;
 
         var eventHub = serviceProvider.GetRequiredService<IEventHub>();
-        ViewModel = new LinkCollectionViewModel(eventHub, _dispatcherQueue, widget);
+        var searchService = serviceProvider.GetRequiredService<ISearchService>();
+        ViewModel = new LinkCollectionViewModel(eventHub, searchService, _dispatcherQueue, widget);
     }
 
     public LinkCollectionViewModel ViewModel { get; }

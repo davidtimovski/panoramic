@@ -1,25 +1,32 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Services;
+using Panoramic.Services.Search;
 
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
 public sealed partial class LinkCollectionViewModel : WidgetViewModel
 {
     private readonly IEventHub _eventHub;
+    private readonly ISearchService _searchService;
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly LinkCollectionWidget _widget;
-    private string searchText = string.Empty;
 
-    public LinkCollectionViewModel(IEventHub eventHub, DispatcherQueue dispatcherQueue, LinkCollectionWidget widget)
+    public LinkCollectionViewModel(IEventHub eventHub, ISearchService searchService, DispatcherQueue dispatcherQueue, LinkCollectionWidget widget)
     {
         _eventHub = eventHub;
-        _eventHub.SearchInvoked += SearchInvoked;
 
+        _searchService = searchService;
+        if (widget.Searchable)
+        {
+            _searchService.SearchInvoked += SearchInvoked;
+        }
+            
         _dispatcherQueue = dispatcherQueue;
 
         _widget = widget;
@@ -36,18 +43,14 @@ public sealed partial class LinkCollectionViewModel : WidgetViewModel
     [ObservableProperty]
     private Visibility filterIconVisibility = Visibility.Collapsed;
 
-    private void SearchInvoked(object? _, string searchText)
-    {
-        this.searchText = searchText;
-        _dispatcherQueue.TryEnqueue(SetViewModel);
-    }
+    private void SearchInvoked(object? _, EventArgs e) => _dispatcherQueue.TryEnqueue(SetViewModel);
 
     private void SetViewModel()
     {
         var source = _widget.Links.AsEnumerable();
-        if (this.searchText.Length > 0)
+        if (_searchService.SearchText.Length > 0)
         {
-            source = source.Where(x => x.Matches(this.searchText));
+            source = source.Where(x => x.Matches(_searchService.SearchText));
 
             FilterIconVisibility = Visibility.Visible;
         }

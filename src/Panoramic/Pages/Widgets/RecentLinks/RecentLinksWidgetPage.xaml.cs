@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Services;
+using Panoramic.Services.Search;
 using Panoramic.Services.Storage;
 using Panoramic.ViewModels.Widgets.RecentLinks;
 
@@ -24,8 +25,9 @@ public sealed partial class RecentLinksWidgetPage : Page
         _widget = widget;
 
         var eventHub = serviceProvider.GetRequiredService<IEventHub>();
+        var searchService = serviceProvider.GetRequiredService<ISearchService>();
         var dispatcherQueue = serviceProvider.GetRequiredService<DispatcherQueue>();
-        ViewModel = new RecentLinksViewModel(_storageService, eventHub, dispatcherQueue, widget);
+        ViewModel = new RecentLinksViewModel(_storageService, eventHub, searchService, dispatcherQueue, widget);
     }
 
     public RecentLinksViewModel ViewModel { get; }

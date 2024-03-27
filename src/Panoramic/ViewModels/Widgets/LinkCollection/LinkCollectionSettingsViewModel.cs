@@ -32,6 +32,9 @@ public sealed partial class LinkCollectionSettingsViewModel(IStorageService stor
         }
     }
 
+    [ObservableProperty]
+    private bool searchable = data.Searchable;
+
     public void AttachValidationHandler(EventHandler<ValidationEventArgs> handler)
     {
         Validated += handler;
@@ -42,7 +45,7 @@ public sealed partial class LinkCollectionSettingsViewModel(IStorageService stor
     {
         if (Id == Guid.Empty)
         {
-            var widget = new LinkCollectionWidget(storageService, Area, Title.Trim());
+            var widget = new LinkCollectionWidget(storageService, Area, Title.Trim(), Searchable);
             await storageService.AddNewWidgetAsync(widget);
         }
         else
@@ -50,6 +53,7 @@ public sealed partial class LinkCollectionSettingsViewModel(IStorageService stor
             var widget = (LinkCollectionWidget)storageService.Widgets[Id];
             widget.Area = Area;
             widget.Title = Title.Trim();
+            widget.Searchable = Searchable;
 
             await storageService.SaveWidgetAsync(widget);
         }

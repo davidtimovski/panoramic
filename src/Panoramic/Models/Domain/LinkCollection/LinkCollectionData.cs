@@ -21,6 +21,10 @@ public sealed class LinkCollectionData : IWidgetData
     public string Title { get; init; } = "My links";
 
     [JsonRequired]
+    [JsonPropertyName("searchable")]
+    public bool Searchable { get; set; } = true;
+
+    [JsonRequired]
     [JsonPropertyName("links")]
     public required List<LinkCollectionItemData> Links { get; init; }
 }

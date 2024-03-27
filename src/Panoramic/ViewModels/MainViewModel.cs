@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Dispatching;
-using Panoramic.Services;
+using Panoramic.Services.Search;
 
 namespace Panoramic.ViewModels;
 
@@ -11,15 +11,15 @@ public sealed class MainViewModel : ObservableObject
     private static readonly TimeSpan SearchTextChangeDebounceInterval = TimeSpan.FromMilliseconds(250);
 
     private readonly DispatcherQueueTimer _debounceTimer;
-    private readonly IEventHub _eventHub;
+    private readonly ISearchService _searchService;
 
-    public MainViewModel(IEventHub eventHub)
+    public MainViewModel(ISearchService searchService)
     {
         var queueController = DispatcherQueueController.CreateOnDedicatedThread();
         var queue = queueController.DispatcherQueue;
         _debounceTimer = queue.CreateTimer();
 
-        _eventHub = eventHub;
+        _searchService = searchService;
     }
 
     private string searchText = string.Empty;
@@ -36,7 +36,7 @@ public sealed class MainViewModel : ObservableObject
             OnPropertyChanged();
 
             var trimmed = value.Trim();
-            _debounceTimer.Debounce(() => _eventHub.RaiseSearchInvoked(trimmed), SearchTextChangeDebounceInterval);
+            _debounceTimer.Debounce(() => _searchService.Search(trimmed), SearchTextChangeDebounceInterval);
         }
     }
 }

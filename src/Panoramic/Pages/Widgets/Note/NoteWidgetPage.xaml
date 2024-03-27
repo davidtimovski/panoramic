@@ -19,142 +19,140 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <Border Padding="15" Background="{x:Bind ViewModel.Background, Mode=OneWay}" CornerRadius="{StaticResource PanoramicWidgetCornerRadius}">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+    <Grid Background="{x:Bind ViewModel.Background, Mode=OneWay}" CornerRadius="{StaticResource PanoramicWidgetCornerRadius}" Padding="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-            <Border Grid.Row="0">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+        <Border Grid.Row="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0" Text="{x:Bind ViewModel.Title, Mode=OneWay}" FontSize="16" Foreground="{StaticResource PanoramicWidgetForegroundBrush}" TextWrapping="Wrap" />
+                <TextBlock Grid.Column="0" Text="{x:Bind ViewModel.Title, Mode=OneWay}" Foreground="{StaticResource PanoramicWidgetForegroundBrush}" FontSize="16" TextWrapping="Wrap" />
 
-                    <ToggleButton Grid.Column="1"
-                                  Click="EditButton_Click"
-                                  Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}"
-                                  IsChecked="{x:Bind ViewModel.Editing, Mode=TwoWay}"
-                                  ToolTipService.ToolTip="{x:Bind ViewModel.EditToggleTooltip, Mode=OneWay}"
-                                  Margin="0 0 10 0">
-                        <FontIcon Glyph="&#xE70F;" FontSize="14" />
-                    </ToggleButton>
+                <ToggleButton Grid.Column="1"
+                          Click="EditButton_Click"
+                          Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}"
+                          IsChecked="{x:Bind ViewModel.Editing, Mode=TwoWay}"
+                          ToolTipService.ToolTip="{x:Bind ViewModel.EditToggleTooltip, Mode=OneWay}"
+                          Margin="0 0 10 0">
+                    <FontIcon Glyph="&#xE70F;" FontSize="14" />
+                </ToggleButton>
 
-                    <DropDownButton Grid.Column="2" AutomationProperties.Name="Setting">
-                        <DropDownButton.Content>
-                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE712;" FontSize="14" />
-                        </DropDownButton.Content>
-                        <DropDownButton.Flyout>
-                            <MenuFlyout Placement="Bottom">
-                                <MenuFlyoutItem Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" Click="{x:Bind ViewModel.DeselectNote}">Explore</MenuFlyoutItem>
-                                <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" />
-                                <MenuFlyoutItem Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" Click="DeleteNoteFromContextMenu_Click">Delete note</MenuFlyoutItem>
-                                <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" />
-                                <MenuFlyoutItem Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}" Click="AddNoteFromContextMenu_Click">Add note</MenuFlyoutItem>
-                                <MenuFlyoutItem Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}" Click="AddFolderFromContextMenu_Click">Add folder</MenuFlyoutItem>
-                                <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}" />
-                                <MenuFlyoutItem Click="SettingsButton_Click">Settings</MenuFlyoutItem>
-                                <MenuFlyoutItem Click="DeleteButton_Click">Delete</MenuFlyoutItem>
-                            </MenuFlyout>
-                        </DropDownButton.Flyout>
-                    </DropDownButton>
-                </Grid>
-            </Border>
+                <DropDownButton Grid.Column="2" AutomationProperties.Name="Setting">
+                    <DropDownButton.Content>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE712;" FontSize="14" />
+                    </DropDownButton.Content>
+                    <DropDownButton.Flyout>
+                        <MenuFlyout Placement="Bottom">
+                            <MenuFlyoutItem Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" Click="{x:Bind ViewModel.DeselectNote}">Explore</MenuFlyoutItem>
+                            <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" />
+                            <MenuFlyoutItem Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" Click="DeleteNoteFromContextMenu_Click">Delete note</MenuFlyoutItem>
+                            <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" />
+                            <MenuFlyoutItem Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}" Click="AddNoteFromContextMenu_Click">Add note</MenuFlyoutItem>
+                            <MenuFlyoutItem Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}" Click="AddFolderFromContextMenu_Click">Add folder</MenuFlyoutItem>
+                            <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}" />
+                            <MenuFlyoutItem Click="SettingsButton_Click">Settings</MenuFlyoutItem>
+                            <MenuFlyoutItem Click="DeleteButton_Click">Delete</MenuFlyoutItem>
+                        </MenuFlyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+            </Grid>
+        </Border>
 
-            <Border Grid.Row="1" Margin="0 15 0 0">
-                <Border.Resources>
-                    <DataTemplate x:Key="FolderTemplate" x:DataType="m:ExplorerItem">
-                        <TreeViewItem AutomationProperties.Name="{x:Bind Name}" ItemsSource="{x:Bind Children}" IsExpanded="True">
-                            <TreeViewItem.ContextFlyout>
-                                <MenuBarItemFlyout>
-                                    <MenuFlyoutItem Click="AddNote_Click">Add note</MenuFlyoutItem>
-                                    <MenuFlyoutItem Click="AddFolder_Click">Add folder</MenuFlyoutItem>
-                                    <MenuFlyoutItem Click="RenameFolder_Click" Visibility="{x:Bind RenameDeleteVisible}">Rename</MenuFlyoutItem>
-                                    <MenuFlyoutItem Click="DeleteFolder_Click" Visibility="{x:Bind RenameDeleteVisible}">Delete</MenuFlyoutItem>
-                                </MenuBarItemFlyout>
-                            </TreeViewItem.ContextFlyout>
-                            
-                            <StackPanel Orientation="Horizontal">
-                                <FontIcon Glyph="&#xE8B7;" Foreground="{StaticResource PanoramicFileSystemIconForegroundBrush}" />
-                                <TextBlock Text="{x:Bind Name}" Margin="10 0 0 0" />
-                            </StackPanel>
-                        </TreeViewItem>
-                    </DataTemplate>
+        <Border Grid.Row="1" Margin="0 15 0 0">
+            <Border.Resources>
+                <DataTemplate x:Key="FolderTemplate" x:DataType="m:ExplorerItem">
+                    <TreeViewItem AutomationProperties.Name="{x:Bind Name}" ItemsSource="{x:Bind Children}" IsExpanded="True">
+                        <TreeViewItem.ContextFlyout>
+                            <MenuBarItemFlyout>
+                                <MenuFlyoutItem Click="AddNote_Click">Add note</MenuFlyoutItem>
+                                <MenuFlyoutItem Click="AddFolder_Click">Add folder</MenuFlyoutItem>
+                                <MenuFlyoutItem Click="RenameFolder_Click" Visibility="{x:Bind RenameDeleteVisible}">Rename</MenuFlyoutItem>
+                                <MenuFlyoutItem Click="DeleteFolder_Click" Visibility="{x:Bind RenameDeleteVisible}">Delete</MenuFlyoutItem>
+                            </MenuBarItemFlyout>
+                        </TreeViewItem.ContextFlyout>
 
-                    <DataTemplate x:Key="FileTemplate" x:DataType="m:ExplorerItem">
-                        <TreeViewItem AutomationProperties.Name="{x:Bind Name}" IsEnabled="{x:Bind IsEnabled, Mode=OneWay}">
-                            <TreeViewItem.ContextFlyout>
-                                <MenuBarItemFlyout>
-                                    <MenuFlyoutItem Click="RenameNote_Click">Rename</MenuFlyoutItem>
-                                    <MenuFlyoutItem Click="DeleteNote_Click">Delete</MenuFlyoutItem>
-                                </MenuBarItemFlyout>
-                            </TreeViewItem.ContextFlyout>
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon Glyph="&#xE8B7;" Foreground="{StaticResource PanoramicFileSystemIconForegroundBrush}" />
+                            <TextBlock Text="{x:Bind Name}" Margin="10 0 0 0" />
+                        </StackPanel>
+                    </TreeViewItem>
+                </DataTemplate>
 
-                            <StackPanel Orientation="Horizontal" Opacity="{x:Bind Opacity, Mode=OneWay}">
-                                <FontIcon Glyph="&#xE8A5;" Foreground="{StaticResource PanoramicBlueForeground}" />
-                                <TextBlock Text="{x:Bind Name}" Margin="10 0 0 0" />
-                            </StackPanel>
-                        </TreeViewItem>
-                    </DataTemplate>
+                <DataTemplate x:Key="FileTemplate" x:DataType="m:ExplorerItem">
+                    <TreeViewItem AutomationProperties.Name="{x:Bind Name}" IsEnabled="{x:Bind IsEnabled, Mode=OneWay}">
+                        <TreeViewItem.ContextFlyout>
+                            <MenuBarItemFlyout>
+                                <MenuFlyoutItem Click="RenameNote_Click">Rename</MenuFlyoutItem>
+                                <MenuFlyoutItem Click="DeleteNote_Click">Delete</MenuFlyoutItem>
+                            </MenuBarItemFlyout>
+                        </TreeViewItem.ContextFlyout>
 
-                    <m:ExplorerItemTemplateSelector x:Key="ExplorerItemTemplateSelector"
-                        FolderTemplate="{StaticResource FolderTemplate}"
-                        FileTemplate="{StaticResource FileTemplate}" />
-                </Border.Resources>
+                        <StackPanel Orientation="Horizontal" Opacity="{x:Bind Opacity, Mode=OneWay}">
+                            <FontIcon Glyph="&#xE8A5;" Foreground="{StaticResource PanoramicBlueForeground}" />
+                            <TextBlock Text="{x:Bind Name}" Margin="10 0 0 0" />
+                        </StackPanel>
+                    </TreeViewItem>
+                </DataTemplate>
 
-                <Grid>
-                    <TreeView ItemsSource="{x:Bind ViewModel.ExplorerItems, Mode=OneWay}"
-                              ItemTemplateSelector="{StaticResource ExplorerItemTemplateSelector}"
-                              Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}"
-                              SelectedItem="{x:Bind ViewModel.SelectedNote, Mode=TwoWay}"
-                              CanDragItems="False"
-                              AllowDrop="False" />
+                <m:ExplorerItemTemplateSelector x:Key="ExplorerItemTemplateSelector"
+                FolderTemplate="{StaticResource FolderTemplate}"
+                FileTemplate="{StaticResource FileTemplate}" />
+            </Border.Resources>
 
-                    <ScrollView Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" Height="Auto">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
+            <Grid>
+                <TreeView ItemsSource="{x:Bind ViewModel.ExplorerItems, Mode=OneWay}"
+                      ItemTemplateSelector="{StaticResource ExplorerItemTemplateSelector}"
+                      Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}"
+                      SelectedItem="{x:Bind ViewModel.SelectedNote, Mode=TwoWay}"
+                      CanDragItems="False"
+                      AllowDrop="False" />
 
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
+                <ScrollView Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" Height="Auto">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
 
-                            <TextBox Grid.Row="0"
-                                     Grid.Column="0"
-                                     x:Name="Editor"
-                                     Text="{x:Bind ViewModel.SelectedNote.Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                     Visibility="{x:Bind ViewModel.EditorVisibility, Mode=OneWay}"
-                                     FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}"
-                                     FontSize="{x:Bind ViewModel.FontSize, Mode=OneWay}"
-                                     Foreground="{StaticResource PanoramicWidgetForegroundBrush}"
-                                     AcceptsReturn="True"
-                                     TextWrapping="Wrap" />
-                            <RichTextBlock Grid.Row="0"
-                                           Grid.Column="0"
-                                           x:Name="Presenter"
-                                           Visibility="{x:Bind ViewModel.PresenterVisibility, Mode=OneWay}"
-                                           FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}"
-                                           Foreground="{StaticResource PanoramicWidgetForegroundBrush}" />
-                        </Grid>
-                    </ScrollView>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
 
-                    <TextBlock Visibility="{x:Bind ViewModel.TipVisibility, Mode=OneWay}"
-                               Foreground="{StaticResource PanoramicPaleTextForeground}"
-                               MaxWidth="400"
-                               HorizontalTextAlignment="Center"
-                               VerticalAlignment="Center"
-                               TextWrapping="Wrap"
-                               LineHeight="22">This is your explorer view. Use the top-right menu "..." to add notes or folders to the root level. Right-click on folders to add files inside. Newly added notes will open automatically. Use the same top-right menu to switch back to this view.</TextBlock>
-                </Grid>
-            </Border>
+                        <TextBox Grid.Row="0"
+                             Grid.Column="0"
+                             x:Name="Editor"
+                             Text="{x:Bind ViewModel.SelectedNote.Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Visibility="{x:Bind ViewModel.EditorVisibility, Mode=OneWay}"
+                             FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}"
+                             FontSize="{x:Bind ViewModel.FontSize, Mode=OneWay}"
+                             Foreground="{StaticResource PanoramicWidgetForegroundBrush}"
+                             AcceptsReturn="True"
+                             TextWrapping="Wrap" />
+                        <RichTextBlock Grid.Row="0"
+                                   Grid.Column="0"
+                                   x:Name="Presenter"
+                                   Visibility="{x:Bind ViewModel.PresenterVisibility, Mode=OneWay}"
+                                   FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}"
+                                   Foreground="{StaticResource PanoramicWidgetForegroundBrush}" />
+                    </Grid>
+                </ScrollView>
 
-        </Grid>
-    </Border>
+                <TextBlock Visibility="{x:Bind ViewModel.TipVisibility, Mode=OneWay}"
+                       Foreground="{StaticResource PanoramicPaleTextForeground}"
+                       MaxWidth="400"
+                       HorizontalTextAlignment="Center"
+                       VerticalAlignment="Center"
+                       TextWrapping="Wrap"
+                       LineHeight="22">This is your explorer view. Use the top-right menu "..." to add notes or folders to the root level. Right-click on folders to add files inside. Newly added notes will open automatically. Use the same top-right menu to switch back to this view.</TextBlock>
+            </Grid>
+        </Border>
+
+    </Grid>
 
 </Page>
