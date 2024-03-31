@@ -27,7 +27,7 @@
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE71C;" FontSize="10" />
                     </Border>
 
-                    <DropDownButton Grid.Column="1" AutomationProperties.Name="Setting">
+                    <DropDownButton AutomationProperties.Name="Setting">
                         <DropDownButton.Content>
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE712;" FontSize="14" />
                         </DropDownButton.Content>

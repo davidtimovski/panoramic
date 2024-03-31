@@ -68,24 +68,20 @@ public sealed class NoteWidget : IWidget
             RelativeFilePath = NotePath?.Relative
         };
 
-    public static bool FolderCanBeCreated(string title, string directory)
+    public static bool FolderCanBeCreated(string name, string directory)
     {
-        title = title.Trim();
-
-        if (string.Equals(title, "widgets", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(name, "widgets", StringComparison.OrdinalIgnoreCase))
         {
             return false;
         }
 
-        var path = Path.Combine(directory, title);
+        var path = Path.Combine(directory, name);
         return !Directory.Exists(path);
     }
 
-    public static bool NoteCanBeCreated(string title, string directory)
+    public static bool NoteCanBeCreated(string name, string directory)
     {
-        title = title.Trim();
-
-        var path = Path.Combine(directory, $"{title}.md");
+        var path = Path.Combine(directory, $"{name}.md");
         return !File.Exists(path);
     }
 

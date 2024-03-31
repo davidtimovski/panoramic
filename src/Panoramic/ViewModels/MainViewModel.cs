@@ -6,21 +6,12 @@ using Panoramic.Services.Search;
 
 namespace Panoramic.ViewModels;
 
-public sealed class MainViewModel : ObservableObject
+public sealed class MainViewModel(DispatcherQueue dispatcherQueue, ISearchService searchService) : ObservableObject
 {
     private static readonly TimeSpan SearchTextChangeDebounceInterval = TimeSpan.FromMilliseconds(250);
 
-    private readonly DispatcherQueueTimer _debounceTimer;
-    private readonly ISearchService _searchService;
-
-    public MainViewModel(ISearchService searchService)
-    {
-        var queueController = DispatcherQueueController.CreateOnDedicatedThread();
-        var queue = queueController.DispatcherQueue;
-        _debounceTimer = queue.CreateTimer();
-
-        _searchService = searchService;
-    }
+    private readonly DispatcherQueueTimer _debounceTimer = dispatcherQueue.CreateTimer();
+    private readonly ISearchService _searchService = searchService;
 
     private string searchText = string.Empty;
     public string SearchText

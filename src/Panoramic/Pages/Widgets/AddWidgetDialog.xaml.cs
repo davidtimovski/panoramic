@@ -4,15 +4,18 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models;
 using Panoramic.Models.Domain;
+using Panoramic.Models.Domain.Checklist;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Models.Events;
+using Panoramic.Pages.Widgets.Checklist;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
 using Panoramic.Services.Storage;
 using Panoramic.UserControls;
+using Panoramic.ViewModels.Widgets.Checklist;
 using Panoramic.ViewModels.Widgets.LinkCollection;
 using Panoramic.ViewModels.Widgets.Note;
 using Panoramic.ViewModels.Widgets.RecentLinks;
@@ -132,6 +135,20 @@ public sealed partial class AddWidgetDialog : Page
 
                 widgetForm = recentLinksForm;
                 ContentFrame.Content = recentLinksForm;
+                break;
+            case WidgetType.Checklist:
+                var checklistVm = new ChecklistSettingsViewModel(_storageService, new ChecklistData
+                {
+                    Id = Guid.Empty,
+                    Area = selectedArea!,
+                    Tasks = []
+                });
+                checklistVm.AttachValidationHandler(Validated!);
+
+                var checklistForm = new ChecklistSettingsForm(checklistVm);
+
+                widgetForm = checklistForm;
+                ContentFrame.Content = checklistForm;
                 break;
             default:
                 throw new InvalidOperationException("Unsupported widget type");

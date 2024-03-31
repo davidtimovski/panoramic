@@ -6,13 +6,14 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Panoramic.Services.Preferences;
 using Panoramic.Services.Storage;
+using Panoramic.Utils;
 
 namespace Panoramic.ViewModels;
 
 public sealed partial class PreferencesViewModel : ObservableObject
 {
-    private readonly SolidColorBrush _themeInfoLabelForegroundBrush;
-    private readonly SolidColorBrush _themeInfoLabelForegroundHighlightedBrush;
+    private readonly SolidColorBrush _themeInfoLabelForeground;
+    private readonly SolidColorBrush _themeInfoLabelForegroundHighlighted;
 
     private readonly IPreferencesService _preferencesService;
     private readonly IStorageService _storageService;
@@ -20,10 +21,8 @@ public sealed partial class PreferencesViewModel : ObservableObject
 
     public PreferencesViewModel(IPreferencesService preferencesService, IStorageService storageService)
     {
-        var currentTheme = Application.Current.RequestedTheme.ToString();
-        var currentThemeDict = (ResourceDictionary)Application.Current.Resources.ThemeDictionaries[currentTheme];
-        _themeInfoLabelForegroundBrush = (currentThemeDict["PanoramicPaleTextForeground"] as SolidColorBrush)!;
-        _themeInfoLabelForegroundHighlightedBrush = (currentThemeDict["PanoramicBlueForeground"] as SolidColorBrush)!;
+        _themeInfoLabelForeground = ResourceUtil.PaleTextForeground;
+        _themeInfoLabelForegroundHighlighted = ResourceUtil.HighlightedForeground;
 
         _preferencesService = preferencesService;
 
@@ -40,8 +39,8 @@ public sealed partial class PreferencesViewModel : ObservableObject
     private string selectedTheme;
 
     public SolidColorBrush ThemeInfoLabelForeground => SelectedTheme != originalTheme
-        ? _themeInfoLabelForegroundHighlightedBrush
-        : _themeInfoLabelForegroundBrush;
+        ? _themeInfoLabelForegroundHighlighted
+        : _themeInfoLabelForeground;
 
     [ObservableProperty]
     private string storagePath;

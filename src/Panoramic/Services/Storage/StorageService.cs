@@ -13,6 +13,7 @@ using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Utils;
+using Panoramic.Models.Domain.Checklist;
 
 namespace Panoramic.Services.Storage;
 
@@ -378,6 +379,10 @@ public sealed class StorageService : IStorageService
             case WidgetType.RecentLinks:
                 var recentLinksWidget = RecentLinksWidget.Load(this, json);
                 Widgets.Add(recentLinksWidget.Id, recentLinksWidget);
+                break;
+            case WidgetType.Checklist:
+                var checklistWidget = ChecklistWidget.Load(this, json);
+                Widgets.Add(checklistWidget.Id, checklistWidget);
                 break;
             default:
                 throw new InvalidOperationException("Unsupported widget type");

@@ -21,6 +21,7 @@
                     <SolidColorBrush x:Key="PanoramicWidgetForegroundBrush" Color="#333" />
 
                     <SolidColorBrush x:Key="PanoramicBlueForeground" Color="#003E92" />
+                    <SolidColorBrush x:Key="PanoramicHighlightedForeground" Color="#ac9100" />
                     <SolidColorBrush x:Key="PanoramicPaleTextForeground" Color="#888" />
                 </ResourceDictionary>
 
@@ -33,6 +34,7 @@
                     <SolidColorBrush x:Key="PanoramicWidgetForegroundBrush" Color="#eee" />
 
                     <SolidColorBrush x:Key="PanoramicBlueForeground" Color="#8DD7E9" />
+                    <SolidColorBrush x:Key="PanoramicHighlightedForeground" Color="#ecd100" />
                     <SolidColorBrush x:Key="PanoramicPaleTextForeground" Color="#aaa" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>

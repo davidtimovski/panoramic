@@ -28,8 +28,8 @@ public sealed partial class EditViewModel : ObservableObject
         IStorageService storageService,
         LinkCollectionData data)
     {
-        _dispatcherQueue = dispatcherQueue;
         _httpClient = httpClient;
+        _dispatcherQueue = dispatcherQueue;
         _storageService = storageService;
         _id = data.Id;
 

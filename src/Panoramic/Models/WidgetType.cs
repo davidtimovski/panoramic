@@ -5,4 +5,5 @@ public enum WidgetType
     Note,
     LinkCollection,
     RecentLinks,
+    Checklist,
 }

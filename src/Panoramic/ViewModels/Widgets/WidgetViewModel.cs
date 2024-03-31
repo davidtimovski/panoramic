@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
+using Panoramic.Utils;
 
 namespace Panoramic.ViewModels.Widgets;
 
@@ -11,11 +11,8 @@ public partial class WidgetViewModel : ObservableObject
 
     protected WidgetViewModel()
     {
-        var currentTheme = Application.Current.RequestedTheme.ToString();
-        var currentThemeDict = (ResourceDictionary)Application.Current.Resources.ThemeDictionaries[currentTheme];
-
-        _backgroundBrush = (currentThemeDict["PanoramicWidgetBackgroundBrush"] as SolidColorBrush)!;
-        _backgroundHighlightedBrush = (currentThemeDict["PanoramicWidgetHighlightedBackgroundBrush"] as SolidColorBrush)!;
+        _backgroundBrush = ResourceUtil.WidgetBackground;
+        _backgroundHighlightedBrush = ResourceUtil.WidgetHighlightedBackground;
     }
 
     [ObservableProperty]

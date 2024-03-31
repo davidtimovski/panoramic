@@ -12,7 +12,11 @@
         <TextBox Grid.Row="0"
                  x:Name="NameTextBox"
                  Text="{x:Bind ViewModel.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 MaxLength="60" />
+                 MaxLength="60">
+            <TextBox.KeyboardAccelerators>
+                <KeyboardAccelerator Key="Enter" Modifiers="None" Invoked="TextBoxEnter_Pressed" />
+            </TextBox.KeyboardAccelerators>
+        </TextBox>
     </Grid>
 
 </Page>

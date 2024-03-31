@@ -5,11 +5,13 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Panoramic.Models;
+using Panoramic.Models.Domain.Checklist;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Pages;
 using Panoramic.Pages.Widgets;
+using Panoramic.Pages.Widgets.Checklist;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
@@ -98,6 +100,7 @@ public sealed partial class MainWindow : Window
             WidgetType.Note => new NoteWidgetPage(_serviceProvider, (NoteWidget)widget),
             WidgetType.LinkCollection => new LinkCollectionWidgetPage(_serviceProvider, (LinkCollectionWidget)widget),
             WidgetType.RecentLinks => new RecentLinksWidgetPage(_serviceProvider, (RecentLinksWidget)widget),
+            WidgetType.Checklist => new ChecklistWidgetPage(_serviceProvider, (ChecklistWidget)widget),
             _ => throw new InvalidOperationException("Unsupported widget type")
         };
 
@@ -152,6 +155,21 @@ public sealed partial class MainWindow : Window
         }
 
         SearchBox.Text = string.Empty;
+
+        args.Handled = true;
+    }
+
+    private void ControlTHotkey_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        var checklistWidgets = _storageService.Widgets.Where(x => x.Value.Type == WidgetType.Checklist).ToList();
+        if (checklistWidgets.Count != 1)
+        {
+            return;
+        }
+
+        var checklistWidget = checklistWidgets[0].Value;
+        var checklistWidgetPage = Grid.Children.OfType<ChecklistWidgetPage>().FirstOrDefault(x => x.Name == checklistWidget.Id.ToString("N"));
+        checklistWidgetPage?.OpenNewTaskDialog();
 
         args.Handled = true;
     }

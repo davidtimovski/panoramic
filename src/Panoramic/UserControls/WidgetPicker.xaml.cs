@@ -10,7 +10,7 @@ namespace Panoramic.UserControls;
 
 public sealed partial class WidgetPicker : UserControl
 {
-    private readonly Dictionary<WidgetType, ToggleButton> _toggleLookup = [];
+    private readonly Dictionary<WidgetType, ToggleButton> _toggleLookup = new(4);
 
     public WidgetPicker(WidgetType? widgetType)
     {
@@ -21,6 +21,7 @@ public sealed partial class WidgetPicker : UserControl
         _toggleLookup.Add(WidgetType.Note, NoteToggle);
         _toggleLookup.Add(WidgetType.LinkCollection, LinkCollectionToggle);
         _toggleLookup.Add(WidgetType.RecentLinks, RecentLinksToggle);
+        _toggleLookup.Add(WidgetType.Checklist, ChecklistToggle);
 
         if (widgetType is not null)
         {

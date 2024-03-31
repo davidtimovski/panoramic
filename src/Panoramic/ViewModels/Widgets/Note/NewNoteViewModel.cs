@@ -23,7 +23,7 @@ public sealed class NewNoteViewModel(string directory) : ObservableObject
 
     public event EventHandler<ValidationEventArgs>? Validated;
 
-    private void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
+    public bool CanBeCreated() => Name.Trim().Length > 0 && NoteWidget.NoteCanBeCreated(Name.Trim(), directory);
 
-    private bool CanBeCreated() => Name.Trim().Length > 0 && NoteWidget.NoteCanBeCreated(Name.Trim(), directory);
+    private void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
 }

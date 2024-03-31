@@ -23,7 +23,7 @@ public sealed class NewFolderViewModel(string directory) : ObservableObject
 
     public event EventHandler<ValidationEventArgs>? Validated;
 
-    private void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
+    public bool CanBeCreated() => Name.Trim().Length > 0 && NoteWidget.FolderCanBeCreated(Name.Trim(), directory);
 
-    private bool CanBeCreated() => Name.Trim().Length > 0 && NoteWidget.FolderCanBeCreated(Name, directory);
+    private void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
 }

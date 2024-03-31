@@ -60,10 +60,7 @@ public sealed class RecentLinksWidget : IWidget
     private List<RecentLink> links;
     public IReadOnlyList<RecentLink> Links
     {
-        get
-        {
-            return links.OrderByDescending(x => x.Clicked).Take(Capacity).ToList();
-        }
+        get => links.OrderByDescending(x => x.Clicked).Take(Capacity).ToList();
         private set
         {
             links = [.. value];

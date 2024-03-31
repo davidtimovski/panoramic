@@ -91,6 +91,11 @@ public sealed partial class NoteWidgetPage : Page
         };
 
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        content.Submitted += (_, e) =>
+        {
+            // TODO
+            dialog.Hide();
+        };
 
         await dialog.ShowAsync();
     }
@@ -110,6 +115,11 @@ public sealed partial class NoteWidgetPage : Page
         };
 
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        content.Submitted += (_, e) =>
+        {
+            // TODO
+            dialog.Hide();
+        };
 
         await dialog.ShowAsync();
     }
@@ -132,6 +142,11 @@ public sealed partial class NoteWidgetPage : Page
         };
 
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        content.Submitted += (_, e) =>
+        {
+            // TODO
+            dialog.Hide();
+        };
 
         await dialog.ShowAsync();
     }
@@ -151,6 +166,11 @@ public sealed partial class NoteWidgetPage : Page
         };
 
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        content.Submitted += (_, e) =>
+        {
+            // TODO
+            dialog.Hide();
+        };
 
         await dialog.ShowAsync();
     }
@@ -172,6 +192,11 @@ public sealed partial class NoteWidgetPage : Page
         };
 
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        content.Submitted += (_, e) =>
+        {
+            // TODO
+            dialog.Hide();
+        };
 
         await dialog.ShowAsync();
     }
@@ -211,6 +236,11 @@ public sealed partial class NoteWidgetPage : Page
         };
 
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        content.Submitted += (_, e) =>
+        {
+            // TODO
+            dialog.Hide();
+        };
 
         await dialog.ShowAsync();
     }
