@@ -5,15 +5,15 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Windows.Storage;
 using Microsoft.UI.Dispatching;
 using Panoramic.Models;
 using Panoramic.Models.Domain;
+using Panoramic.Models.Domain.Checklist;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Utils;
-using Panoramic.Models.Domain.Checklist;
+using Windows.Storage;
 
 namespace Panoramic.Services.Storage;
 
@@ -360,16 +360,13 @@ public sealed class StorageService : IStorageService
 
     private async Task ReadWidgetAsync(string widgetFilePath)
     {
+        var type = WidgetUtil.GetType(widgetFilePath);
         var json = await File.ReadAllTextAsync(widgetFilePath);
-
-        using var jsonDoc = JsonDocument.Parse(json);
-        var typeProperty = jsonDoc.RootElement.GetProperty("type");
-        var type = Enum.Parse<WidgetType>(typeProperty.GetString()!);
 
         switch (type)
         {
             case WidgetType.Note:
-                var noteWidget = await NoteWidget.LoadAsync(this, json);
+                var noteWidget = NoteWidget.Load(this, json);
                 Widgets.Add(noteWidget.Id, noteWidget);
                 break;
             case WidgetType.LinkCollection:

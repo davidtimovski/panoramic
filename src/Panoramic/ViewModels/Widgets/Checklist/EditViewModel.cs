@@ -16,12 +16,12 @@ public sealed partial class EditViewModel : ObservableObject
 
     public EditViewModel(
         IStorageService storageService,
-        ChecklistData data)
+        ChecklistWidget widget)
     {
         _storageService = storageService;
-        _id = data.Id;
+        _id = widget.Id;
 
-        foreach (var task in data.Tasks)
+        foreach (var task in widget.Tasks)
         {
             var dueDate = task.DueDate.HasValue ? (DateTimeOffset?)task.DueDate.Value.ToDateTime(TimeOnly.MinValue) : null;
             Tasks.Add(new EditTaskViewModel(task.Title, dueDate, task.Created));

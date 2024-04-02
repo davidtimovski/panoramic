@@ -40,8 +40,7 @@ public sealed partial class LinkCollectionWidgetPage : Page
     {
         ViewModel.Highlighted = true;
 
-        var data = _widget.GetData();
-        var vm = new EditViewModel(_httpClient, _dispatcherQueue, _storageService, data);
+        var vm = new EditViewModel(_httpClient, _dispatcherQueue, _storageService, _widget);
 
         var content = new EditDialog(vm);
         var dialog = new ContentDialog

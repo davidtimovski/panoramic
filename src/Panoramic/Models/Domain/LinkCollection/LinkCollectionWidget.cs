@@ -22,7 +22,7 @@ public sealed class LinkCollectionWidget : IWidget
         _storageService = storageService;
 
         Id = Guid.NewGuid();
-        _dataFileName = $"{Id}.json";
+        _dataFileName = WidgetUtil.CreateDataFileName(Id, WidgetType.LinkCollection);
 
         Area = area;
         Title = title;
@@ -36,7 +36,7 @@ public sealed class LinkCollectionWidget : IWidget
     private LinkCollectionWidget(IStorageService storageService, LinkCollectionData data)
     {
         _storageService = storageService;
-        _dataFileName = $"{data.Id}.json";
+        _dataFileName = WidgetUtil.CreateDataFileName(data.Id, WidgetType.LinkCollection);
 
         Id = data.Id;
         Area = data.Area;

@@ -22,7 +22,7 @@ public sealed class RecentLinksWidget : IWidget
         _storageService = storageService;
 
         Id = Guid.NewGuid();
-        _dataFileName = $"{Id}.json";
+        _dataFileName = WidgetUtil.CreateDataFileName(Id, WidgetType.RecentLinks);
 
         Area = area;
         Title = title;
@@ -38,7 +38,7 @@ public sealed class RecentLinksWidget : IWidget
     private RecentLinksWidget(IStorageService storageService, RecentLinksData data)
     {
         _storageService = storageService;
-        _dataFileName = $"{data.Id}.json";
+        _dataFileName = WidgetUtil.CreateDataFileName(data.Id, WidgetType.RecentLinks);
 
         Id = data.Id;
         Area = data.Area;

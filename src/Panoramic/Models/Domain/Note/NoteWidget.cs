@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Panoramic.Services;
 using Panoramic.Services.Storage;
 using Panoramic.Utils;
 
@@ -23,7 +22,7 @@ public sealed class NoteWidget : IWidget
         _storageService = storageService;
 
         Id = Guid.NewGuid();
-        _dataFileName = $"{Id}.json";
+        _dataFileName = WidgetUtil.CreateDataFileName(Id, WidgetType.Note);
 
         Area = area;
         FontFamily = fontFamily;
@@ -36,8 +35,7 @@ public sealed class NoteWidget : IWidget
     private NoteWidget(IStorageService storageService, NoteData data)
     {
         _storageService = storageService;
-
-        _dataFileName = $"{data.Id}.json";
+        _dataFileName = WidgetUtil.CreateDataFileName(data.Id, WidgetType.Note);
 
         Id = data.Id;
         Area = data.Area;
@@ -106,10 +104,10 @@ public sealed class NoteWidget : IWidget
         return folders.Concat(notes).ToList();
     }
 
-    public static Task<NoteWidget> LoadAsync(IStorageService storageService, string json)
+    public static NoteWidget Load(IStorageService storageService, string json)
     {
         var data = JsonSerializer.Deserialize<NoteData>(json, storageService.SerializerOptions)!;
-        return Task.FromResult<NoteWidget>(new(storageService, data));
+        return new(storageService, data);
     }
 
     public async Task WriteAsync()

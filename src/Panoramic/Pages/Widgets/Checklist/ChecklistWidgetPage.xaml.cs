@@ -64,8 +64,7 @@ public sealed partial class ChecklistWidgetPage : Page
     {
         ViewModel.Highlighted = true;
 
-        var data = _widget.GetData();
-        var vm = new EditViewModel(_storageService, data);
+        var vm = new EditViewModel(_storageService, _widget);
 
         var content = new EditDialog(vm);
         var dialog = new ContentDialog

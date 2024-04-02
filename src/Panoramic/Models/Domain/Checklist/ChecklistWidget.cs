@@ -22,7 +22,7 @@ public sealed class ChecklistWidget : IWidget
         _storageService = storageService;
 
         Id = Guid.NewGuid();
-        _dataFileName = $"{Id}.json";
+        _dataFileName = WidgetUtil.CreateDataFileName(Id, WidgetType.Checklist);
 
         Area = area;
         Title = title;
@@ -36,7 +36,7 @@ public sealed class ChecklistWidget : IWidget
     private ChecklistWidget(IStorageService storageService, ChecklistData data)
     {
         _storageService = storageService;
-        _dataFileName = $"{data.Id}.json";
+        _dataFileName = WidgetUtil.CreateDataFileName(data.Id, WidgetType.Checklist);
 
         Id = data.Id;
         Area = data.Area;

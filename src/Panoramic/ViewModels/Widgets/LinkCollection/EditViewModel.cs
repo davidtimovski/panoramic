@@ -26,14 +26,14 @@ public sealed partial class EditViewModel : ObservableObject
         HttpClient httpClient,
         DispatcherQueue dispatcherQueue,
         IStorageService storageService,
-        LinkCollectionData data)
+        LinkCollectionWidget widget)
     {
         _httpClient = httpClient;
         _dispatcherQueue = dispatcherQueue;
         _storageService = storageService;
-        _id = data.Id;
+        _id = widget.Id;
 
-        foreach (var link in data.Links)
+        foreach (var link in widget.Links)
         {
             Links.Add(new EditLinkViewModel(link.Title, link.Uri));
         }
