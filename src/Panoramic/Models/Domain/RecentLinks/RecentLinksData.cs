@@ -15,22 +15,22 @@ public sealed class RecentLinksData : IWidgetData
 
     [JsonPropertyName("area")]
     [JsonConverter(typeof(AreaJsonConverter))]
-    public required Area Area { get; set; }
+    public required Area Area { get; init; }
 
     [JsonPropertyName("title")]
-    public string Title { get; set; } = "Recent";
+    public string Title { get; init; } = "Recent";
 
     [JsonRequired]
     [JsonPropertyName("capacity")]
-    public int Capacity { get; set; } = 15;
+    public int Capacity { get; init; } = 15;
 
     [JsonRequired]
     [JsonPropertyName("onlyFromToday")]
-    public bool OnlyFromToday { get; set; }
+    public bool OnlyFromToday { get; init; }
 
     [JsonRequired]
     [JsonPropertyName("searchable")]
-    public bool Searchable { get; set; } = true;
+    public bool Searchable { get; init; } = true;
 
     [JsonRequired]
     [JsonPropertyName("links")]
@@ -49,5 +49,5 @@ public sealed class RecentLinkData
 
     [JsonRequired]
     [JsonPropertyName("clicked")]
-    public required DateTime Clicked { get; set; }
+    public required DateTime Clicked { get; init; }
 }

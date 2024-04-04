@@ -14,14 +14,14 @@ public sealed class NoteData : IWidgetData
 
     [JsonPropertyName("area")]
     [JsonConverter(typeof(AreaJsonConverter))]
-    public required Area Area { get; set; }
+    public required Area Area { get; init; }
 
     [JsonPropertyName("fontFamily")]
-    public string FontFamily { get; set; } = "Default";
+    public string FontFamily { get; init; } = "Default";
 
     [JsonPropertyName("fontSize")]
-    public double FontSize { get; set; } = 15;
+    public double FontSize { get; init; } = 15;
 
     [JsonPropertyName("relativeFilePath")]
-    public string? RelativeFilePath { get; set; }
+    public string? RelativeFilePath { get; init; }
 }

@@ -15,14 +15,14 @@ public sealed class ChecklistData : IWidgetData
 
     [JsonPropertyName("area")]
     [JsonConverter(typeof(AreaJsonConverter))]
-    public required Area Area { get; set; }
+    public required Area Area { get; init; }
 
     [JsonPropertyName("title")]
     public string Title { get; init; } = "To do";
 
     [JsonRequired]
     [JsonPropertyName("searchable")]
-    public bool Searchable { get; set; } = true;
+    public bool Searchable { get; init; } = true;
 
     [JsonRequired]
     [JsonPropertyName("tasks")]
