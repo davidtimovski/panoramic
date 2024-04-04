@@ -44,7 +44,7 @@ public sealed partial class ChecklistWidgetPage : Page
             PrimaryButtonCommand = new RelayCommand(() => AddTask(content.ViewModel)),
             IsPrimaryButtonEnabled = false
         };
-       
+
         content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
         content.Submitted += (_, e) =>
         {

@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using Panoramic.Services;
 using Panoramic.Services.Storage;
 
 namespace Panoramic.Models.Domain.Note;

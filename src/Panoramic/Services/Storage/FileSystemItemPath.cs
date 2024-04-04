@@ -29,7 +29,7 @@ public sealed class FileSystemItemPath(string path, string storagePath)
 
         throw new ArgumentException($"Cannot compare {nameof(FileSystemItemPath)} to {obj.GetType()}", nameof(obj));
     }
-    
+
     public bool Equals(string? stringPath)
         => stringPath is not null && string.Equals(Absolute, stringPath, StringComparison.OrdinalIgnoreCase);
 

@@ -104,7 +104,7 @@ public sealed partial class AddWidgetDialog : Page
                 noteVm.AttachValidationHandler(Validated!);
 
                 var noteForm = new NoteSettingsForm(noteVm);
-          
+
                 widgetForm = noteForm;
                 ContentFrame.Content = noteForm;
                 break;

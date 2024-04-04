@@ -443,7 +443,7 @@ public sealed class StorageService : IStorageService
             .Where(x => x.NotePath is not null)
             .ToDictionary(x => x.NotePath!.Absolute, x => x.Id);
 
-        foreach (var selectedNote in  selectedNotesLookup)
+        foreach (var selectedNote in selectedNotesLookup)
         {
             fileSystemItems[selectedNote.Key].SelectedInWidgetId = selectedNote.Value;
         }

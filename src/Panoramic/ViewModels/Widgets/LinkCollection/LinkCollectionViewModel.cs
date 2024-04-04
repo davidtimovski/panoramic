@@ -26,7 +26,7 @@ public sealed partial class LinkCollectionViewModel : WidgetViewModel
         {
             _searchService.SearchInvoked += SearchInvoked;
         }
-            
+
         _dispatcherQueue = dispatcherQueue;
 
         _widget = widget;

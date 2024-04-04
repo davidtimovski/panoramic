@@ -8,7 +8,6 @@ using Microsoft.UI.Xaml.Media;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Services.Storage;
 using Panoramic.Utils;
-using Panoramic.ViewModels.Widgets.LinkCollection;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 
@@ -301,7 +300,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
         {
             AddItem(ExplorerItems, explorerItem, explorerItem.Path.Parent);
         }
-     
+
         if (noteCreatedInThisWidget)
         {
             _widget.NotePath = e.Path;
