@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using Panoramic.Utils.Serialization;
+using Panoramic.Data;
 
 namespace Panoramic.Models.Domain.LinkCollection;
 
@@ -14,7 +14,6 @@ public sealed class LinkCollectionData : IWidgetData
     public WidgetType Type { get; } = WidgetType.LinkCollection;
 
     [JsonPropertyName("area")]
-    [JsonConverter(typeof(AreaJsonConverter))]
     public required Area Area { get; init; }
 
     [JsonPropertyName("title")]

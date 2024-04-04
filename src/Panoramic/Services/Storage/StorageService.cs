@@ -91,7 +91,7 @@ public sealed class StorageService : IStorageService
     {
         LoadFileSystemItems();
 
-        var widgetFilePaths = Directory.GetFiles(WidgetsFolderPath, "*.json");
+        var widgetFilePaths = Directory.GetFiles(WidgetsFolderPath, "*.md");
 
         var tasks = widgetFilePaths.Select(ReadWidgetAsync);
 

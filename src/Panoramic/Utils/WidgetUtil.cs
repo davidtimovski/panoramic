@@ -22,6 +22,12 @@ internal static class WidgetUtil
         return $"{widgetTypeString}-{id:N}.json";
     }
 
+    internal static string CreateDataFileName2(Guid id, WidgetType type)
+    {
+        var widgetTypeString = type.ToString().ToLowerInvariant();
+        return $"{widgetTypeString}-{id:N}.md";
+    }
+
     internal static WidgetType GetType(string widgetFilePath)
     {
         var fileName = Path.GetFileNameWithoutExtension(widgetFilePath);

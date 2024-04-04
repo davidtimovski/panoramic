@@ -35,6 +35,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Panoramic.Domain\Panoramic.Data.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Content Update="Assets\Fonts\OpenSans-Regular.ttf">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Text.Json.Serialization;
-using Panoramic.Utils.Serialization;
+using Panoramic.Data;
 
 namespace Panoramic.Models.Domain.Note;
 
@@ -13,7 +13,6 @@ public sealed class NoteData : IWidgetData
     public WidgetType Type { get; } = WidgetType.Note;
 
     [JsonPropertyName("area")]
-    [JsonConverter(typeof(AreaJsonConverter))]
     public required Area Area { get; init; }
 
     [JsonPropertyName("fontFamily")]

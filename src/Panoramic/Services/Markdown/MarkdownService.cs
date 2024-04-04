@@ -225,7 +225,7 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
     {
         var result = new Queue<StringSegment>();
 
-        var match = MyRegex().Match(text);
+        var match = UrlRegex().Match(text);
         while (match.Success)
         {
             var uriGroup = match.Groups[2]!;
@@ -288,7 +288,7 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
     }
 
     [GeneratedRegex(@"\[([^\[\]]*)\]\((.*?)\)")]
-    private static partial Regex MyRegex();
+    private static partial Regex UrlRegex();
 
     private sealed class StringSegment
     {

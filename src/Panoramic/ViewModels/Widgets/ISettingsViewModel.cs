@@ -1,5 +1,5 @@
 ﻿using System;
-using Panoramic.Models.Domain;
+using Panoramic.Data;
 using Panoramic.Models.Events;
 
 namespace Panoramic.ViewModels.Widgets;

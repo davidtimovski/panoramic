@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
+using System.Text;
 using System.Threading.Tasks;
+using Panoramic.Data;
+using Panoramic.Data.Widgets;
 using Panoramic.Services.Storage;
 using Panoramic.Utils;
 
@@ -22,7 +24,7 @@ public sealed class RecentLinksWidget : IWidget
         _storageService = storageService;
 
         Id = Guid.NewGuid();
-        _dataFileName = WidgetUtil.CreateDataFileName(Id, WidgetType.RecentLinks);
+        _dataFileName = WidgetUtil.CreateDataFileName2(Id, WidgetType.RecentLinks);
 
         Area = area;
         Title = title;
@@ -38,7 +40,7 @@ public sealed class RecentLinksWidget : IWidget
     private RecentLinksWidget(IStorageService storageService, RecentLinksData data)
     {
         _storageService = storageService;
-        _dataFileName = WidgetUtil.CreateDataFileName(data.Id, WidgetType.RecentLinks);
+        _dataFileName = WidgetUtil.CreateDataFileName2(data.Id, WidgetType.RecentLinks);
 
         Id = data.Id;
         Area = data.Area;
@@ -110,9 +112,9 @@ public sealed class RecentLinksWidget : IWidget
             Links = Links.Select(x => new RecentLinkData { Title = x.Title, Uri = x.Uri, Clicked = x.Clicked }).ToList()
         };
 
-    public static RecentLinksWidget Load(IStorageService storageService, string json)
+    public static RecentLinksWidget Load(IStorageService storageService, string markdown)
     {
-        var data = JsonSerializer.Deserialize<RecentLinksData>(json, storageService.SerializerOptions)!;
+        var data = RecentLinksData.FromMarkdown(markdown);
         return new(storageService, data);
     }
 
@@ -121,9 +123,10 @@ public sealed class RecentLinksWidget : IWidget
         DebugLogger.Log($"Writing {Type} widget with ID: {Id}");
 
         var data = GetData();
-        var json = JsonSerializer.Serialize(data, _storageService.SerializerOptions);
 
-        await File.WriteAllTextAsync(Path.Combine(_storageService.WidgetsFolderPath, _dataFileName), json);
+        var builder = new StringBuilder();
+        data.ToMarkdown(builder);
+        await File.WriteAllTextAsync(Path.Combine(_storageService.WidgetsFolderPath, _dataFileName), builder.ToString());
     }
 
     public void Delete()
