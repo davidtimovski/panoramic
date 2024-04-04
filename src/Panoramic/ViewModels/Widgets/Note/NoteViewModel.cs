@@ -106,7 +106,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
 
     public Visibility PresenterVisibility => Editing ? Visibility.Collapsed : Visibility.Visible;
 
-    public string EditToggleTooltip => Editing ? "Stop editing" : "Edit";
+    public string EditToggleTooltip => Editing ? "Preview" : "Edit";
 
     public void DeselectNote()
     {

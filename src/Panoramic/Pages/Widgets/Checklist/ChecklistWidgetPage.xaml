@@ -30,7 +30,7 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0">
-            <Grid>
+            <Grid ColumnSpacing="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -73,7 +73,7 @@
 
             <Border.Resources>
                 <DataTemplate x:Key="ChecklistViewTemplate" x:DataType="vm:TaskViewModel">
-                    <Grid ColumnSpacing="10">
+                    <Grid ColumnSpacing="8">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>

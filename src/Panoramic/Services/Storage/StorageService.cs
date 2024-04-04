@@ -52,7 +52,7 @@ public sealed class StorageService : IStorageService
         _timer.Interval = TimeSpan.FromSeconds(15);
         _timer.Tick += async (timer, _) =>
         {
-            DebugLogger.Log("Running auto save..");
+            DebugLogger.Log("Running auto-save..");
 
             await WriteUnsavedChangesAsync();
         };
