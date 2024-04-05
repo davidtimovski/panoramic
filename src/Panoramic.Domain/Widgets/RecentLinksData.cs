@@ -26,7 +26,7 @@ public sealed partial class RecentLinksData : IWidgetData
         var links = new List<RecentLinkData>();
         while (lines[lineIndex].StartsWith('|'))
         {
-            var linkLineParts = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries);
+            var linkLineParts = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
             var hyperlinkMarkdown = linkLineParts[0];
             var match = HyperlinkMarkdownRegex().Match(hyperlinkMarkdown);
@@ -44,6 +44,7 @@ public sealed partial class RecentLinksData : IWidgetData
                 Uri = new Uri(uriGroup.Value),
                 Clicked = DateTime.Parse(linkLineParts[1])
             });
+
             lineIndex++;
         }
 
