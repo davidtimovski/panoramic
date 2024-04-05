@@ -1,4 +1,4 @@
-# Recent
+# Recent links
 
 | Link | Clicked |
 | - | - |

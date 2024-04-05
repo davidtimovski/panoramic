@@ -361,24 +361,24 @@ public sealed class StorageService : IStorageService
     private async Task ReadWidgetAsync(string widgetFilePath)
     {
         var type = WidgetUtil.GetType(widgetFilePath);
-        var json = await File.ReadAllTextAsync(widgetFilePath);
+        var markdown = await File.ReadAllTextAsync(widgetFilePath);
 
         switch (type)
         {
             case WidgetType.Note:
-                var noteWidget = NoteWidget.Load(this, json);
+                var noteWidget = NoteWidget.Load(this, markdown);
                 Widgets.Add(noteWidget.Id, noteWidget);
                 break;
             case WidgetType.LinkCollection:
-                var linkCollectionWidget = LinkCollectionWidget.Load(this, json);
+                var linkCollectionWidget = LinkCollectionWidget.Load(this, markdown);
                 Widgets.Add(linkCollectionWidget.Id, linkCollectionWidget);
                 break;
             case WidgetType.RecentLinks:
-                var recentLinksWidget = RecentLinksWidget.Load(this, json);
+                var recentLinksWidget = RecentLinksWidget.Load(this, markdown);
                 Widgets.Add(recentLinksWidget.Id, recentLinksWidget);
                 break;
             case WidgetType.Checklist:
-                var checklistWidget = ChecklistWidget.Load(this, json);
+                var checklistWidget = ChecklistWidget.Load(this, markdown);
                 Widgets.Add(checklistWidget.Id, checklistWidget);
                 break;
             default:

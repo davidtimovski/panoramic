@@ -3,17 +3,15 @@ using System.Text.RegularExpressions;
 
 namespace Panoramic.Data.Widgets;
 
-public sealed partial class RecentLinksData : IWidgetData
+public sealed partial class LinkCollectionData : IWidgetData
 {
     public required Guid Id { get; init; }
     public required Area Area { get; init; }
-    public string Title { get; init; } = "Recent";
-    public int Capacity { get; init; } = 15;
-    public bool OnlyFromToday { get; init; }
+    public string Title { get; init; } = "My links";
     public bool Searchable { get; init; } = true;
-    public required List<RecentLinkData> Links { get; init; }
+    public required List<LinkCollectionItemData> Links { get; init; }
 
-    public static RecentLinksData FromMarkdown(string markdown)
+    public static LinkCollectionData FromMarkdown(string markdown)
     {
         var lines = markdown.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
 
@@ -23,12 +21,11 @@ public sealed partial class RecentLinksData : IWidgetData
         lineIndex += 4;
 
         // Links
-        var links = new List<RecentLinkData>();
-        while (lines[lineIndex].StartsWith('|'))
+        short order = 0;
+        var links = new List<LinkCollectionItemData>();
+        while (lines[lineIndex].StartsWith('-'))
         {
-            var linkLineParts = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries);
-
-            var hyperlinkMarkdown = linkLineParts[0];
+            var hyperlinkMarkdown = lines[lineIndex][2..];
             var match = HyperlinkMarkdownRegex().Match(hyperlinkMarkdown);
             if (!match.Success)
             {
@@ -38,12 +35,14 @@ public sealed partial class RecentLinksData : IWidgetData
             var titleGroup = match.Groups[1]!;
             var uriGroup = match.Groups[2]!;
 
-            links.Add(new RecentLinkData
+            links.Add(new LinkCollectionItemData
             {
                 Title = titleGroup.Value,
                 Uri = new Uri(uriGroup.Value),
-                Clicked = DateTime.Parse(linkLineParts[1])
+                Order = order
             });
+
+            order++;
             lineIndex++;
         }
 
@@ -52,17 +51,13 @@ public sealed partial class RecentLinksData : IWidgetData
         // Metadata
         var idRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         var areaRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var capacityRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var onlyFromTodayRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         var searchableRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-        return new RecentLinksData
+        return new LinkCollectionData
         {
             Id = Guid.ParseExact(idRowValues[1], "N"),
             Area = new(areaRowValues[1]),
             Title = title,
-            Capacity = int.Parse(capacityRowValues[1]),
-            OnlyFromToday = bool.Parse(onlyFromTodayRowValues[1]),
             Searchable = bool.Parse(searchableRowValues[1]),
             Links = links
         };
@@ -72,9 +67,6 @@ public sealed partial class RecentLinksData : IWidgetData
     {
         builder.AppendLine($"# {Title}");
         builder.AppendLine();
-
-        builder.AppendLine("| Link | Clicked |");
-        builder.AppendLine("| - | - |");
 
         foreach (var link in Links)
         {
@@ -88,8 +80,6 @@ public sealed partial class RecentLinksData : IWidgetData
         builder.AppendLine("| - | - |");
         builder.AppendLine($"| {nameof(Id)} | {Id:N} |");
         builder.AppendLine($"| {nameof(Area)} | {Area} |");
-        builder.AppendLine($"| {nameof(Capacity)} | {Capacity} |");
-        builder.AppendLine($"| {nameof(OnlyFromToday)} | {OnlyFromToday} |");
         builder.AppendLine($"| {nameof(Searchable)} | {Searchable} |");
     }
 
@@ -97,14 +87,14 @@ public sealed partial class RecentLinksData : IWidgetData
     private static partial Regex HyperlinkMarkdownRegex();
 }
 
-public sealed class RecentLinkData
+public sealed class LinkCollectionItemData
 {
     public required string Title { get; init; }
     public required Uri Uri { get; init; }
-    public required DateTime Clicked { get; init; }
+    public required short Order { get; init; }
 
     public void ToMarkdown(StringBuilder builder)
     {
-        builder.AppendLine($"| [{Title}]({Uri}) | {Clicked} |");
+        builder.AppendLine($"- [{Title}]({Uri})");
     }
 }
