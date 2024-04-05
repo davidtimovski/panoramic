@@ -5,6 +5,8 @@ namespace Panoramic.Data.Widgets;
 
 public sealed partial class LinkCollectionData : IWidgetData
 {
+    private const short Version = 1;
+
     public required Guid Id { get; init; }
     public required Area Area { get; init; }
     public string Title { get; init; } = "My links";
@@ -81,6 +83,8 @@ public sealed partial class LinkCollectionData : IWidgetData
         builder.AppendLine($"| {nameof(Id)} | {Id:N} |");
         builder.AppendLine($"| {nameof(Area)} | {Area} |");
         builder.AppendLine($"| {nameof(Searchable)} | {Searchable} |");
+        builder.AppendLine();
+        builder.Append($"> Version: {Version}");
     }
 
     [GeneratedRegex(@"\[([^\[\]]*)\]\((.*?)\)", RegexOptions.Singleline)]

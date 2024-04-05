@@ -27,3 +27,5 @@
 | Capacity | 15 |
 | Only from today | False |
 | Searchable | True |
+
+> Version: 1

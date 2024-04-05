@@ -9,3 +9,5 @@
 | FontFamily | Default |
 | FontSize | 15 |
 | RelativeFilePath | My note.md |
+
+> Version: 1

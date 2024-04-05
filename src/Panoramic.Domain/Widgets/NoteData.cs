@@ -4,6 +4,8 @@ namespace Panoramic.Data.Widgets;
 
 public sealed class NoteData : IWidgetData
 {
+    private const short Version = 1;
+
     public required Guid Id { get; init; }
     public required Area Area { get; init; }
     public string FontFamily { get; init; } = "Default";
@@ -47,5 +49,7 @@ public sealed class NoteData : IWidgetData
         builder.AppendLine($"| {nameof(FontFamily)} | {FontFamily} |");
         builder.AppendLine($"| {nameof(FontSize)} | {FontSize} |");
         builder.AppendLine($"| {nameof(RelativeFilePath)} | {RelativeFilePath} |");
+        builder.AppendLine();
+        builder.Append($"> Version: {Version}");
     }
 }

@@ -4,6 +4,8 @@ namespace Panoramic.Data.Widgets;
 
 public sealed class ChecklistData : IWidgetData
 {
+    private const short Version = 1;
+
     public required Guid Id { get; init; }
     public required Area Area { get; init; }
     public string Title { get; init; } = "To do";
@@ -24,8 +26,8 @@ public sealed class ChecklistData : IWidgetData
         while (lines[lineIndex].StartsWith('-'))
         {
             var taskTitle = lines[lineIndex][6..];
-            var taskDueDateString = lines[lineIndex + 1][6..];
-            var taskDueDate = taskDueDateString.Length > 0 ? DateOnly.Parse(taskDueDateString.Trim()) : (DateOnly?)null;
+            var taskDueDateString = lines[lineIndex + 1][6..].Trim();
+            var taskDueDate = taskDueDateString.Length > 0 ? DateOnly.Parse(taskDueDateString) : (DateOnly?)null;
             var taskCreatedString = lines[lineIndex + 2][11..];
             var taskCreated = DateTime.Parse(taskCreatedString);
 
@@ -74,6 +76,8 @@ public sealed class ChecklistData : IWidgetData
         builder.AppendLine($"| {nameof(Id)} | {Id:N} |");
         builder.AppendLine($"| {nameof(Area)} | {Area} |");
         builder.AppendLine($"| {nameof(Searchable)} | {Searchable} |");
+        builder.AppendLine();
+        builder.Append($"> Version: {Version}");
     }
 }
 
