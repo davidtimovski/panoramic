@@ -7,12 +7,12 @@ namespace Benchmarks.MarkdownConversion;
 [SimpleJob]
 [MemoryDiagnoser]
 [HtmlExporter]
-public class LinkCollection
+public class Note
 {
-    private const string SampleFileName = "linkcollection.md";
+    private const string SampleFileName = "note.md";
 
     private string? markdown;
-    private LinkCollectionData? model;
+    private NoteData? model;
 
     [GlobalSetup]
     public void Setup()
@@ -20,11 +20,11 @@ public class LinkCollection
         var mdFilePath = Path.Combine(Directory.GetCurrentDirectory(), Global.SamplesFolderName, SampleFileName);
         markdown = File.ReadAllText(mdFilePath);
 
-        model = LinkCollectionData.FromMarkdown(markdown!);
+        model = NoteData.FromMarkdown(markdown!);
     }
 
     [Benchmark]
-    public LinkCollectionData FromMarkdown() => LinkCollectionData.FromMarkdown(markdown!);
+    public NoteData FromMarkdown() => NoteData.FromMarkdown(markdown!);
 
     [Benchmark]
     public void ToMarkdown()

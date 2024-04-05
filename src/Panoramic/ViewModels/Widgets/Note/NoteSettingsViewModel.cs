@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Panoramic.Data;
+using Panoramic.Data.Widgets;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Events;
 using Panoramic.Services.Storage;

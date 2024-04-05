@@ -24,7 +24,7 @@ public sealed class LinkCollectionWidget : IWidget
         _storageService = storageService;
 
         Id = Guid.NewGuid();
-        _dataFileName = WidgetUtil.CreateDataFileName2(Id, WidgetType.LinkCollection);
+        _dataFileName = WidgetUtil.CreateDataFileName(Id, WidgetType.LinkCollection);
 
         Area = area;
         Title = title;
@@ -38,7 +38,7 @@ public sealed class LinkCollectionWidget : IWidget
     private LinkCollectionWidget(IStorageService storageService, LinkCollectionData data)
     {
         _storageService = storageService;
-        _dataFileName = WidgetUtil.CreateDataFileName2(data.Id, WidgetType.LinkCollection);
+        _dataFileName = WidgetUtil.CreateDataFileName(data.Id, WidgetType.LinkCollection);
 
         Id = data.Id;
         Area = data.Area;

@@ -9,7 +9,6 @@ namespace Benchmarks.MarkdownConversion;
 [HtmlExporter]
 public class RecentLinks
 {
-    private const string SamplesFolderName = "MarkdownSamples";
     private const string SampleFileName = "recentlinks.md";
 
     private string? markdown;
@@ -18,7 +17,7 @@ public class RecentLinks
     [GlobalSetup]
     public void Setup()
     {
-        var mdFilePath = Path.Combine(Directory.GetCurrentDirectory(), SamplesFolderName, SampleFileName);
+        var mdFilePath = Path.Combine(Directory.GetCurrentDirectory(), Global.SamplesFolderName, SampleFileName);
         markdown = File.ReadAllText(mdFilePath);
 
         model = RecentLinksData.FromMarkdown(markdown!);
