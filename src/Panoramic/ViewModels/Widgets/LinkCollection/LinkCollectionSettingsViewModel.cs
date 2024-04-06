@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Panoramic.Models.Domain;
+using Panoramic.Data;
+using Panoramic.Data.Widgets;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Events;
 using Panoramic.Services.Storage;

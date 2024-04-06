@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
+using System.Text;
 using System.Threading.Tasks;
+using Panoramic.Data;
+using Panoramic.Data.Widgets;
 using Panoramic.Services.Storage;
 using Panoramic.Utils;
 
@@ -71,9 +73,9 @@ public sealed class LinkCollectionWidget : IWidget
             Links = links.Select(x => new LinkCollectionItemData { Title = x.Title, Uri = x.Uri, Order = x.Order }).ToList()
         };
 
-    public static LinkCollectionWidget Load(IStorageService storageService, string json)
+    public static LinkCollectionWidget Load(IStorageService storageService, string markdown)
     {
-        var data = JsonSerializer.Deserialize<LinkCollectionData>(json, storageService.SerializerOptions)!;
+        var data = LinkCollectionData.FromMarkdown(markdown);
         return new(storageService, data);
     }
 
@@ -82,9 +84,10 @@ public sealed class LinkCollectionWidget : IWidget
         DebugLogger.Log($"Writing {Type} widget with ID: {Id}");
 
         var data = GetData();
-        var json = JsonSerializer.Serialize(data, _storageService.SerializerOptions);
 
-        await File.WriteAllTextAsync(Path.Combine(_storageService.WidgetsFolderPath, _dataFileName), json);
+        var builder = new StringBuilder();
+        data.ToMarkdown(builder);
+        await File.WriteAllTextAsync(Path.Combine(_storageService.WidgetsFolderPath, _dataFileName), builder.ToString());
     }
 
     public void Delete()

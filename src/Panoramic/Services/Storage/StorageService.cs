@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
 using Panoramic.Models;
@@ -70,11 +68,6 @@ public sealed class StorageService : IStorageService
     public string WidgetsFolderPath => Path.Combine(StoragePath, "widgets");
     public string StoragePath { get; private set; }
 
-    public JsonSerializerOptions SerializerOptions { get; } = new()
-    {
-        Converters = { new JsonStringEnumConverter() }
-    };
-
     private Dictionary<string, FileSystemItem> fileSystemItems = [];
     public IReadOnlyList<FileSystemItem> FileSystemItems
     {
@@ -91,7 +84,7 @@ public sealed class StorageService : IStorageService
     {
         LoadFileSystemItems();
 
-        var widgetFilePaths = Directory.GetFiles(WidgetsFolderPath, "*.json");
+        var widgetFilePaths = Directory.GetFiles(WidgetsFolderPath, "*.md");
 
         var tasks = widgetFilePaths.Select(ReadWidgetAsync);
 
@@ -361,24 +354,24 @@ public sealed class StorageService : IStorageService
     private async Task ReadWidgetAsync(string widgetFilePath)
     {
         var type = WidgetUtil.GetType(widgetFilePath);
-        var json = await File.ReadAllTextAsync(widgetFilePath);
+        var markdown = await File.ReadAllTextAsync(widgetFilePath);
 
         switch (type)
         {
             case WidgetType.Note:
-                var noteWidget = NoteWidget.Load(this, json);
+                var noteWidget = NoteWidget.Load(this, markdown);
                 Widgets.Add(noteWidget.Id, noteWidget);
                 break;
             case WidgetType.LinkCollection:
-                var linkCollectionWidget = LinkCollectionWidget.Load(this, json);
+                var linkCollectionWidget = LinkCollectionWidget.Load(this, markdown);
                 Widgets.Add(linkCollectionWidget.Id, linkCollectionWidget);
                 break;
             case WidgetType.RecentLinks:
-                var recentLinksWidget = RecentLinksWidget.Load(this, json);
+                var recentLinksWidget = RecentLinksWidget.Load(this, markdown);
                 Widgets.Add(recentLinksWidget.Id, recentLinksWidget);
                 break;
             case WidgetType.Checklist:
-                var checklistWidget = ChecklistWidget.Load(this, json);
+                var checklistWidget = ChecklistWidget.Load(this, markdown);
                 Widgets.Add(checklistWidget.Id, checklistWidget);
                 break;
             default:

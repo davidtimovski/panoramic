@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
+using System.Text;
 using System.Threading.Tasks;
+using Panoramic.Data;
+using Panoramic.Data.Widgets;
 using Panoramic.Services.Storage;
 using Panoramic.Utils;
 
@@ -93,9 +95,9 @@ public sealed class ChecklistWidget : IWidget
             Tasks = tasks.Select(x => new ChecklistTaskData { Title = x.Title, DueDate = x.DueDate, Created = x.Created }).ToList()
         };
 
-    public static ChecklistWidget Load(IStorageService storageService, string json)
+    public static ChecklistWidget Load(IStorageService storageService, string markdown)
     {
-        var data = JsonSerializer.Deserialize<ChecklistData>(json, storageService.SerializerOptions)!;
+        var data = ChecklistData.FromMarkdown(markdown);
         return new(storageService, data);
     }
 
@@ -104,9 +106,10 @@ public sealed class ChecklistWidget : IWidget
         DebugLogger.Log($"Writing {Type} widget with ID: {Id}");
 
         var data = GetData();
-        var json = JsonSerializer.Serialize(data, _storageService.SerializerOptions);
 
-        await File.WriteAllTextAsync(Path.Combine(_storageService.WidgetsFolderPath, _dataFileName), json);
+        var builder = new StringBuilder();
+        data.ToMarkdown(builder);
+        await File.WriteAllTextAsync(Path.Combine(_storageService.WidgetsFolderPath, _dataFileName), builder.ToString());
     }
 
     public void Delete()
