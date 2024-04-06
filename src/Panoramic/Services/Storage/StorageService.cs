@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
 using Panoramic.Models;
@@ -69,11 +67,6 @@ public sealed class StorageService : IStorageService
 
     public string WidgetsFolderPath => Path.Combine(StoragePath, "widgets");
     public string StoragePath { get; private set; }
-
-    public JsonSerializerOptions SerializerOptions { get; } = new()
-    {
-        Converters = { new JsonStringEnumConverter() }
-    };
 
     private Dictionary<string, FileSystemItem> fileSystemItems = [];
     public IReadOnlyList<FileSystemItem> FileSystemItems

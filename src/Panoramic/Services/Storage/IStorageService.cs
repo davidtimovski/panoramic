@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Panoramic.Models.Domain;
 
@@ -19,7 +18,6 @@ public interface IStorageService
 
     string WidgetsFolderPath { get; }
     string StoragePath { get; }
-    JsonSerializerOptions SerializerOptions { get; }
     IReadOnlyList<FileSystemItem> FileSystemItems { get; }
     Dictionary<Guid, IWidget> Widgets { get; }
 
