@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
+using Panoramic.Data;
 using Panoramic.Models.Domain.Checklist;
 
 namespace Panoramic.ViewModels.Widgets.Checklist;
@@ -27,7 +28,7 @@ public sealed partial class TaskViewModel : ObservableObject
         _titleCompletedForeground = titleCompletedForeground;
 
         Title = title;
-        DueDate = dueDate.HasValue ? dueDate.Value.ToString("MMM d", Globals.Culture) : string.Empty;
+        DueDate = dueDate.HasValue ? dueDate.Value.ToString("MMM d", Global.Culture) : string.Empty;
         DueDateVisibility = dueDate.HasValue ? Visibility.Visible : Visibility.Collapsed;
 
         DueDateBackground = dueDateBackground;

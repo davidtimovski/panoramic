@@ -27,9 +27,9 @@ public sealed class ChecklistData : IWidgetData
         {
             var taskTitle = lines[lineIndex][6..];
             var taskDueDateString = lines[lineIndex + 1][6..].Trim();
-            var taskDueDate = taskDueDateString.Length > 0 ? DateOnly.Parse(taskDueDateString) : (DateOnly?)null;
+            var taskDueDate = taskDueDateString.Length > 0 ? DateOnly.ParseExact(taskDueDateString, Global.StoredDateOnlyFormat) : (DateOnly?)null;
             var taskCreatedString = lines[lineIndex + 2][11..];
-            var taskCreated = DateTime.Parse(taskCreatedString);
+            var taskCreated = DateTime.ParseExact(taskCreatedString, Global.StoredDateTimeFormat, Global.Culture);
 
             tasks.Add(new ChecklistTaskData
             {
@@ -90,7 +90,10 @@ public sealed class ChecklistTaskData
     public void ToMarkdown(StringBuilder builder)
     {
         builder.AppendLine($"- [ ] {Title}");
-        builder.AppendLine($"  Due: {DueDate}");
-        builder.AppendLine($"  Created: {Created}");
+
+        var dueDate = DueDate.HasValue ? DueDate.Value.ToString(Global.StoredDateOnlyFormat) : string.Empty;
+        builder.AppendLine($"  Due: {dueDate}");
+
+        builder.AppendLine($"  Created: {Created.ToString(Global.StoredDateTimeFormat)}");
     }
 }

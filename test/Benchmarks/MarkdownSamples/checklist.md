@@ -1,20 +1,20 @@
 # Checklist
 
 - [ ] Integer iaculis ex quam
-  Due: 2024.04.20
-  Created: 2024-03-31T00:44:11.5025155+01:00
+  Due: 2024-04-20
+  Created: 2024-03-31 00:44:11.50
 - [ ] Morbi imperdiet consectetur
-  Due: 2024.04.03
-  Created: 2024-03-31T00:44:30.7204827+01:00
+  Due: 2024-04-03
+  Created: 2024-03-31 00:44:30.72
 - [ ] Maecenas auctor
   Due:
-  Created: 2024-03-31T00:44:38.8562168+01:00
+  Created: 2024-03-31 00:44:38.85
 - [ ] Suspendisse at dolor
-  Due: 2024.03.28
-  Created: 2024-03-31T00:53:02.7483524+01:00
+  Due: 2024-03-28
+  Created: 2024-03-31 00:53:02.74
 - [ ] Vestibulum eget
   Due:
-  Created: 2024-04-02T00:37:24.1441499+02:00
+  Created: 2024-04-02 00:37:24.14
 
 ## Metadata
 

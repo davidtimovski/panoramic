@@ -44,7 +44,7 @@ public sealed partial class RecentLinksData : IWidgetData
             {
                 Title = titleGroup.Value,
                 Uri = new Uri(uriGroup.Value),
-                Clicked = DateTime.Parse(linkLineParts[1])
+                Clicked = DateTime.ParseExact(linkLineParts[1], Global.StoredDateTimeFormat, Global.Culture)
             });
 
             lineIndex++;
@@ -110,6 +110,6 @@ public sealed class RecentLinkData
 
     public void ToMarkdown(StringBuilder builder)
     {
-        builder.AppendLine($"| [{Title}]({Uri}) | {Clicked} |");
+        builder.AppendLine($"| [{Title}]({Uri}) | {Clicked.ToString(Global.StoredDateTimeFormat)} |");
     }
 }
