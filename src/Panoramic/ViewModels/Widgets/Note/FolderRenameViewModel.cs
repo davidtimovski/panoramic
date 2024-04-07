@@ -10,7 +10,7 @@ public sealed class FolderRenameViewModel(string path) : ObservableObject
 {
     private readonly string _directory = Path.GetDirectoryName(path)!;
 
-    private string name = Path.GetFileName(path)!;
+    private string name = Path.GetFileName(path);
     public string Name
     {
         get => name;

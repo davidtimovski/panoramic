@@ -63,7 +63,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
 
             if (value is not null && value.Text is null)
             {
-                value.Text = File.ReadAllText(value.Path!.Absolute);
+                value.Text = File.ReadAllText(value.Path.Absolute);
             }
 
             if (_initialized)
@@ -215,12 +215,9 @@ public sealed partial class NoteViewModel : WidgetViewModel
                 return true;
             }
 
-            for (var j = 0; j < items[i].Children.Count; j++)
+            if (items[i].Children.Any(t => AddItem(items[i].Children, item, directory)))
             {
-                if (AddItem(items[i].Children, item, directory))
-                {
-                    return true;
-                }
+                return true;
             }
         }
 
@@ -242,12 +239,9 @@ public sealed partial class NoteViewModel : WidgetViewModel
                 return true;
             }
 
-            for (var j = 0; j < items[i].Children.Count; j++)
+            if (items[i].Children.Any(t => RemoveItem(items[i].Children, path)))
             {
-                if (RemoveItem(items[i].Children, path))
-                {
-                    return true;
-                }
+                return true;
             }
         }
 

@@ -228,12 +228,12 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
         var match = HyperlinkMarkdownRegex().Match(text);
         while (match.Success)
         {
-            var uriGroup = match.Groups[2]!;
+            var uriGroup = match.Groups[2];
 
             if (Uri.TryCreate(uriGroup.Value, UriKind.Absolute, out var uri))
             {
-                var fullGroup = match.Groups[0]!;
-                var textGroup = match.Groups[1]!;
+                var fullGroup = match.Groups[0];
+                var textGroup = match.Groups[1];
 
                 result.Enqueue(new StringSegment
                 {

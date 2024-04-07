@@ -11,7 +11,6 @@ public sealed class MainViewModel(DispatcherQueue dispatcherQueue, ISearchServic
     private static readonly TimeSpan SearchTextChangeDebounceInterval = TimeSpan.FromMilliseconds(250);
 
     private readonly DispatcherQueueTimer _debounceTimer = dispatcherQueue.CreateTimer();
-    private readonly ISearchService _searchService = searchService;
 
     private string searchText = string.Empty;
     public string SearchText
@@ -27,7 +26,7 @@ public sealed class MainViewModel(DispatcherQueue dispatcherQueue, ISearchServic
             OnPropertyChanged();
 
             var trimmed = value.Trim();
-            _debounceTimer.Debounce(() => _searchService.Search(trimmed), SearchTextChangeDebounceInterval);
+            _debounceTimer.Debounce(() => searchService.Search(trimmed), SearchTextChangeDebounceInterval);
         }
     }
 }

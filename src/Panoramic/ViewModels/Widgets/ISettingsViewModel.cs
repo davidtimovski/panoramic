@@ -6,7 +6,7 @@ namespace Panoramic.ViewModels.Widgets;
 
 public interface ISettingsViewModel
 {
-    Area Area { get; set; }
+    Area Area { set; }
 
     /// <summary>
     /// Used for attaching the validation handler later, after ViewModel creation.

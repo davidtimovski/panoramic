@@ -205,7 +205,7 @@ public sealed class StorageService : IStorageService
 
         StoragePath = storagePath;
 
-        StoragePathChanged?.Invoke(this, new EventArgs());
+        StoragePathChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void ChangeNoteSelection(Guid widgetId, string? previousFilePath, string? newFilePath)
@@ -230,10 +230,8 @@ public sealed class StorageService : IStorageService
 
     public void ChangeNoteContent(Guid widgetId, string path, string content)
     {
-        if (fileSystemItems.TryGetValue(path, out FileSystemItem? value))
+        if (fileSystemItems.ContainsKey(path))
         {
-            value.Content = content;
-
             NoteContentChanged?.Invoke(this, new NoteContentChangedEventArgs
             {
                 WidgetId = widgetId,
@@ -250,9 +248,10 @@ public sealed class StorageService : IStorageService
         var path = Path.Combine(directory, name);
         Directory.CreateDirectory(path);
 
-        var folder = new FileSystemItem(FileType.Folder)
+        var folder = new FileSystemItem
         {
             Name = name,
+            Type = FileType.Folder,
             Path = new(path, StoragePath)
         };
         fileSystemItems.Add(folder.Path.Absolute, folder);
@@ -299,9 +298,10 @@ public sealed class StorageService : IStorageService
         var path = Path.Combine(directory, $"{name}.md");
         File.Create(path).Dispose();
 
-        var note = new FileSystemItem(FileType.Note)
+        var note = new FileSystemItem
         {
             Name = name,
+            Type = FileType.Note,
             Path = new(path, StoragePath),
             SelectedInWidgetId = widgetId
         };
@@ -337,7 +337,7 @@ public sealed class StorageService : IStorageService
         fileSystemItems.Remove(path);
         fileSystemItems.Add(newPath, item);
 
-        ItemRenamed?.Invoke(this, new EventArgs());
+        ItemRenamed?.Invoke(this, EventArgs.Empty);
     }
 
     public void DeleteNote(string path)
@@ -405,9 +405,10 @@ public sealed class StorageService : IStorageService
         var subdirectories = Directory.GetDirectories(currentPath).Where(x => !Equals(x, WidgetsFolderPath)).OrderBy(x => x).ToList();
         foreach (var subdirectory in subdirectories)
         {
-            var item = new FileSystemItem(FileType.Folder)
+            var item = new FileSystemItem
             {
                 Name = Path.GetFileName(subdirectory),
+                Type = FileType.Folder,
                 Path = new(subdirectory, StoragePath)
             };
             fileSystemItems.Add(item.Path.Absolute, item);
@@ -418,9 +419,10 @@ public sealed class StorageService : IStorageService
         var filePaths = Directory.GetFiles(currentPath, "*.md").OrderBy(Path.GetFileName).ToList();
         foreach (var filePath in filePaths)
         {
-            var note = new FileSystemItem(FileType.Note)
+            var note = new FileSystemItem
             {
                 Name = Path.GetFileNameWithoutExtension(filePath),
+                Type = FileType.Note,
                 Path = new(filePath, StoragePath)
             };
 

@@ -32,7 +32,7 @@ A collection of tasks. Searchable through the global search (Ctrl+S). You can ad
 
 ## Storage
 
-I wanted to make the app easy to onboard to, but I also wanted to make it easy to offboard from. All of the data is stored in markdown files in the folder specified in Preferences, so if you decide to dip out it should be fairly easy to do so without losing your data to a proprietary format.
+I wanted to make the app easy to onboard to, but I also wanted to make it easy to off-board from. All of the data is stored in markdown files in the folder specified in Preferences, so if you decide to dip out it should be fairly easy to do so without losing your data to a proprietary format.
 
 An example of how the markdown files are formatted can be seen in the [MarkdownSamples folder](/test/Benchmarks/MarkdownSamples).
 

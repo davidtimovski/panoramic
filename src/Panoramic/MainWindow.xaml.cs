@@ -78,8 +78,8 @@ public sealed partial class MainWindow : Window
             IsPrimaryButtonEnabled = false
         };
 
-        content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
-        content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        content.StepChanged += (_, e) => { dialog.Title = e.DialogTitle; };
+        content.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
 
         await dialog.ShowAsync();
     }
@@ -113,10 +113,7 @@ public sealed partial class MainWindow : Window
         content.SetValue(Grid.ColumnSpanProperty, widget.Area.ColumnSpan);
 
         var widgetPage = Grid.Children.OfType<Page>().FirstOrDefault(x => x.Name == name);
-        if (widget is not null)
-        {
-            Grid.Children.Remove(widgetPage);
-        }
+        Grid.Children.Remove(widgetPage);
 
         Grid.Children.Add(content);
     }
@@ -134,7 +131,7 @@ public sealed partial class MainWindow : Window
             PrimaryButtonCommand = new RelayCommand(content.ViewModel.Submit)
         };
 
-        content.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        content.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
 
         await dialog.ShowAsync();
     }

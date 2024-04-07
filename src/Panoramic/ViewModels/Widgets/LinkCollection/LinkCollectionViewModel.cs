@@ -38,7 +38,7 @@ public sealed partial class LinkCollectionViewModel : WidgetViewModel
 
     public string Title { get; }
 
-    public ObservableCollection<LinkViewModel> Links = [];
+    public readonly ObservableCollection<LinkViewModel> Links = [];
 
     [ObservableProperty]
     private Visibility filterIconVisibility = Visibility.Collapsed;

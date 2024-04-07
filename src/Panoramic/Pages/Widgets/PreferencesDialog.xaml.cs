@@ -10,7 +10,7 @@ using Windows.Storage.AccessCache;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
 
-namespace Panoramic.Pages;
+namespace Panoramic.Pages.Widgets;
 
 public sealed partial class PreferencesDialog : Page
 {

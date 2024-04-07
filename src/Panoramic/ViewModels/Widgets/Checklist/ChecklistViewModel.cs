@@ -58,7 +58,7 @@ public sealed partial class ChecklistViewModel : WidgetViewModel
 
     public string Title { get; }
 
-    public ObservableCollection<TaskViewModel> Tasks = [];
+    public readonly ObservableCollection<TaskViewModel> Tasks = [];
 
     [ObservableProperty]
     private Visibility filterIconVisibility = Visibility.Collapsed;

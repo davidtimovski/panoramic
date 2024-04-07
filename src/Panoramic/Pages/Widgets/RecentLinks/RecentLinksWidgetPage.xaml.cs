@@ -48,8 +48,8 @@ public sealed partial class RecentLinksWidgetPage : Page
             CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })
         };
 
-        content.AttachSettingsValidationHandler((_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; });
-        content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
+        content.AttachSettingsValidationHandler((_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; });
+        content.StepChanged += (_, e) => { dialog.Title = e.DialogTitle; };
 
         await dialog.ShowAsync();
     }

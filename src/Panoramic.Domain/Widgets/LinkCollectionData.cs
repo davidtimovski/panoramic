@@ -20,7 +20,7 @@ public sealed partial class LinkCollectionData : IWidgetData
         var lineIndex = 0;
         var title = lines[lineIndex][2..];
 
-        lineIndex += 4;
+        lineIndex += 2;
 
         // Links
         short order = 0;
@@ -34,8 +34,8 @@ public sealed partial class LinkCollectionData : IWidgetData
                 throw new ApplicationException($"Cannot parse hyperlink markdown: {hyperlinkMarkdown}");
             }
 
-            var titleGroup = match.Groups[1]!;
-            var uriGroup = match.Groups[2]!;
+            var titleGroup = match.Groups[1];
+            var uriGroup = match.Groups[2];
 
             links.Add(new LinkCollectionItemData
             {

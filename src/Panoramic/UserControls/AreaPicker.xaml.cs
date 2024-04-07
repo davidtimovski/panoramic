@@ -90,7 +90,7 @@ public sealed partial class AreaPicker : UserControl
         if (checkedToggles.Count < 2)
         {
             // Skip if there's only one section toggled
-            AreaReset?.Invoke(this, new EventArgs());
+            AreaReset?.Invoke(this, EventArgs.Empty);
             return;
         }
 
@@ -102,7 +102,7 @@ public sealed partial class AreaPicker : UserControl
             {
                 toggleKvp.Value.IsChecked = false;
             }
-            AreaReset?.Invoke(this, new EventArgs());
+            AreaReset?.Invoke(this, EventArgs.Empty);
             return;
         }
 
@@ -166,7 +166,7 @@ public sealed partial class AreaPicker : UserControl
             {
                 toggle.Value.IsChecked = false;
             }
-            AreaReset?.Invoke(this, new EventArgs());
+            AreaReset?.Invoke(this, EventArgs.Empty);
             return;
         }
 

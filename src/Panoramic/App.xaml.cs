@@ -26,7 +26,7 @@ public sealed partial class App : Application
 
         InitializeTheme();
 
-        ServiceCollection services = new();
+        ServiceCollection services = [];
 
         ConfigureServices(services);
         _serviceProvider = services.BuildServiceProvider();

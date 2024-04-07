@@ -90,10 +90,9 @@ public sealed partial class NoteWidgetPage : Page
             IsPrimaryButtonEnabled = false
         };
 
-        content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
         content.Submitted += (_, e) =>
         {
-            // TODO
             dialog.Hide();
         };
 
@@ -114,10 +113,9 @@ public sealed partial class NoteWidgetPage : Page
             IsPrimaryButtonEnabled = false
         };
 
-        content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
         content.Submitted += (_, e) =>
         {
-            // TODO
             dialog.Hide();
         };
 
@@ -141,10 +139,9 @@ public sealed partial class NoteWidgetPage : Page
             IsPrimaryButtonEnabled = false
         };
 
-        content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
         content.Submitted += (_, e) =>
         {
-            // TODO
             dialog.Hide();
         };
 
@@ -165,10 +162,9 @@ public sealed partial class NoteWidgetPage : Page
             IsPrimaryButtonEnabled = false
         };
 
-        content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
         content.Submitted += (_, e) =>
         {
-            // TODO
             dialog.Hide();
         };
 
@@ -191,10 +187,9 @@ public sealed partial class NoteWidgetPage : Page
             PrimaryButtonCommand = new RelayCommand(() => _storageService.RenameFolder(folder.Path.Absolute, content.ViewModel.Name))
         };
 
-        content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
         content.Submitted += (_, e) =>
         {
-            // TODO
             dialog.Hide();
         };
 
@@ -210,7 +205,7 @@ public sealed partial class NoteWidgetPage : Page
         {
             XamlRoot = Content.XamlRoot,
             Title = "Delete folder",
-            Content = $@"Are you sure want to delete the ""{folder.Name}"" folder and everything in it?",
+            Content = $"""Are you sure want to delete the "{folder.Name}" folder and everything in it?""",
             PrimaryButtonText = "Yes, delete",
             CloseButtonText = "Cancel",
             PrimaryButtonCommand = new RelayCommand(() => _storageService.DeleteFolder(folder.Path.Absolute))
@@ -235,10 +230,9 @@ public sealed partial class NoteWidgetPage : Page
             PrimaryButtonCommand = new RelayCommand(() => _storageService.RenameNote(note.Path.Absolute, content.ViewModel.Name))
         };
 
-        content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
         content.Submitted += (_, e) =>
         {
-            // TODO
             dialog.Hide();
         };
 
@@ -296,8 +290,8 @@ public sealed partial class NoteWidgetPage : Page
             CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })
         };
 
-        content.AttachSettingsValidationHandler((_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; });
-        content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
+        content.AttachSettingsValidationHandler((_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; });
+        content.StepChanged += (_, e) => { dialog.Title = e.DialogTitle; };
 
         await dialog.ShowAsync();
     }

@@ -45,7 +45,7 @@ public sealed partial class ChecklistWidgetPage : Page
             IsPrimaryButtonEnabled = false
         };
 
-        content.ViewModel.Validated += (_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; };
+        content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
         content.Submitted += (_, e) =>
         {
             AddTask(content.ViewModel);
@@ -97,8 +97,8 @@ public sealed partial class ChecklistWidgetPage : Page
             CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })
         };
 
-        content.AttachSettingsValidationHandler((_, e) => { dialog!.IsPrimaryButtonEnabled = e.Valid; });
-        content.StepChanged += (_, e) => { dialog!.Title = e.DialogTitle; };
+        content.AttachSettingsValidationHandler((_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; });
+        content.StepChanged += (_, e) => { dialog.Title = e.DialogTitle; };
 
         await dialog.ShowAsync();
     }

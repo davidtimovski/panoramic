@@ -37,8 +37,8 @@ public sealed partial class RecentLinksData : IWidgetData
                 throw new ApplicationException($"Cannot parse hyperlink markdown: {hyperlinkMarkdown}");
             }
 
-            var titleGroup = match.Groups[1]!;
-            var uriGroup = match.Groups[2]!;
+            var titleGroup = match.Groups[1];
+            var uriGroup = match.Groups[2];
 
             links.Add(new RecentLinkData
             {

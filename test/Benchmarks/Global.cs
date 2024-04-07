@@ -2,5 +2,5 @@
 
 internal static class Global
 {
-    public static string SamplesFolderName = "MarkdownSamples";
+    public const string SamplesFolderName = "MarkdownSamples";
 }

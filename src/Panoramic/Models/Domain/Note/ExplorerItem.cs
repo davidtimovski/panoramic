@@ -67,7 +67,7 @@ public sealed partial class ExplorerItem : ObservableObject
         }
     }
 
-    public ObservableCollection<ExplorerItem> Children = [];
+    public readonly ObservableCollection<ExplorerItem> Children = [];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Opacity))]
