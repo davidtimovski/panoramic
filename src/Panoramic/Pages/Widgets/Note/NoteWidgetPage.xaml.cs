@@ -79,6 +79,8 @@ public sealed partial class NoteWidgetPage : Page
         var folder = (ExplorerItem)menuItem.DataContext;
 
         var content = new NewNoteForm(folder.Path.Absolute);
+        void createNote() => _storageService.CreateNote(_widget.Id, folder.Path.Absolute, content.ViewModel.Name);
+
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -86,13 +88,14 @@ public sealed partial class NoteWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Add",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateNote(_widget.Id, folder.Path.Absolute, content.ViewModel.Name)),
+            PrimaryButtonCommand = new RelayCommand(createNote),
             IsPrimaryButtonEnabled = false
         };
 
         content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
         content.Submitted += (_, e) =>
         {
+            createNote();
             dialog.Hide();
         };
 
@@ -102,6 +105,8 @@ public sealed partial class NoteWidgetPage : Page
     private async void AddNoteFromContextMenu_Click(object _, RoutedEventArgs e)
     {
         var content = new NewNoteForm(_storageService.StoragePath);
+        void createNote() => _storageService.CreateNote(_widget.Id, _storageService.StoragePath, content.ViewModel.Name);
+
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -109,13 +114,14 @@ public sealed partial class NoteWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Add",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateNote(_widget.Id, _storageService.StoragePath, content.ViewModel.Name)),
+            PrimaryButtonCommand = new RelayCommand(createNote),
             IsPrimaryButtonEnabled = false
         };
 
         content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
         content.Submitted += (_, e) =>
         {
+            createNote();
             dialog.Hide();
         };
 
@@ -128,6 +134,8 @@ public sealed partial class NoteWidgetPage : Page
         var folder = (ExplorerItem)menuItem.DataContext;
 
         var content = new NewFolderForm(folder.Path.Absolute);
+        void createFolder() => _storageService.CreateFolder(_widget.Id, folder.Path.Absolute, content.ViewModel.Name);
+
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -135,13 +143,14 @@ public sealed partial class NoteWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Add",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateFolder(_widget.Id, folder.Path.Absolute, content.ViewModel.Name)),
+            PrimaryButtonCommand = new RelayCommand(createFolder),
             IsPrimaryButtonEnabled = false
         };
 
         content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
         content.Submitted += (_, e) =>
         {
+            createFolder();
             dialog.Hide();
         };
 
@@ -151,6 +160,8 @@ public sealed partial class NoteWidgetPage : Page
     private async void AddFolderFromContextMenu_Click(object _, RoutedEventArgs e)
     {
         var content = new NewFolderForm(_storageService.StoragePath);
+        void createFolder() => _storageService.CreateFolder(_widget.Id, _storageService.StoragePath, content.ViewModel.Name);
+
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -158,13 +169,14 @@ public sealed partial class NoteWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Add",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.CreateFolder(_widget.Id, _storageService.StoragePath, content.ViewModel.Name)),
+            PrimaryButtonCommand = new RelayCommand(createFolder),
             IsPrimaryButtonEnabled = false
         };
 
         content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
         content.Submitted += (_, e) =>
         {
+            createFolder();
             dialog.Hide();
         };
 
@@ -177,6 +189,8 @@ public sealed partial class NoteWidgetPage : Page
         var folder = (ExplorerItem)menuItem.DataContext;
 
         var content = new FolderRenameForm(folder.Path.Absolute);
+        void renameFolder() => _storageService.RenameFolder(folder.Path.Absolute, content.ViewModel.Name);
+
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -184,12 +198,13 @@ public sealed partial class NoteWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.RenameFolder(folder.Path.Absolute, content.ViewModel.Name))
+            PrimaryButtonCommand = new RelayCommand(renameFolder)
         };
 
         content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
         content.Submitted += (_, e) =>
         {
+            renameFolder();
             dialog.Hide();
         };
 
@@ -220,6 +235,8 @@ public sealed partial class NoteWidgetPage : Page
         var note = (ExplorerItem)menuItem.DataContext;
 
         var content = new NoteRenameForm(note.Path.Absolute);
+        void renameNote() => _storageService.RenameNote(note.Path.Absolute, content.ViewModel.Name);
+
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -227,12 +244,13 @@ public sealed partial class NoteWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.RenameNote(note.Path.Absolute, content.ViewModel.Name))
+            PrimaryButtonCommand = new RelayCommand(renameNote)
         };
 
         content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
         content.Submitted += (_, e) =>
         {
+            renameNote();
             dialog.Hide();
         };
 

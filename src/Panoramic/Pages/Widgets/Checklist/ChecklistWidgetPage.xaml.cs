@@ -34,6 +34,8 @@ public sealed partial class ChecklistWidgetPage : Page
     public void OpenNewTaskDialog()
     {
         var content = new NewTaskForm(_widget);
+        void addTask() => AddTask(content.ViewModel);
+
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -41,14 +43,14 @@ public sealed partial class ChecklistWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Add",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => AddTask(content.ViewModel)),
+            PrimaryButtonCommand = new RelayCommand(addTask),
             IsPrimaryButtonEnabled = false
         };
 
         content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
         content.Submitted += (_, e) =>
         {
-            AddTask(content.ViewModel);
+            addTask();
             dialog.Hide();
         };
 
