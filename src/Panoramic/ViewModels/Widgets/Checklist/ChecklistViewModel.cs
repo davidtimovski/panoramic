@@ -34,7 +34,7 @@ public sealed partial class ChecklistViewModel : WidgetViewModel
     {
         _titleDefaultForeground = ResourceUtil.WidgetForeground;
         _titleCompletedForeground = ResourceUtil.HighlightedForeground;
-        _taskDueDateBackground = ResourceUtil.WidgetHighlightedBackground;
+        _taskDueDateBackground = ResourceUtil.HighlightedBackground;
         _taskDueDateDueBackground = ResourceUtil.GetBrushFromPage("PanoramicTaskDueBackgroundBrush", page);
         _taskDueDateAlmostDueBackground = ResourceUtil.GetBrushFromPage("PanoramicTaskAlmostDueBackgroundBrush", page);
 
@@ -51,10 +51,13 @@ public sealed partial class ChecklistViewModel : WidgetViewModel
         _widget.TaskAdded += TaskAdded;
         _widget.TaskCompleted += TaskCompleted;
 
+        HeaderBackgroundBrush = ResourceUtil.WidgetHeaderBrushes[widget.HeaderHighlight];
         Title = widget.Title;
 
         SetViewModel();
     }
+
+    public SolidColorBrush HeaderBackgroundBrush { get; }
 
     public string Title { get; }
 

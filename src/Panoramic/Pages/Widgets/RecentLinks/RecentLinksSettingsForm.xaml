@@ -10,6 +10,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBox Grid.Row="0"
@@ -18,20 +19,34 @@
                  Header="Title"
                  MaxLength="60" />
 
-        <NumberBox Grid.Row="1"
+        <ComboBox Grid.Row="1"
+                  SelectedItem="{x:Bind ViewModel.HeaderHighlight, Mode=TwoWay}"
+                  Width="150"
+                  Header="Header highlight">
+            <x:String>None</x:String>
+            <x:String>Blue</x:String>
+            <x:String>Red</x:String>
+            <x:String>Green</x:String>
+            <x:String>Yellow</x:String>
+            <x:String>Orange</x:String>
+            <x:String>Purple</x:String>
+            <x:String>Teal</x:String>
+        </ComboBox>
+
+        <NumberBox Grid.Row="2"
                    Value="{x:Bind ViewModel.Capacity, Mode=TwoWay}"
                    Header="Capacity"
                    SpinButtonPlacementMode="Compact"
                    Minimum="3"
                    Maximum="100" />
 
-        <ToggleSwitch Grid.Row="2"
+        <ToggleSwitch Grid.Row="3"
                       IsOn="{x:Bind ViewModel.OnlyFromToday, Mode=TwoWay}"
                       Header="Only from today"
                       OffContent="Show all links"
                       OnContent="Show only today's clicked links" />
 
-        <ToggleSwitch Grid.Row="3"
+        <ToggleSwitch Grid.Row="4"
                       IsOn="{x:Bind ViewModel.Searchable, Mode=TwoWay}"
                       Header="Searchability"
                       OffContent="Links will not be filtered by global search"

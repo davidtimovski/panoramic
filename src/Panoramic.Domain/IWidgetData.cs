@@ -4,4 +4,5 @@ public interface IWidgetData
 {
     Guid Id { get; }
     Area Area { get; }
+    HeaderHighlight HeaderHighlight { get; }
 }

@@ -4,9 +4,11 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Services;
 using Panoramic.Services.Search;
+using Panoramic.Utils;
 
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
@@ -31,10 +33,13 @@ public sealed partial class LinkCollectionViewModel : WidgetViewModel
 
         _widget = widget;
 
+        HeaderBackgroundBrush = ResourceUtil.WidgetHeaderBrushes[widget.HeaderHighlight];
         Title = widget.Title;
 
         SetViewModel();
     }
+
+    public SolidColorBrush HeaderBackgroundBrush { get; }
 
     public string Title { get; }
 

@@ -4,10 +4,12 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Services;
 using Panoramic.Services.Search;
 using Panoramic.Services.Storage;
+using Panoramic.Utils;
 
 namespace Panoramic.ViewModels.Widgets.RecentLinks;
 
@@ -41,10 +43,13 @@ public sealed partial class RecentLinksViewModel : WidgetViewModel
 
         _widget = widget;
 
+        HeaderBackgroundBrush = ResourceUtil.WidgetHeaderBrushes[widget.HeaderHighlight];
         Title = widget.Title;
 
         SetViewModel();
     }
+
+    public SolidColorBrush HeaderBackgroundBrush { get; }
 
     public string Title { get; }
 

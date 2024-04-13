@@ -19,20 +19,20 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <Grid Background="{x:Bind ViewModel.Background, Mode=OneWay}" CornerRadius="{StaticResource PanoramicWidgetCornerRadius}" Padding="15">
+    <Grid Background="{x:Bind ViewModel.Background, Mode=OneWay}" CornerRadius="{StaticResource PanoramicWidgetCornerRadius}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0">
+        <Border Grid.Row="0" Background="{x:Bind ViewModel.HeaderBackgroundBrush}" Padding="15 8 8 8">
             <Grid ColumnSpacing="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Text="{x:Bind ViewModel.Title, Mode=OneWay}" Foreground="{StaticResource PanoramicWidgetForegroundBrush}" FontSize="16" TextWrapping="Wrap" />
+                <TextBlock Grid.Column="0" Text="{x:Bind ViewModel.Title, Mode=OneWay}" Foreground="{StaticResource PanoramicWidgetForegroundBrush}" FontSize="16" VerticalAlignment="Center" TextWrapping="Wrap" />
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <ToggleButton Click="EditButton_Click"
@@ -43,9 +43,32 @@
                         <FontIcon Glyph="&#xE70F;" FontSize="14" />
                     </ToggleButton>
 
+                    <DropDownButton Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}"
+                            ToolTipService.ToolTip="Add"
+                            Margin="0 0 8 0">
+                        <DropDownButton.Content>
+                            <FontIcon Glyph="&#xE710;" FontSize="14" />
+                        </DropDownButton.Content>
+
+                        <DropDownButton.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <MenuFlyoutItem Click="AddNoteFromContextMenu_Click" Text="Note">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE8A5;"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Click="AddFolderFromContextMenu_Click" Text="Folder">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE8B7;"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </DropDownButton.Flyout>
+                    </DropDownButton>
+
                     <DropDownButton AutomationProperties.Name="Setting">
                         <DropDownButton.Content>
-                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE712;" FontSize="14" />
+                            <FontIcon Glyph="&#xE712;" FontSize="14" />
                         </DropDownButton.Content>
                         <DropDownButton.Flyout>
                             <MenuFlyout Placement="Bottom">
@@ -53,9 +76,6 @@
                                 <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" />
                                 <MenuFlyoutItem Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" Click="DeleteNoteFromContextMenu_Click">Delete note</MenuFlyoutItem>
                                 <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" />
-                                <MenuFlyoutItem Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}" Click="AddNoteFromContextMenu_Click">Add note</MenuFlyoutItem>
-                                <MenuFlyoutItem Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}" Click="AddFolderFromContextMenu_Click">Add folder</MenuFlyoutItem>
-                                <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}" />
                                 <MenuFlyoutItem Click="SettingsButton_Click">Settings</MenuFlyoutItem>
                                 <MenuFlyoutItem Click="DeleteButton_Click">Delete</MenuFlyoutItem>
                             </MenuFlyout>
@@ -66,7 +86,7 @@
             </Grid>
         </Border>
 
-        <Border Grid.Row="1" Margin="0 15 0 0">
+        <Border Grid.Row="1" Padding="15">
             <Border.Resources>
                 <DataTemplate x:Key="FolderTemplate" x:DataType="m:ExplorerItem">
                     <TreeViewItem AutomationProperties.Name="{x:Bind Name}" ItemsSource="{x:Bind Children}" IsExpanded="True">

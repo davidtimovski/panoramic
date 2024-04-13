@@ -19,7 +19,7 @@ public sealed class NoteWidget : IWidget
     /// <summary>
     /// Constructs a new note widget.
     /// </summary>
-    public NoteWidget(IStorageService storageService, Area area, string fontFamily, double fontSize)
+    public NoteWidget(IStorageService storageService, Area area, HeaderHighlight headerHighlight, string fontFamily, double fontSize)
     {
         _storageService = storageService;
 
@@ -27,6 +27,7 @@ public sealed class NoteWidget : IWidget
         _dataFileName = WidgetUtil.CreateDataFileName(Id, WidgetType.Note);
 
         Area = area;
+        HeaderHighlight = headerHighlight;
         FontFamily = fontFamily;
         FontSize = fontSize;
     }
@@ -41,6 +42,7 @@ public sealed class NoteWidget : IWidget
 
         Id = data.Id;
         Area = data.Area;
+        HeaderHighlight = data.HeaderHighlight;
         FontFamily = data.FontFamily;
         FontSize = data.FontSize;
 
@@ -54,6 +56,7 @@ public sealed class NoteWidget : IWidget
     public Guid Id { get; }
     public WidgetType Type { get; } = WidgetType.Note;
     public Area Area { get; set; }
+    public HeaderHighlight HeaderHighlight { get; set; }
     public string FontFamily { get; set; }
     public double FontSize { get; set; }
     public FileSystemItemPath? NotePath { get; set; }
@@ -63,6 +66,7 @@ public sealed class NoteWidget : IWidget
         {
             Id = Id,
             Area = Area,
+            HeaderHighlight = HeaderHighlight,
             FontFamily = FontFamily,
             FontSize = FontSize,
             RelativeFilePath = NotePath?.Relative

@@ -16,26 +16,48 @@
                     <SolidColorBrush x:Key="PanoramicMainWindowBackgroundBrush" Color="#fafafa" />
                     
                     <SolidColorBrush x:Key="PanoramicWidgetBackgroundBrush" Color="#eee" />
-                    <SolidColorBrush x:Key="PanoramicWidgetHighlightedBackgroundBrush" Color="#d3e3f3" />
+                    <SolidColorBrush x:Key="PanoramicWidgetHighlightedBackgroundBrush" Color="#ddd" />
+                    
+                    <SolidColorBrush x:Key="PanoramicHighlightedBackgroundBrush" Color="#d3e3f3" />
 
                     <SolidColorBrush x:Key="PanoramicWidgetForegroundBrush" Color="#333" />
 
                     <SolidColorBrush x:Key="PanoramicBlueForeground" Color="#003E92" />
                     <SolidColorBrush x:Key="PanoramicHighlightedForeground" Color="#ac9100" />
                     <SolidColorBrush x:Key="PanoramicPaleTextForeground" Color="#888" />
+                    
+                    <!-- Header highlights -->
+                    <SolidColorBrush x:Key="PanoramicBlueHeaderHighlight" Color="#acf" />
+                    <SolidColorBrush x:Key="PanoramicRedHeaderHighlight" Color="#ef7777" />
+                    <SolidColorBrush x:Key="PanoramicGreenHeaderHighlight" Color="#bda" />
+                    <SolidColorBrush x:Key="PanoramicYellowHeaderHighlight" Color="#ed5" />
+                    <SolidColorBrush x:Key="PanoramicOrangeHeaderHighlight" Color="#ea5" />
+                    <SolidColorBrush x:Key="PanoramicPurpleHeaderHighlight" Color="#cbe" />
+                    <SolidColorBrush x:Key="PanoramicTealHeaderHighlight" Color="#aae0e0" />
                 </ResourceDictionary>
 
                 <ResourceDictionary x:Key="Dark">
                     <SolidColorBrush x:Key="PanoramicMainWindowBackgroundBrush" Color="#151515" />
                     
                     <SolidColorBrush x:Key="PanoramicWidgetBackgroundBrush" Color="#222" />
-                    <SolidColorBrush x:Key="PanoramicWidgetHighlightedBackgroundBrush" Color="#234" />
+                    <SolidColorBrush x:Key="PanoramicWidgetHighlightedBackgroundBrush" Color="#333" />
+                    
+                    <SolidColorBrush x:Key="PanoramicHighlightedBackgroundBrush" Color="#234" />
 
                     <SolidColorBrush x:Key="PanoramicWidgetForegroundBrush" Color="#eee" />
 
                     <SolidColorBrush x:Key="PanoramicBlueForeground" Color="#8DD7E9" />
                     <SolidColorBrush x:Key="PanoramicHighlightedForeground" Color="#ecd100" />
                     <SolidColorBrush x:Key="PanoramicPaleTextForeground" Color="#aaa" />
+
+                    <!-- Header highlights -->
+                    <SolidColorBrush x:Key="PanoramicBlueHeaderHighlight" Color="#112a4d" />
+                    <SolidColorBrush x:Key="PanoramicRedHeaderHighlight" Color="#411" />
+                    <SolidColorBrush x:Key="PanoramicGreenHeaderHighlight" Color="#131" />
+                    <SolidColorBrush x:Key="PanoramicYellowHeaderHighlight" Color="#444411" />
+                    <SolidColorBrush x:Key="PanoramicOrangeHeaderHighlight" Color="#553300" />
+                    <SolidColorBrush x:Key="PanoramicPurpleHeaderHighlight" Color="#31113e" />
+                    <SolidColorBrush x:Key="PanoramicTealHeaderHighlight" Color="#004040" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 

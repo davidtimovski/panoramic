@@ -29,6 +29,8 @@ public sealed partial class NoteViewModel : WidgetViewModel
 
         _widget = widget;
 
+        HeaderBackgroundBrush = ResourceUtil.WidgetHeaderBrushes[widget.HeaderHighlight];
+
         ReloadFiles();
 
         fontFamily = FontFamilyHelper.Get(_widget.FontFamily);
@@ -39,6 +41,8 @@ public sealed partial class NoteViewModel : WidgetViewModel
 
         _initialized = true;
     }
+
+    public SolidColorBrush HeaderBackgroundBrush { get; }
 
     public ObservableCollection<ExplorerItem> ExplorerItems { get; } = [];
 

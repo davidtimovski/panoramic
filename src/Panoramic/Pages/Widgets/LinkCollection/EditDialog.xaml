@@ -23,7 +23,7 @@
 
                     <FontIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
                               ToolTipService.ToolTip="Drag to reorder"
-                              FontFamily="Segoe MDL2 Assets"
+                             
                               Glyph="&#xE8CB;"
                               FontSize="14" />
                    
@@ -35,7 +35,7 @@
                             Click="DeleteLinkClicked"
                             ToolTipService.ToolTip="Remove"
                             VerticalAlignment="Stretch">
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;" FontSize="14" />
+                        <FontIcon Glyph="&#xE74D;" FontSize="14" />
                     </Button>
 
                     <TextBox Grid.Row="1" Grid.Column="1"
@@ -47,7 +47,7 @@
                                      IsEnabled="{x:Bind NavigationIsEnabled, Mode=OneWay}"
                                      ToolTipService.ToolTip="Navigate to"
                                      VerticalAlignment="Stretch">
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE71B;" FontSize="14" />
+                        <FontIcon Glyph="&#xE71B;" FontSize="14" />
                     </HyperlinkButton>
                 </Grid>
 

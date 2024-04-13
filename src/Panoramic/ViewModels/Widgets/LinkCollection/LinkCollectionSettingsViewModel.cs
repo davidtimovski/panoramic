@@ -34,6 +34,9 @@ public sealed partial class LinkCollectionSettingsViewModel(IStorageService stor
     }
 
     [ObservableProperty]
+    private string headerHighlight = data.HeaderHighlight.ToString();
+
+    [ObservableProperty]
     private bool searchable = data.Searchable;
 
     public void AttachValidationHandler(EventHandler<ValidationEventArgs> handler)
@@ -44,15 +47,18 @@ public sealed partial class LinkCollectionSettingsViewModel(IStorageService stor
 
     public async Task SubmitAsync()
     {
+        var headerHighlight = Enum.Parse<HeaderHighlight>(HeaderHighlight);
+
         if (Id == Guid.Empty)
         {
-            var widget = new LinkCollectionWidget(storageService, Area, Title.Trim(), Searchable);
+            var widget = new LinkCollectionWidget(storageService, Area, headerHighlight, Title.Trim(), Searchable);
             await storageService.AddNewWidgetAsync(widget);
         }
         else
         {
             var widget = (LinkCollectionWidget)storageService.Widgets[Id];
             widget.Area = Area;
+            widget.HeaderHighlight = headerHighlight;
             widget.Title = Title.Trim();
             widget.Searchable = Searchable;
 

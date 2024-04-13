@@ -19,7 +19,7 @@ public sealed class ChecklistWidget : IWidget
     /// <summary>
     /// Constructs a new link collection widget.
     /// </summary>
-    public ChecklistWidget(IStorageService storageService, Area area, string title, bool searchable)
+    public ChecklistWidget(IStorageService storageService, Area area, HeaderHighlight headerHighlight, string title, bool searchable)
     {
         _storageService = storageService;
 
@@ -27,6 +27,7 @@ public sealed class ChecklistWidget : IWidget
         _dataFileName = WidgetUtil.CreateDataFileName(Id, WidgetType.Checklist);
 
         Area = area;
+        HeaderHighlight = headerHighlight;
         Title = title;
         Searchable = searchable;
         tasks = [];
@@ -42,6 +43,7 @@ public sealed class ChecklistWidget : IWidget
 
         Id = data.Id;
         Area = data.Area;
+        HeaderHighlight = data.HeaderHighlight;
         Title = data.Title;
         Searchable = data.Searchable;
         tasks = data.Tasks.Select(x => new ChecklistTask { Title = x.Title, DueDate = x.DueDate, Created = x.Created }).ToList();
@@ -50,6 +52,7 @@ public sealed class ChecklistWidget : IWidget
     public Guid Id { get; }
     public WidgetType Type { get; } = WidgetType.Checklist;
     public Area Area { get; set; }
+    public HeaderHighlight HeaderHighlight { get; set; }
     public string Title { get; set; }
     public bool Searchable { get; set; }
 
@@ -90,6 +93,7 @@ public sealed class ChecklistWidget : IWidget
         {
             Id = Id,
             Area = Area,
+            HeaderHighlight = HeaderHighlight,
             Title = Title,
             Searchable = Searchable,
             Tasks = tasks.Select(x => new ChecklistTaskData { Title = x.Title, DueDate = x.DueDate, Created = x.Created }).ToList()

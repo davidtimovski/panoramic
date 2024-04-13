@@ -34,6 +34,9 @@ public sealed partial class RecentLinksSettingsViewModel(IStorageService storage
     }
 
     [ObservableProperty]
+    private string headerHighlight = data.HeaderHighlight.ToString();
+
+    [ObservableProperty]
     private int capacity = data.Capacity;
 
     [ObservableProperty]
@@ -50,15 +53,18 @@ public sealed partial class RecentLinksSettingsViewModel(IStorageService storage
 
     public async Task SubmitAsync()
     {
+        var headerHighlight = Enum.Parse<HeaderHighlight>(HeaderHighlight);
+
         if (Id == Guid.Empty)
         {
-            var widget = new RecentLinksWidget(storageService, Area, Title.Trim(), Capacity, OnlyFromToday, Searchable);
+            var widget = new RecentLinksWidget(storageService, Area, headerHighlight, Title.Trim(), Capacity, OnlyFromToday, Searchable);
             await storageService.AddNewWidgetAsync(widget);
         }
         else
         {
             var widget = (RecentLinksWidget)storageService.Widgets[Id];
             widget.Area = Area;
+            widget.HeaderHighlight = headerHighlight;
             widget.Title = Title;
             widget.Capacity = Capacity;
             widget.OnlyFromToday = OnlyFromToday;

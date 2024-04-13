@@ -19,7 +19,7 @@ public sealed class LinkCollectionWidget : IWidget
     /// <summary>
     /// Constructs a new link collection widget.
     /// </summary>
-    public LinkCollectionWidget(IStorageService storageService, Area area, string title, bool searchable)
+    public LinkCollectionWidget(IStorageService storageService, Area area, HeaderHighlight headerHighlight, string title, bool searchable)
     {
         _storageService = storageService;
 
@@ -27,6 +27,7 @@ public sealed class LinkCollectionWidget : IWidget
         _dataFileName = WidgetUtil.CreateDataFileName(Id, WidgetType.LinkCollection);
 
         Area = area;
+        HeaderHighlight = headerHighlight;
         Title = title;
         Searchable = searchable;
         links = [];
@@ -42,6 +43,7 @@ public sealed class LinkCollectionWidget : IWidget
 
         Id = data.Id;
         Area = data.Area;
+        HeaderHighlight = data.HeaderHighlight;
         Title = data.Title;
         Searchable = data.Searchable;
         links = data.Links.Select(x => new LinkCollectionItem { Title = x.Title, Uri = x.Uri, Order = x.Order }).ToList();
@@ -50,6 +52,7 @@ public sealed class LinkCollectionWidget : IWidget
     public Guid Id { get; }
     public WidgetType Type { get; } = WidgetType.LinkCollection;
     public Area Area { get; set; }
+    public HeaderHighlight HeaderHighlight { get; set; }
     public string Title { get; set; }
     public bool Searchable { get; set; }
 
@@ -68,6 +71,7 @@ public sealed class LinkCollectionWidget : IWidget
         {
             Id = Id,
             Area = Area,
+            HeaderHighlight = HeaderHighlight,
             Title = Title,
             Searchable = Searchable,
             Links = links.Select(x => new LinkCollectionItemData { Title = x.Title, Uri = x.Uri, Order = x.Order }).ToList()

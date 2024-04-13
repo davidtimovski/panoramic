@@ -8,6 +8,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
         <TextBox Grid.Row="0"
@@ -16,7 +17,21 @@
                  Header="Title"
                  MaxLength="60" />
 
-        <ToggleSwitch Grid.Row="1"
+        <ComboBox Grid.Row="1"
+                  SelectedItem="{x:Bind ViewModel.HeaderHighlight, Mode=TwoWay}"
+                  Width="150"
+                  Header="Header highlight">
+            <x:String>None</x:String>
+            <x:String>Blue</x:String>
+            <x:String>Red</x:String>
+            <x:String>Green</x:String>
+            <x:String>Yellow</x:String>
+            <x:String>Orange</x:String>
+            <x:String>Purple</x:String>
+            <x:String>Teal</x:String>
+        </ComboBox>
+
+        <ToggleSwitch Grid.Row="2"
                       IsOn="{x:Bind ViewModel.Searchable, Mode=TwoWay}"
                       Header="Searchability"
                       OffContent="Tasks will not be filtered by global search"

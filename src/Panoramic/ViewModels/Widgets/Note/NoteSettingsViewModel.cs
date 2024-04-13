@@ -27,6 +27,7 @@ public sealed partial class NoteSettingsViewModel
 
         Id = data.Id;
         area = data.Area;
+        headerHighlight = data.HeaderHighlight.ToString();
         fontFamily = data.FontFamily;
         fontSize = data.FontSize.ToString(CultureInfo.InvariantCulture);
     }
@@ -38,6 +39,9 @@ public sealed partial class NoteSettingsViewModel
 
     [ObservableProperty]
     private Area area;
+
+    [ObservableProperty]
+    private string headerHighlight;
 
     public ObservableCollection<string> FontFamilyOptions { get; } = [];
 
@@ -56,16 +60,18 @@ public sealed partial class NoteSettingsViewModel
     public async Task SubmitAsync()
     {
         var size = double.Parse(FontSize);
+        var headerHighlight = Enum.Parse<HeaderHighlight>(HeaderHighlight);
 
         if (Id == Guid.Empty)
         {
-            var widget = new NoteWidget(_storageService, Area, FontFamily, size);
+            var widget = new NoteWidget(_storageService, Area, headerHighlight, FontFamily, size);
             await _storageService.AddNewWidgetAsync(widget);
         }
         else
         {
             var widget = (NoteWidget)_storageService.Widgets[Id];
             widget.Area = Area;
+            widget.HeaderHighlight = headerHighlight;
             widget.FontFamily = FontFamily;
             widget.FontSize = size;
 

@@ -23,38 +23,38 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <Grid Background="{x:Bind ViewModel.Background, Mode=OneWay}" CornerRadius="{StaticResource PanoramicWidgetCornerRadius}" Padding="15">
+    <Grid Background="{x:Bind ViewModel.Background, Mode=OneWay}" CornerRadius="{StaticResource PanoramicWidgetCornerRadius}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0">
+        <Border Grid.Row="0" Background="{x:Bind ViewModel.HeaderBackgroundBrush}" Padding="15 8 8 8">
             <Grid ColumnSpacing="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Text="{x:Bind ViewModel.Title}" Foreground="{StaticResource PanoramicWidgetForegroundBrush}" FontSize="16" TextWrapping="Wrap" />
+                <TextBlock Grid.Column="0" Text="{x:Bind ViewModel.Title}" Foreground="{StaticResource PanoramicWidgetForegroundBrush}" FontSize="16" VerticalAlignment="Center" TextWrapping="Wrap" />
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <Border Visibility="{x:Bind ViewModel.FilterIconVisibility, Mode=OneWay}"
-                            Background="{StaticResource PanoramicWidgetHighlightedBackgroundBrush}"
+                            Background="{StaticResource PanoramicHighlightedBackgroundBrush}"
                             Margin="0 0 8 0" Padding="10 0" CornerRadius="6" ToolTipService.ToolTip="Filtered">
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE71C;" FontSize="10" />
+                        <FontIcon Glyph="&#xE71C;" FontSize="10" />
                     </Border>
 
                     <Button Click="AddTask_Click"
                             VerticalAlignment="Stretch"
                             Margin="0 0 8 0"
                             ToolTipService.ToolTip="New task">
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;" FontSize="11" />
+                        <FontIcon Glyph="&#xE710;" FontSize="11" />
                     </Button>
 
                     <DropDownButton AutomationProperties.Name="Setting">
                         <DropDownButton.Content>
-                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE712;" FontSize="14" />
+                            <FontIcon Glyph="&#xE712;" FontSize="14" />
                         </DropDownButton.Content>
                         <DropDownButton.Flyout>
                             <MenuFlyout Placement="Bottom">
@@ -69,7 +69,7 @@
             </Grid>
         </Border>
 
-        <Border Grid.Row="1" Margin="0 15 0 0">
+        <Border Grid.Row="1" Padding="15">
 
             <Border.Resources>
                 <DataTemplate x:Key="ChecklistViewTemplate" x:DataType="vm:TaskViewModel">
@@ -96,7 +96,7 @@
                         </Border>
                         
                         <Button Grid.Row="0" Grid.Column="2" Click="{x:Bind Complete}" IsEnabled="{x:Bind IsEnabled, Mode=OneWay}">
-                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE73E;" FontSize="14" />
+                            <FontIcon Glyph="&#xE73E;" FontSize="14" />
                         </Button>
                     </Grid>
                 </DataTemplate>

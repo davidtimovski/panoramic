@@ -7,9 +7,24 @@
     <Grid RowSpacing="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
+        <ComboBox Grid.Row="0"
+                  SelectedItem="{x:Bind ViewModel.HeaderHighlight, Mode=TwoWay}"
+                  Width="150"
+                  Header="Header highlight">
+            <x:String>None</x:String>
+            <x:String>Blue</x:String>
+            <x:String>Red</x:String>
+            <x:String>Green</x:String>
+            <x:String>Yellow</x:String>
+            <x:String>Orange</x:String>
+            <x:String>Purple</x:String>
+            <x:String>Teal</x:String>
+        </ComboBox>
+
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />

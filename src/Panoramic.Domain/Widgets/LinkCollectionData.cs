@@ -9,6 +9,7 @@ public sealed partial class LinkCollectionData : IWidgetData
 
     public required Guid Id { get; init; }
     public required Area Area { get; init; }
+    public HeaderHighlight HeaderHighlight { get; init; }
     public string Title { get; init; } = "My links";
     public bool Searchable { get; init; } = true;
     public required List<LinkCollectionItemData> Links { get; init; }
@@ -53,12 +54,14 @@ public sealed partial class LinkCollectionData : IWidgetData
         // Metadata
         var idRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         var areaRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var headerHighlightRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         var searchableRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
         return new LinkCollectionData
         {
             Id = Guid.ParseExact(idRowValues[1], "N"),
             Area = new(areaRowValues[1]),
+            HeaderHighlight = Enum.Parse<HeaderHighlight>(headerHighlightRowValues[1]),
             Title = title,
             Searchable = bool.Parse(searchableRowValues[1]),
             Links = links
@@ -82,6 +85,7 @@ public sealed partial class LinkCollectionData : IWidgetData
         builder.AppendLine("| - | - |");
         builder.AppendLine($"| {nameof(Id)} | {Id:N} |");
         builder.AppendLine($"| {nameof(Area)} | {Area} |");
+        builder.AppendLine($"| {nameof(HeaderHighlight)} | {HeaderHighlight} |");
         builder.AppendLine($"| {nameof(Searchable)} | {Searchable} |");
         builder.AppendLine();
         builder.Append($"> Version: {Version}");

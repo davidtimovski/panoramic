@@ -9,6 +9,7 @@ public sealed partial class RecentLinksData : IWidgetData
 
     public required Guid Id { get; init; }
     public required Area Area { get; init; }
+    public HeaderHighlight HeaderHighlight { get; init; }
     public string Title { get; init; } = "Recent";
     public int Capacity { get; init; } = 15;
     public bool OnlyFromToday { get; init; }
@@ -55,14 +56,16 @@ public sealed partial class RecentLinksData : IWidgetData
         // Metadata
         var idRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         var areaRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var headerHighlightRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         var capacityRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         var onlyFromTodayRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         var searchableRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
+        
         return new RecentLinksData
         {
             Id = Guid.ParseExact(idRowValues[1], "N"),
             Area = new(areaRowValues[1]),
+            HeaderHighlight = Enum.Parse<HeaderHighlight>(headerHighlightRowValues[1]),
             Title = title,
             Capacity = int.Parse(capacityRowValues[1]),
             OnlyFromToday = bool.Parse(onlyFromTodayRowValues[1]),
@@ -91,6 +94,7 @@ public sealed partial class RecentLinksData : IWidgetData
         builder.AppendLine("| - | - |");
         builder.AppendLine($"| {nameof(Id)} | {Id:N} |");
         builder.AppendLine($"| {nameof(Area)} | {Area} |");
+        builder.AppendLine($"| {nameof(HeaderHighlight)} | {HeaderHighlight} |");
         builder.AppendLine($"| {nameof(Capacity)} | {Capacity} |");
         builder.AppendLine($"| {nameof(OnlyFromToday)} | {OnlyFromToday} |");
         builder.AppendLine($"| {nameof(Searchable)} | {Searchable} |");

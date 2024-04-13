@@ -8,6 +8,7 @@ public sealed class ChecklistData : IWidgetData
 
     public required Guid Id { get; init; }
     public required Area Area { get; init; }
+    public HeaderHighlight HeaderHighlight { get; init; }
     public string Title { get; init; } = "To do";
     public bool Searchable { get; init; } = true;
     public required List<ChecklistTaskData> Tasks { get; init; }
@@ -46,12 +47,14 @@ public sealed class ChecklistData : IWidgetData
         // Metadata
         var idRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         var areaRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var headerHighlightRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         var searchableRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
         return new ChecklistData
         {
             Id = Guid.ParseExact(idRowValues[1], "N"),
             Area = new(areaRowValues[1]),
+            HeaderHighlight = Enum.Parse<HeaderHighlight>(headerHighlightRowValues[1]),
             Title = title,
             Searchable = bool.Parse(searchableRowValues[1]),
             Tasks = tasks
@@ -75,6 +78,7 @@ public sealed class ChecklistData : IWidgetData
         builder.AppendLine("| - | - |");
         builder.AppendLine($"| {nameof(Id)} | {Id:N} |");
         builder.AppendLine($"| {nameof(Area)} | {Area} |");
+        builder.AppendLine($"| {nameof(HeaderHighlight)} | {HeaderHighlight} |");
         builder.AppendLine($"| {nameof(Searchable)} | {Searchable} |");
         builder.AppendLine();
         builder.Append($"> Version: {Version}");
