@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
@@ -20,7 +19,7 @@ public sealed partial class EditViewModel : ObservableObject
     private readonly HttpClient _httpClient;
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly IStorageService _storageService;
-    private readonly Guid _id;
+    private readonly LinkCollectionWidget _widget;
 
     public EditViewModel(
         HttpClient httpClient,
@@ -31,7 +30,7 @@ public sealed partial class EditViewModel : ObservableObject
         _httpClient = httpClient;
         _dispatcherQueue = dispatcherQueue;
         _storageService = storageService;
-        _id = widget.Id;
+        _widget = widget;
 
         foreach (var link in widget.Links)
         {
@@ -130,22 +129,16 @@ public sealed partial class EditViewModel : ObservableObject
 
     public async Task SaveAsync()
     {
-        var widget = (LinkCollectionWidget)_storageService.Widgets[_id];
-
-        var links = new List<LinkCollectionItem>(Links.Count);
-        for (short i = 0; i < Links.Count; i++)
+        short order = 1;
+        _widget.Links = Links
+            .Where(x => x.Uri is not null)
+            .Select(x => new LinkCollectionItem
         {
-            var link = Links[i];
+            Title = x.Title.Trim(),
+            Uri = x.Uri!,
+            Order = order++
+        }).ToList();
 
-            links.Add(new LinkCollectionItem
-            {
-                Title = link.Title.Trim(),
-                Uri = link.Uri!,
-                Order = (short)(i + 1)
-            });
-        }
-
-        widget.Links = links;
-        await _storageService.SaveWidgetAsync(widget);
+        await _storageService.SaveWidgetAsync(_widget);
     }
 }

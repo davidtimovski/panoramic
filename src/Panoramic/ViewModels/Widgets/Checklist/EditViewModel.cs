@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,14 +11,14 @@ namespace Panoramic.ViewModels.Widgets.Checklist;
 public sealed partial class EditViewModel : ObservableObject
 {
     private readonly IStorageService _storageService;
-    private readonly Guid _id;
+    private readonly ChecklistWidget _widget;
 
     public EditViewModel(
         IStorageService storageService,
         ChecklistWidget widget)
     {
         _storageService = storageService;
-        _id = widget.Id;
+        _widget = widget;
 
         foreach (var task in widget.Tasks)
         {
@@ -52,22 +51,14 @@ public sealed partial class EditViewModel : ObservableObject
 
     public async Task SaveAsync()
     {
-        var widget = (ChecklistWidget)_storageService.Widgets[_id];
-
-        var tasks = new List<ChecklistTask>(Tasks.Count);
-        for (short i = 0; i < Tasks.Count; i++)
-        {
-            var task = Tasks[i];
-
-            tasks.Add(new ChecklistTask
+        _widget.Tasks = Tasks
+            .Select(x => new ChecklistTask
             {
-                Title = task.Title.Trim(),
-                DueDate = task.DueDate.HasValue ? DateOnly.FromDateTime(task.DueDate.Value.Date) : null,
-                Created = task.Created
-            });
-        }
+                Title = x.Title.Trim(),
+                DueDate = x.DueDate.HasValue ? DateOnly.FromDateTime(x.DueDate.Value.Date) : null,
+                Created = x.Created
+            }).ToList();
 
-        widget.Tasks = tasks;
-        await _storageService.SaveWidgetAsync(widget);
+        await _storageService.SaveWidgetAsync(_widget);
     }
 }

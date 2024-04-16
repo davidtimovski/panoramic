@@ -1,6 +1,5 @@
 ﻿using System;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Panoramic.Utils;
 
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
@@ -20,7 +19,7 @@ public sealed partial class EditLinkViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(NavigationIsEnabled))]
     private string url;
 
-    public Uri? Uri => UriHelper.Create(Url);
+    public Uri? Uri => Url.Trim().Length > 0 && Uri.TryCreate(Url.Trim(), UriKind.Absolute, out var createdUri) ? createdUri : null;
 
     public bool NavigationIsEnabled => Uri is not null;
 }
