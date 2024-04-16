@@ -22,6 +22,7 @@
 | - | - |
 | Id | 2ef4e491de914484b376660d5d622520 |
 | Area | 05-26 |
+| HeaderHighlight | Blue |
 | Searchable | True |
 
 > Version: 1

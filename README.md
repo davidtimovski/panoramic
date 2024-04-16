@@ -4,7 +4,8 @@ A productivity app that revolves around a high-level view of notes, links, and c
 
 Organized as a grid system, it allows you to add widgets in a layout that you prefer.
 
-![Preview](design/preview.webp)
+![Preview (Dark)](design/preview-dark.webp)
+![Preview (Light)](design/preview-light.webp)
 
 ---
 

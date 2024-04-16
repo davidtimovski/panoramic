@@ -24,6 +24,7 @@
 | - | - |
 | Id | c4dc56ec789a4865892d35c442a716b5 |
 | Area | 35-56 |
+| HeaderHighlight | Yellow |
 | Capacity | 15 |
 | Only from today | False |
 | Searchable | True |
