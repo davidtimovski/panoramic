@@ -44,7 +44,7 @@
             </Grid>
         </Border>
 
-        <Border Grid.Row="1" Padding="15">
+        <Border Grid.Row="1" Padding="10">
 
             <Border.Resources>
                 <DataTemplate x:Key="RecentLinksViewTemplate" x:DataType="vm:RecentLinkViewModel">

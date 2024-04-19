@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
+using Panoramic.Data.Exceptions;
 
 namespace Panoramic.Data.Widgets;
 
@@ -16,56 +17,73 @@ public sealed partial class LinkCollectionData : IWidgetData
 
     public static LinkCollectionData FromMarkdown(string markdown)
     {
+        var lineIndex = 0;
         var lines = markdown.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
 
-        var lineIndex = 0;
-        var title = lines[lineIndex][2..];
-
-        lineIndex += 2;
-
-        // Links
-        short order = 0;
-        var links = new List<LinkCollectionItemData>();
-        while (lines[lineIndex].StartsWith('-'))
+        try
         {
-            var hyperlinkMarkdown = lines[lineIndex][2..];
-            var match = HyperlinkMarkdownRegex().Match(hyperlinkMarkdown);
-            if (!match.Success)
+            var title = lines[lineIndex][2..];
+
+            lineIndex += 2;
+
+            // Links
+            short order = 0;
+            var links = new List<LinkCollectionItemData>();
+            while (lines[lineIndex].StartsWith('-'))
             {
-                throw new ApplicationException($"Cannot parse hyperlink markdown: {hyperlinkMarkdown}");
+                var hyperlinkMarkdown = lines[lineIndex][2..];
+                var match = HyperlinkMarkdownRegex().Match(hyperlinkMarkdown);
+                if (!match.Success)
+                {
+                    throw new ApplicationException($"Cannot parse hyperlink markdown: {hyperlinkMarkdown}");
+                }
+
+                var titleGroup = match.Groups[1];
+                var uriGroup = match.Groups[2];
+
+                links.Add(new LinkCollectionItemData
+                {
+                    Title = titleGroup.Value,
+                    Uri = new Uri(uriGroup.Value),
+                    Order = order
+                });
+
+                order++;
+                lineIndex++;
             }
 
-            var titleGroup = match.Groups[1];
-            var uriGroup = match.Groups[2];
+            lineIndex += 5;
 
-            links.Add(new LinkCollectionItemData
-            {
-                Title = titleGroup.Value,
-                Uri = new Uri(uriGroup.Value),
-                Order = order
-            });
-
-            order++;
+            // Metadata
+            var idRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var id = Guid.ParseExact(idRowValues[1], "N");
             lineIndex++;
+
+            var areaRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var area = new Area(areaRowValues[1]);
+            lineIndex++;
+
+            var headerHighlightRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var headerHighlight = Enum.Parse<HeaderHighlight>(headerHighlightRowValues[1]);
+            lineIndex++;
+
+            var searchableRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var searchable = bool.Parse(searchableRowValues[1]);
+
+            return new LinkCollectionData
+            {
+                Id = id,
+                Area = area,
+                HeaderHighlight = headerHighlight,
+                Title = title,
+                Searchable = searchable,
+                Links = links
+            };
         }
-
-        lineIndex += 5;
-
-        // Metadata
-        var idRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var areaRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var headerHighlightRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var searchableRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-        return new LinkCollectionData
+        catch
         {
-            Id = Guid.ParseExact(idRowValues[1], "N"),
-            Area = new(areaRowValues[1]),
-            HeaderHighlight = Enum.Parse<HeaderHighlight>(headerHighlightRowValues[1]),
-            Title = title,
-            Searchable = bool.Parse(searchableRowValues[1]),
-            Links = links
-        };
+            throw new MarkdownParsingException(lines, lineIndex);
+        }
     }
 
     public void ToMarkdown(StringBuilder builder)

@@ -20,7 +20,7 @@ public sealed partial class TaskViewModel : ObservableObject
         SolidColorBrush titleDefaultForeground,
         SolidColorBrush titleCompletedForeground,
         SolidColorBrush dueDateBackground,
-        SolidColorBrush dueDateDueBackground,
+        SolidColorBrush dueDateOverdueBackground,
         SolidColorBrush dueDateAlmostDueBackground)
     {
         _widget = widget;
@@ -28,7 +28,6 @@ public sealed partial class TaskViewModel : ObservableObject
         _titleCompletedForeground = titleCompletedForeground;
 
         Title = title;
-        DueDate = dueDate.HasValue ? dueDate.Value.ToString("MMM d", Global.Culture) : string.Empty;
         DueDateVisibility = dueDate.HasValue ? Visibility.Visible : Visibility.Collapsed;
 
         DueDateBackground = dueDateBackground;
@@ -37,22 +36,24 @@ public sealed partial class TaskViewModel : ObservableObject
             var now = DateTime.Now;
             if (dueDate.Value.Date <= now.Date)
             {
-                DueDateTooltip = dueDate.Value.Date == now.Date ? "Due today" : "Overdue";
-                DueDateBackground = dueDateDueBackground;
+                DueDateBackground = dueDateOverdueBackground;
             }
             else if (dueDate.Value.Date == now.Date.AddDays(1))
             {
-                DueDateTooltip = "Due tomorrow";
+                DueLabel = "Tomorrow";
                 DueDateBackground = dueDateAlmostDueBackground;
+            }
+            else
+            {
+                DueLabel = dueDate.Value.ToString("MMM d", Global.Culture);
             }
         }
     }
 
     public string Title { get; }
     public SolidColorBrush TitleForeground => IsEnabled ? _titleDefaultForeground : _titleCompletedForeground;
-    public string DueDate { get; }
+    public string DueLabel { get; } = string.Empty;
     public Visibility DueDateVisibility { get; }
-    public string? DueDateTooltip { get; }
     public SolidColorBrush DueDateBackground { get; }
 
     [ObservableProperty]

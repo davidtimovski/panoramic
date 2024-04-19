@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:uc="using:Panoramic.UserControls">
 
-    <Grid Background="{StaticResource PanoramicMainWindowBackgroundBrush}">
+    <Grid Background="{StaticResource PanoramicMainWindowBackgroundBrush}" x:Name="RootElement">
         <Grid.KeyboardAccelerators>
             <KeyboardAccelerator Invoked="ControlSHotkey_Invoked" Key="S" Modifiers="Control" ToolTipService.ToolTip="" />
             <KeyboardAccelerator Invoked="EscapeHotkey_Invoked" Key="Escape" ToolTipService.ToolTip="" />

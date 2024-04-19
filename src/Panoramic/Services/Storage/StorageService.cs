@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
+using Panoramic.Data.Exceptions;
 using Panoramic.Models;
 using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.Checklist;
@@ -356,26 +357,34 @@ public sealed class StorageService : IStorageService
         var type = WidgetUtil.GetType(widgetFilePath);
         var markdown = await File.ReadAllTextAsync(widgetFilePath);
 
-        switch (type)
+        try
         {
-            case WidgetType.Note:
-                var noteWidget = NoteWidget.Load(this, markdown);
-                Widgets.Add(noteWidget.Id, noteWidget);
-                break;
-            case WidgetType.LinkCollection:
-                var linkCollectionWidget = LinkCollectionWidget.Load(this, markdown);
-                Widgets.Add(linkCollectionWidget.Id, linkCollectionWidget);
-                break;
-            case WidgetType.RecentLinks:
-                var recentLinksWidget = RecentLinksWidget.Load(this, markdown);
-                Widgets.Add(recentLinksWidget.Id, recentLinksWidget);
-                break;
-            case WidgetType.Checklist:
-                var checklistWidget = ChecklistWidget.Load(this, markdown);
-                Widgets.Add(checklistWidget.Id, checklistWidget);
-                break;
-            default:
-                throw new InvalidOperationException("Unsupported widget type");
+            switch (type)
+            {
+                case WidgetType.Note:
+                    var noteWidget = NoteWidget.Load(this, markdown);
+                    Widgets.Add(noteWidget.Id, noteWidget);
+                    break;
+                case WidgetType.LinkCollection:
+                    var linkCollectionWidget = LinkCollectionWidget.Load(this, markdown);
+                    Widgets.Add(linkCollectionWidget.Id, linkCollectionWidget);
+                    break;
+                case WidgetType.RecentLinks:
+                    var recentLinksWidget = RecentLinksWidget.Load(this, markdown);
+                    Widgets.Add(recentLinksWidget.Id, recentLinksWidget);
+                    break;
+                case WidgetType.Checklist:
+                    var checklistWidget = ChecklistWidget.Load(this, markdown);
+                    Widgets.Add(checklistWidget.Id, checklistWidget);
+                    break;
+                default:
+                    throw new InvalidOperationException("Unsupported widget type");
+            }
+        }
+        catch (MarkdownParsingException ex)
+        {
+            ex.FilePath = Path.GetFileName(widgetFilePath);
+            throw;
         }
     }
 

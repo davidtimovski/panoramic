@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Panoramic.Pages.MarkdownParsingFailure"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Width="550">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition MinHeight="200" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   TextWrapping="Wrap"
+                   Margin="0 0 0 5">An error occurred during markdown parsing. The following widget file is not correctly formatted:</TextBlock>
+
+        <TextBox Grid.Row="1"
+                 Text="{x:Bind FilePath}"
+                 Margin="0 0 0 10"
+                 IsReadOnly="True" />
+
+        <TextBlock Grid.Row="2"
+                   Margin="0 0 0 8"
+                   TextWrapping="Wrap">The line where the issue most likely occurred is highlighted below.</TextBlock>
+
+        <Border Grid.Row="3"
+                Background="{StaticResource PanoramicMainWindowBackgroundBrush}"
+                Margin="0 0 0 10"
+                Padding="10"
+                CornerRadius="{StaticResource PanoramicWidgetCornerRadius}">
+            <ScrollView>
+                <RichTextBlock x:Name="MarkdownPresenter" />
+            </ScrollView>
+        </Border>
+
+        <TextBlock Grid.Row="4" TextWrapping="Wrap">Fix the formatting and start the app again.</TextBlock>
+    </Grid>
+    
+</Page>

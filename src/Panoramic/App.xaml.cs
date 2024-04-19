@@ -58,9 +58,6 @@ public sealed partial class App : Application
             return;
         }
 
-        var storageService = _serviceProvider.GetRequiredService<IStorageService>();
-        await storageService.ReadAsync();
-
         var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
         mainWindow.Activate();
     }

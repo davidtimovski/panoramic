@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Panoramic.Data.Exceptions;
 
 namespace Panoramic.Data.Widgets;
 
@@ -15,50 +16,67 @@ public sealed class ChecklistData : IWidgetData
 
     public static ChecklistData FromMarkdown(string markdown)
     {
+        var lineIndex = 0;
         var lines = markdown.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
 
-        var lineIndex = 0;
-        var title = lines[lineIndex][2..];
-
-        lineIndex += 2;
-
-        // Tasks
-        var tasks = new List<ChecklistTaskData>();
-        while (lines[lineIndex].StartsWith('-'))
+        try
         {
-            var taskTitle = lines[lineIndex][6..];
-            var taskDueDateString = lines[lineIndex + 1][6..].Trim();
-            var taskDueDate = taskDueDateString.Length > 0 ? DateOnly.ParseExact(taskDueDateString, Global.StoredDateOnlyFormat) : (DateOnly?)null;
-            var taskCreatedString = lines[lineIndex + 2][11..];
-            var taskCreated = DateTime.ParseExact(taskCreatedString, Global.StoredDateTimeFormat, Global.Culture);
+            var title = lines[lineIndex][2..];
 
-            tasks.Add(new ChecklistTaskData
+            lineIndex += 2;
+
+            // Tasks
+            var tasks = new List<ChecklistTaskData>();
+            while (lines[lineIndex].StartsWith('-'))
             {
-                Title = taskTitle,
-                DueDate = taskDueDate,
-                Created = taskCreated
-            });
+                var taskTitle = lines[lineIndex][6..];
+                var taskDueDateString = lines[lineIndex + 1][6..].Trim();
+                var taskDueDate = taskDueDateString.Length > 0 ? DateOnly.ParseExact(taskDueDateString, Global.StoredDateOnlyFormat) : (DateOnly?)null;
+                var taskCreatedString = lines[lineIndex + 2][11..];
+                var taskCreated = DateTime.ParseExact(taskCreatedString, Global.StoredDateTimeFormat, Global.Culture);
 
-            lineIndex += 3;
+                tasks.Add(new ChecklistTaskData
+                {
+                    Title = taskTitle,
+                    DueDate = taskDueDate,
+                    Created = taskCreated
+                });
+
+                lineIndex += 3;
+            }
+
+            lineIndex += 5;
+
+            // Metadata
+            var idRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var id = Guid.ParseExact(idRowValues[1], "N");
+            lineIndex++;
+
+            var areaRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var area = new Area(areaRowValues[1]);
+            lineIndex++;
+
+            var headerHighlightRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var headerHighlight = Enum.Parse<HeaderHighlight>(headerHighlightRowValues[1]);
+            lineIndex++;
+
+            var searchableRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var searchable = bool.Parse(searchableRowValues[1]);
+
+            return new ChecklistData
+            {
+                Id = id,
+                Area = area,
+                HeaderHighlight = headerHighlight,
+                Title = title,
+                Searchable = searchable,
+                Tasks = tasks
+            };
         }
-
-        lineIndex += 5;
-
-        // Metadata
-        var idRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var areaRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var headerHighlightRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var searchableRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-        return new ChecklistData
+        catch
         {
-            Id = Guid.ParseExact(idRowValues[1], "N"),
-            Area = new(areaRowValues[1]),
-            HeaderHighlight = Enum.Parse<HeaderHighlight>(headerHighlightRowValues[1]),
-            Title = title,
-            Searchable = bool.Parse(searchableRowValues[1]),
-            Tasks = tasks
-        };
+            throw new MarkdownParsingException(lines, lineIndex);
+        }
     }
 
     public void ToMarkdown(StringBuilder builder)

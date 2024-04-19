@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Panoramic.Data.Exceptions;
 
 namespace Panoramic.Data.Widgets;
 
@@ -15,27 +16,48 @@ public sealed class NoteData : IWidgetData
 
     public static NoteData FromMarkdown(string markdown)
     {
+        var lineIndex = 6;
         var lines = markdown.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
 
-        var lineIndex = 6;
-
-        // Metadata
-        var idRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var areaRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var headerHighlightRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var fontFamilyRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var fontSizeRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var relativeFilePathRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-        return new NoteData
+        try
         {
-            Id = Guid.ParseExact(idRowValues[1], "N"),
-            Area = new(areaRowValues[1]),
-            HeaderHighlight = Enum.Parse<HeaderHighlight>(headerHighlightRowValues[1]),
-            FontFamily = fontFamilyRowValues[1],
-            FontSize = double.Parse(fontSizeRowValues[1]),
-            RelativeFilePath = relativeFilePathRowValues.Length == 1 ? null : relativeFilePathRowValues[1]
-        };
+            // Metadata
+            var idRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var id = Guid.ParseExact(idRowValues[1], "N");
+            lineIndex++;
+
+            var areaRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var area = new Area(areaRowValues[1]);
+            lineIndex++;
+
+            var headerHighlightRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var headerHighlight = Enum.Parse<HeaderHighlight>(headerHighlightRowValues[1]);
+            lineIndex++;
+
+            var fontFamily = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[1];
+            lineIndex++;
+
+            var fontSizeRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var fontSize = double.Parse(fontSizeRowValues[1]);
+            lineIndex++;
+
+            var relativeFilePathRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var relativeFilePath = relativeFilePathRowValues.Length == 1 ? null : relativeFilePathRowValues[1];
+
+            return new NoteData
+            {
+                Id = id,
+                Area = area,
+                HeaderHighlight = headerHighlight,
+                FontFamily = fontFamily,
+                FontSize = fontSize,
+                RelativeFilePath = relativeFilePath
+            };
+        }
+        catch
+        {
+            throw new MarkdownParsingException(lines, lineIndex);
+        }
     }
 
     public void ToMarkdown(StringBuilder builder)

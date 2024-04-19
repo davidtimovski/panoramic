@@ -21,7 +21,7 @@ public sealed partial class ChecklistViewModel : WidgetViewModel
     private readonly SolidColorBrush _titleDefaultForeground;
     private readonly SolidColorBrush _titleCompletedForeground;
     private readonly SolidColorBrush _taskDueDateBackground;
-    private readonly SolidColorBrush _taskDueDateDueBackground;
+    private readonly SolidColorBrush _taskDueDateOverdueBackground;
     private readonly SolidColorBrush _taskDueDateAlmostDueBackground;
 
     private readonly ISearchService _searchService;
@@ -35,7 +35,7 @@ public sealed partial class ChecklistViewModel : WidgetViewModel
         _titleDefaultForeground = ResourceUtil.WidgetForeground;
         _titleCompletedForeground = ResourceUtil.HighlightedForeground;
         _taskDueDateBackground = ResourceUtil.HighlightedBackground;
-        _taskDueDateDueBackground = ResourceUtil.GetBrushFromPage("PanoramicTaskDueBackgroundBrush", page);
+        _taskDueDateOverdueBackground = ResourceUtil.GetBrushFromPage("PanoramicTaskOverdueBackgroundBrush", page);
         _taskDueDateAlmostDueBackground = ResourceUtil.GetBrushFromPage("PanoramicTaskAlmostDueBackgroundBrush", page);
 
         _searchService = searchService;
@@ -114,6 +114,6 @@ public sealed partial class ChecklistViewModel : WidgetViewModel
     private TaskViewModel MapToViewModel(ChecklistTask task)
     {
         var dueDate = task.DueDate.HasValue ? (DateTimeOffset?)task.DueDate.Value.ToDateTime(TimeOnly.MinValue) : null;
-        return new(_widget, task.Title, dueDate, _titleDefaultForeground, _titleCompletedForeground, _taskDueDateBackground, _taskDueDateDueBackground, _taskDueDateAlmostDueBackground);
+        return new(_widget, task.Title, dueDate, _titleDefaultForeground, _titleCompletedForeground, _taskDueDateBackground, _taskDueDateOverdueBackground, _taskDueDateAlmostDueBackground);
     }
 }

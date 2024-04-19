@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
+using Panoramic.Data.Exceptions;
 
 namespace Panoramic.Data.Widgets;
 
@@ -18,60 +19,83 @@ public sealed partial class RecentLinksData : IWidgetData
 
     public static RecentLinksData FromMarkdown(string markdown)
     {
+        var lineIndex = 0;
         var lines = markdown.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
 
-        var lineIndex = 0;
-        var title = lines[lineIndex][2..];
-
-        lineIndex += 4;
-
-        // Links
-        var links = new List<RecentLinkData>();
-        while (lines[lineIndex].StartsWith('|'))
+        try
         {
-            var linkLineParts = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var title = lines[lineIndex][2..];
 
-            var hyperlinkMarkdown = linkLineParts[0];
-            var match = HyperlinkMarkdownRegex().Match(hyperlinkMarkdown);
-            if (!match.Success)
+            lineIndex += 4;
+
+            // Links
+            var links = new List<RecentLinkData>();
+            while (lines[lineIndex].StartsWith('|'))
             {
-                throw new ApplicationException($"Cannot parse hyperlink markdown: {hyperlinkMarkdown}");
+                var linkLineParts = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+                var hyperlinkMarkdown = linkLineParts[0];
+                var match = HyperlinkMarkdownRegex().Match(hyperlinkMarkdown);
+                if (!match.Success)
+                {
+                    throw new ApplicationException($"Cannot parse hyperlink markdown: {hyperlinkMarkdown}");
+                }
+
+                var titleGroup = match.Groups[1];
+                var uriGroup = match.Groups[2];
+
+                links.Add(new RecentLinkData
+                {
+                    Title = titleGroup.Value,
+                    Uri = new Uri(uriGroup.Value),
+                    Clicked = DateTime.ParseExact(linkLineParts[1], Global.StoredDateTimeFormat, Global.Culture)
+                });
+
+                lineIndex++;
             }
 
-            var titleGroup = match.Groups[1];
-            var uriGroup = match.Groups[2];
+            lineIndex += 5;
 
-            links.Add(new RecentLinkData
-            {
-                Title = titleGroup.Value,
-                Uri = new Uri(uriGroup.Value),
-                Clicked = DateTime.ParseExact(linkLineParts[1], Global.StoredDateTimeFormat, Global.Culture)
-            });
-
+            // Metadata
+            var idRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var id = Guid.ParseExact(idRowValues[1], "N");
             lineIndex++;
+
+            var areaRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var area = new Area(areaRowValues[1]);
+            lineIndex++;
+
+            var headerHighlightRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var headerHighlight = Enum.Parse<HeaderHighlight>(headerHighlightRowValues[1]);
+            lineIndex++;
+
+            var capacityRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var capacity = int.Parse(capacityRowValues[1]);
+            lineIndex++;
+
+            var onlyFromTodayRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var onlyFromToday = bool.Parse(onlyFromTodayRowValues[1]);
+            lineIndex++;
+
+            var searchableRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var searchable = bool.Parse(searchableRowValues[1]);
+
+            return new RecentLinksData
+            {
+                Id = id,
+                Area = area,
+                HeaderHighlight = headerHighlight,
+                Title = title,
+                Capacity = capacity,
+                OnlyFromToday = onlyFromToday,
+                Searchable = searchable,
+                Links = links
+            };
         }
-
-        lineIndex += 5;
-
-        // Metadata
-        var idRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var areaRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var headerHighlightRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var capacityRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var onlyFromTodayRowValues = lines[lineIndex++].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var searchableRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        
-        return new RecentLinksData
+        catch
         {
-            Id = Guid.ParseExact(idRowValues[1], "N"),
-            Area = new(areaRowValues[1]),
-            HeaderHighlight = Enum.Parse<HeaderHighlight>(headerHighlightRowValues[1]),
-            Title = title,
-            Capacity = int.Parse(capacityRowValues[1]),
-            OnlyFromToday = bool.Parse(onlyFromTodayRowValues[1]),
-            Searchable = bool.Parse(searchableRowValues[1]),
-            Links = links
-        };
+            throw new MarkdownParsingException(lines, lineIndex);
+        }
     }
 
     public void ToMarkdown(StringBuilder builder)

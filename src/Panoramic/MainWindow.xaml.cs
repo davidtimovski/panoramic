@@ -1,9 +1,11 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Panoramic.Data.Exceptions;
 using Panoramic.Models;
 using Panoramic.Models.Domain.Checklist;
 using Panoramic.Models.Domain.LinkCollection;
@@ -39,6 +41,7 @@ public sealed partial class MainWindow : Window
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
 
+        RootElement.Loaded += RootElement_Loaded;
         Closed += WindowClosed;
 
         _preferencesService = preferencesService;
@@ -50,14 +53,36 @@ public sealed partial class MainWindow : Window
         _serviceProvider = serviceProvider;
 
         ViewModel = viewModel;
+    }
+
+    public MainViewModel ViewModel { get; }
+
+    private async void RootElement_Loaded(object _, RoutedEventArgs e)
+    {
+        try
+        {
+            await _storageService.ReadAsync();
+        }
+        catch (MarkdownParsingException ex)
+        {
+            var content = new MarkdownParsingFailure(ex.FilePath!, ex.Lines, ex.PotentialErrorLine);
+            var dialog = new ContentDialog
+            {
+                XamlRoot = Content.XamlRoot,
+                Title = "Markdown parsing failure",
+                Content = content,
+                CloseButtonText = "I understand, exit",
+                CloseButtonCommand = new RelayCommand(Process.GetCurrentProcess().Kill)
+            };
+            await dialog.ShowAsync();
+            return;
+        }
 
         foreach (var id in _storageService.Widgets.Keys)
         {
             RenderWidget(id);
         }
     }
-
-    public MainViewModel ViewModel { get; }
 
     private async void WindowClosed(object _, WindowEventArgs args)
     {
@@ -106,14 +131,17 @@ public sealed partial class MainWindow : Window
 
         var name = widget.Id.ToString("N");
 
-        content.SetValue(Page.NameProperty, name);
+        content.SetValue(FrameworkElement.NameProperty, name);
         content.SetValue(Grid.RowProperty, widget.Area.Row);
         content.SetValue(Grid.ColumnProperty, widget.Area.Column);
         content.SetValue(Grid.RowSpanProperty, widget.Area.RowSpan);
         content.SetValue(Grid.ColumnSpanProperty, widget.Area.ColumnSpan);
 
         var widgetPage = Grid.Children.OfType<Page>().FirstOrDefault(x => x.Name == name);
-        Grid.Children.Remove(widgetPage);
+        if (widgetPage is not null)
+        {
+            Grid.Children.Remove(widgetPage);
+        }
 
         Grid.Children.Add(content);
     }
