@@ -9,28 +9,45 @@
         <Grid.Resources>
             <DataTemplate x:Key="ListViewTemplate" x:DataType="vm:EditTaskViewModel">
 
-                <Grid Margin="0 8" ColumnSpacing="10">
+                <Grid Margin="0 8" RowSpacing="5" ColumnSpacing="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBox Grid.Column="0"
+                    <TextBox Grid.Row="0" Grid.Column="0"
                              Text="{x:Bind Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              MaxLength="60"
                              PlaceholderText="Title" />
 
-                    <CalendarDatePicker Grid.Column="1"
+                    <CalendarDatePicker Grid.Row="0" Grid.Column="1"
                                         Date="{x:Bind DueDate, Mode=TwoWay}"
                                         PlaceholderText="Due" />
 
-                    <Button Grid.Column="2"
+                    <Button Grid.Row="0" Grid.Column="2"
                             Click="DeleteTaskClicked"
                             ToolTipService.ToolTip="Remove"
                             VerticalAlignment="Stretch">
                         <FontIcon Glyph="&#xE74D;" FontSize="14" />
                     </Button>
+
+                    <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                             Text="{x:Bind Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             PlaceholderText="URL" />
+                    
+                    <HyperlinkButton Grid.Row="1" Grid.Column="2"
+                                     NavigateUri="{x:Bind Uri, Mode=OneWay}"
+                                     IsEnabled="{x:Bind NavigationIsEnabled, Mode=OneWay}"
+                                     ToolTipService.ToolTip="Navigate to"
+                                     VerticalAlignment="Stretch">
+                        <FontIcon Glyph="&#xE71B;" FontSize="14" />
+                    </HyperlinkButton>
                 </Grid>
 
             </DataTemplate>

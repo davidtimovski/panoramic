@@ -23,7 +23,7 @@ public sealed partial class EditViewModel : ObservableObject
         foreach (var task in widget.Tasks)
         {
             var dueDate = task.DueDate.HasValue ? (DateTimeOffset?)task.DueDate.Value.ToDateTime(TimeOnly.MinValue) : null;
-            Tasks.Add(new EditTaskViewModel(task.Title, dueDate, task.Created));
+            Tasks.Add(new EditTaskViewModel(task.Title, dueDate, task.Uri, task.Created));
         }
     }
 
@@ -34,7 +34,13 @@ public sealed partial class EditViewModel : ObservableObject
     [ObservableProperty]
     private DateTimeOffset? newTaskDueDate;
 
-    public bool NewTaskFormValid => NewTaskTitle.Trim().Length > 0;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(NewTaskFormValid))]
+    private string newTaskUri = string.Empty;
+
+    public bool NewTaskFormValid =>
+        NewTaskTitle.Trim().Length > 0 &&
+        (NewTaskUri.Trim().Length == 0 || Uri.TryCreate(NewTaskUri.Trim(), UriKind.Absolute, out var _));
 
     public ObservableCollection<EditTaskViewModel> Tasks { get; } = [];
 
@@ -42,7 +48,10 @@ public sealed partial class EditViewModel : ObservableObject
 
     public void Add()
     {
-        Tasks.Add(new EditTaskViewModel(NewTaskTitle.Trim(), NewTaskDueDate, DateTime.Now));
+        var uri = NewTaskUri.Trim().Length > 0 && Uri.TryCreate(NewTaskUri.Trim(), UriKind.Absolute, out var createdUri) ? createdUri : null;
+
+        Tasks.Add(new EditTaskViewModel(NewTaskTitle.Trim(), NewTaskDueDate, uri, DateTime.Now));
+
         NewTaskTitle = string.Empty;
         NewTaskDueDate = null;
     }
@@ -56,6 +65,7 @@ public sealed partial class EditViewModel : ObservableObject
             {
                 Title = x.Title.Trim(),
                 DueDate = x.DueDate.HasValue ? DateOnly.FromDateTime(x.DueDate.Value.Date) : null,
+                Uri = x.Uri,
                 Created = x.Created
             }).ToList();
 

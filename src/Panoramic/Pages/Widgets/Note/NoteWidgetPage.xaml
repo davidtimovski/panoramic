@@ -3,7 +3,8 @@
     x:Class="Panoramic.Pages.Widgets.Note.NoteWidgetPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:m="using:Panoramic.Models.Domain.Note">
+    xmlns:m="using:Panoramic.Models.Domain.Note"
+    xmlns:vm="using:Panoramic.ViewModels.Widgets.Note">
 
     <Page.Resources>
         <ResourceDictionary>
@@ -122,9 +123,9 @@
                     </TreeViewItem>
                 </DataTemplate>
 
-                <m:ExplorerItemTemplateSelector x:Key="ExplorerItemTemplateSelector"
-                FolderTemplate="{StaticResource FolderTemplate}"
-                FileTemplate="{StaticResource FileTemplate}" />
+                <vm:ExplorerItemTemplateSelector x:Key="ExplorerItemTemplateSelector"
+                                                 FolderTemplate="{StaticResource FolderTemplate}"
+                                                 FileTemplate="{StaticResource FileTemplate}" />
             </Border.Resources>
 
             <Grid>

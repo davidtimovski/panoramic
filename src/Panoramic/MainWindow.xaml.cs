@@ -65,7 +65,7 @@ public sealed partial class MainWindow : Window
         }
         catch (MarkdownParsingException ex)
         {
-            var content = new MarkdownParsingFailure(ex.FilePath!, ex.Lines, ex.PotentialErrorLine);
+            var content = new MarkdownParsingFailure(ex.FileName!, ex.Lines, ex.PotentialErrorLine);
             var dialog = new ContentDialog
             {
                 XamlRoot = Content.XamlRoot,

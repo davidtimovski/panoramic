@@ -1,9 +1,10 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 using Panoramic.Data.Exceptions;
 
 namespace Panoramic.Data.Widgets;
 
-public sealed class ChecklistData : IWidgetData
+public sealed partial class ChecklistData : IWidgetData
 {
     private const short Version = 1;
 
@@ -29,7 +30,19 @@ public sealed class ChecklistData : IWidgetData
             var tasks = new List<ChecklistTaskData>();
             while (lines[lineIndex].StartsWith('-'))
             {
+                Uri? uri = null;
                 var taskTitle = lines[lineIndex][6..];
+
+                var match = HyperlinkMarkdownRegex().Match(taskTitle);
+                if (match.Success)
+                {
+                    var titleGroup = match.Groups[1];
+                    var uriGroup = match.Groups[2];
+
+                    taskTitle = titleGroup.Value;
+                    uri = new Uri(uriGroup.Value);
+                }
+
                 var taskDueDateString = lines[lineIndex + 1][6..].Trim();
                 var taskDueDate = taskDueDateString.Length > 0 ? DateOnly.ParseExact(taskDueDateString, Global.StoredDateOnlyFormat) : (DateOnly?)null;
                 var taskCreatedString = lines[lineIndex + 2][11..];
@@ -39,6 +52,7 @@ public sealed class ChecklistData : IWidgetData
                 {
                     Title = taskTitle,
                     DueDate = taskDueDate,
+                    Uri = uri,
                     Created = taskCreated
                 });
 
@@ -101,17 +115,22 @@ public sealed class ChecklistData : IWidgetData
         builder.AppendLine();
         builder.Append($"> Version: {Version}");
     }
+
+    [GeneratedRegex(@"\[([^\[\]]*)\]\((.*?)\)", RegexOptions.Singleline)]
+    private static partial Regex HyperlinkMarkdownRegex();
 }
 
 public sealed class ChecklistTaskData
 {
     public required string Title { get; init; }
     public required DateOnly? DueDate { get; init; }
+    public required Uri? Uri { get; init; }
     public required DateTime Created { get; init; }
 
     public void ToMarkdown(StringBuilder builder)
     {
-        builder.AppendLine($"- [ ] {Title}");
+        var title = Uri is not null ? $"[{Title}]({Uri})" : Title;
+        builder.AppendLine($"- [ ] {title}");
 
         var dueDate = DueDate.HasValue ? DueDate.Value.ToString(Global.StoredDateOnlyFormat) : string.Empty;
         builder.AppendLine($"  Due: {dueDate}");

@@ -65,7 +65,11 @@ public sealed class RecentLinksWidget : IWidget
     private List<RecentLink> links;
     public IReadOnlyList<RecentLink> Links
     {
-        get => links.OrderByDescending(x => x.Clicked).Take(Capacity).ToList();
+        get
+        {
+            var query = OnlyFromToday ? links.Where(x => x.Clicked >= DateTime.Today) : links;
+            return query.OrderByDescending(x => x.Clicked).Take(Capacity).ToList();
+        }
         private set
         {
             links = [.. value];
@@ -92,10 +96,6 @@ public sealed class RecentLinksWidget : IWidget
         }
 
         var query = Links.AsEnumerable();
-        if (OnlyFromToday)
-        {
-            query = query.Where(x => x.Clicked >= DateTime.Today);
-        }
 
         links.Clear();
         links.AddRange(query.OrderByDescending(x => x.Clicked).Take(Capacity));

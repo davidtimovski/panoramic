@@ -383,7 +383,7 @@ public sealed class StorageService : IStorageService
         }
         catch (MarkdownParsingException ex)
         {
-            ex.FilePath = Path.GetFileName(widgetFilePath);
+            ex.FileName = Path.GetFileName(widgetFilePath);
             throw;
         }
     }

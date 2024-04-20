@@ -4,25 +4,30 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Panoramic.Data;
 using Panoramic.Models.Domain.Checklist;
+using Panoramic.Services;
 
 namespace Panoramic.ViewModels.Widgets.Checklist;
 
 public sealed partial class TaskViewModel : ObservableObject
 {
+    private readonly IEventHub _eventHub;
     private readonly ChecklistWidget _widget;
     private readonly SolidColorBrush _titleDefaultForeground;
     private readonly SolidColorBrush _titleCompletedForeground;
 
     public TaskViewModel(
+        IEventHub eventHub,
         ChecklistWidget widget,
         string title,
         DateTimeOffset? dueDate,
+        Uri? uri,
         SolidColorBrush titleDefaultForeground,
         SolidColorBrush titleCompletedForeground,
         SolidColorBrush dueDateBackground,
         SolidColorBrush dueDateOverdueBackground,
         SolidColorBrush dueDateAlmostDueBackground)
     {
+        _eventHub = eventHub;
         _widget = widget;
         _titleDefaultForeground = titleDefaultForeground;
         _titleCompletedForeground = titleCompletedForeground;
@@ -48,6 +53,8 @@ public sealed partial class TaskViewModel : ObservableObject
                 DueLabel = dueDate.Value.ToString("MMM d", Global.Culture);
             }
         }
+
+        Uri = uri;
     }
 
     public string Title { get; }
@@ -55,6 +62,7 @@ public sealed partial class TaskViewModel : ObservableObject
     public string DueLabel { get; } = string.Empty;
     public Visibility DueDateVisibility { get; }
     public SolidColorBrush DueDateBackground { get; }
+    public Uri? Uri { get; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TitleForeground))]
@@ -66,4 +74,6 @@ public sealed partial class TaskViewModel : ObservableObject
 
         _widget.CompleteTask(Title);
     }
+
+    public void Clicked() => _eventHub.RaiseHyperlinkClicked($"{Title} - {_widget.Title}", Uri!, DateTime.Now);
 }

@@ -46,7 +46,7 @@ public sealed class ChecklistWidget : IWidget
         HeaderHighlight = data.HeaderHighlight;
         Title = data.Title;
         Searchable = data.Searchable;
-        tasks = data.Tasks.Select(x => new ChecklistTask { Title = x.Title, DueDate = x.DueDate, Created = x.Created }).ToList();
+        tasks = data.Tasks.Select(x => new ChecklistTask { Title = x.Title, DueDate = x.DueDate, Uri = x.Uri, Created = x.Created }).ToList();
     }
 
     public Guid Id { get; }
@@ -72,9 +72,9 @@ public sealed class ChecklistWidget : IWidget
     public bool TaskCanBeCreated(string title)
         => !tasks.Any(x => x.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
 
-    public void AddTask(string title, DateOnly? dueDate)
+    public void AddTask(string title, DateOnly? dueDate, Uri? uri)
     {
-        tasks.Add(new ChecklistTask { Title = title, DueDate = dueDate, Created = DateTime.Now });
+        tasks.Add(new ChecklistTask { Title = title, DueDate = dueDate, Uri = uri, Created = DateTime.Now });
         _storageService.EnqueueWidgetWrite(Id);
 
         TaskAdded?.Invoke(this, EventArgs.Empty);
@@ -96,7 +96,7 @@ public sealed class ChecklistWidget : IWidget
             HeaderHighlight = HeaderHighlight,
             Title = Title,
             Searchable = Searchable,
-            Tasks = tasks.Select(x => new ChecklistTaskData { Title = x.Title, DueDate = x.DueDate, Created = x.Created }).ToList()
+            Tasks = tasks.Select(x => new ChecklistTaskData { Title = x.Title, DueDate = x.DueDate, Uri = x.Uri, Created = x.Created }).ToList()
         };
 
     public static ChecklistWidget Load(IStorageService storageService, string markdown)

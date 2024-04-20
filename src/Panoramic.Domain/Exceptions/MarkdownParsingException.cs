@@ -4,5 +4,5 @@ public class MarkdownParsingException(IReadOnlyList<string> lines, int potential
 {
     public IReadOnlyList<string> Lines { get; } = lines;
     public int PotentialErrorLine { get; } = potentialErrorLine;
-    public string? FilePath { get; set; }
+    public string? FileName { get; set; }
 }

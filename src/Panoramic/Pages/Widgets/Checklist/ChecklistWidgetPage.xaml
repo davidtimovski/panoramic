@@ -70,9 +70,8 @@
         </Border>
 
         <Border Grid.Row="1" Padding="15 10">
-
             <Border.Resources>
-                <DataTemplate x:Key="ChecklistViewTemplate" x:DataType="vm:TaskViewModel">
+                <DataTemplate x:Key="TaskTemplate" x:DataType="vm:TaskViewModel">
                     <Grid ColumnSpacing="8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -101,11 +100,51 @@
                         </Grid>
                     </Grid>
                 </DataTemplate>
+
+                <DataTemplate x:Key="UriTaskTemplate" x:DataType="vm:TaskViewModel">
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <RichTextBlock VerticalAlignment="Center">
+                            <Paragraph>
+                                <Hyperlink NavigateUri="{x:Bind Uri}" Click="{x:Bind Clicked}">
+                                    <Run Text="{x:Bind Title}" TextDecorations="None" />
+                                </Hyperlink>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <Grid Grid.Column="1" ColumnSpacing="8" VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0"
+                                    Visibility="{x:Bind DueDateVisibility}"
+                                    Background="{x:Bind DueDateBackground}"
+                                    CornerRadius="5"
+                                    Padding="10 0">
+                                <TextBlock Grid.Column="0" Text="{x:Bind DueLabel}" Foreground="{StaticResource PanoramicTaskDueDateForeground}" FontSize="12" VerticalAlignment="Center" />
+                            </Border>
+
+                            <Button Grid.Column="1" Click="{x:Bind Complete}" IsEnabled="{x:Bind IsEnabled, Mode=OneWay}">
+                                <FontIcon Glyph="&#xE73E;" FontSize="14" />
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+
+                <vm:TaskTemplateSelector x:Key="ExplorerItemTemplateSelector"
+                                         TaskTemplate="{StaticResource TaskTemplate}"
+                                         UriTaskTemplate="{StaticResource UriTaskTemplate}" />
             </Border.Resources>
 
             <ListView
                 ItemsSource="{x:Bind ViewModel.Tasks}"
-                ItemTemplate="{StaticResource ChecklistViewTemplate}"
+                ItemTemplateSelector="{StaticResource ExplorerItemTemplateSelector}"
                 SelectionMode="None">
 
                 <ListView.ItemContainerStyle>

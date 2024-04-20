@@ -1,8 +1,9 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Panoramic.Models.Domain.Note;
 using Panoramic.Services.Storage;
 
-namespace Panoramic.Models.Domain.Note;
+namespace Panoramic.ViewModels.Widgets.Note;
 
 public sealed class ExplorerItemTemplateSelector : DataTemplateSelector
 {

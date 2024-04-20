@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Panoramic.Models.Domain.Checklist;
+using Panoramic.Services;
 using Panoramic.Services.Search;
 using Panoramic.Utils;
 
@@ -24,19 +25,22 @@ public sealed partial class ChecklistViewModel : WidgetViewModel
     private readonly SolidColorBrush _taskDueDateOverdueBackground;
     private readonly SolidColorBrush _taskDueDateAlmostDueBackground;
 
+    private readonly IEventHub _eventHub;
     private readonly ISearchService _searchService;
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly DispatcherQueueTimer _debounceTimer;
     private readonly ChecklistWidget _widget;
     private readonly Queue<TaskViewModel> _tasksToBeRemoved = [];
 
-    public ChecklistViewModel(ISearchService searchService, DispatcherQueue dispatcherQueue, Page page, ChecklistWidget widget)
+    public ChecklistViewModel(IEventHub eventHub, ISearchService searchService, DispatcherQueue dispatcherQueue, Page page, ChecklistWidget widget)
     {
         _titleDefaultForeground = ResourceUtil.WidgetForeground;
         _titleCompletedForeground = ResourceUtil.HighlightedForeground;
         _taskDueDateBackground = ResourceUtil.HighlightedBackground;
         _taskDueDateOverdueBackground = ResourceUtil.GetBrushFromPage("PanoramicTaskOverdueBackgroundBrush", page);
         _taskDueDateAlmostDueBackground = ResourceUtil.GetBrushFromPage("PanoramicTaskAlmostDueBackgroundBrush", page);
+
+        _eventHub = eventHub;
 
         _searchService = searchService;
         if (widget.Searchable)
@@ -114,6 +118,6 @@ public sealed partial class ChecklistViewModel : WidgetViewModel
     private TaskViewModel MapToViewModel(ChecklistTask task)
     {
         var dueDate = task.DueDate.HasValue ? (DateTimeOffset?)task.DueDate.Value.ToDateTime(TimeOnly.MinValue) : null;
-        return new(_widget, task.Title, dueDate, _titleDefaultForeground, _titleCompletedForeground, _taskDueDateBackground, _taskDueDateOverdueBackground, _taskDueDateAlmostDueBackground);
+        return new(_eventHub, _widget, task.Title, dueDate, task.Uri, _titleDefaultForeground, _titleCompletedForeground, _taskDueDateBackground, _taskDueDateOverdueBackground, _taskDueDateAlmostDueBackground);
     }
 }

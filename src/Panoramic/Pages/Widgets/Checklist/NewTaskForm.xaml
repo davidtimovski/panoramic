@@ -4,24 +4,34 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Grid Width="350" ColumnSpacing="10">
+    <Grid Width="350" RowSpacing="10" ColumnSpacing="10">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <TextBox Grid.Column="0"
+        <TextBox Grid.Row="0" Grid.Column="0"
                  x:Name="TitleTextBox"
                  Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 PlaceholderText="Title"
                  MaxLength="60">
             <TextBox.KeyboardAccelerators>
                 <KeyboardAccelerator Key="Enter" Modifiers="None" Invoked="TextBoxEnter_Pressed" />
             </TextBox.KeyboardAccelerators>
         </TextBox>
 
-        <CalendarDatePicker Grid.Column="1"
+        <CalendarDatePicker Grid.Row="0" Grid.Column="1"
                             Date="{x:Bind ViewModel.DueDate, Mode=TwoWay}"
                             PlaceholderText="Due date" />
+
+        <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                 Text="{x:Bind ViewModel.Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 PlaceholderText="URL" />
     </Grid>
 
 </Page>

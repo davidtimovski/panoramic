@@ -5,6 +5,7 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.Checklist;
+using Panoramic.Services;
 using Panoramic.Services.Search;
 using Panoramic.Services.Storage;
 using Panoramic.ViewModels.Widgets.Checklist;
@@ -25,8 +26,9 @@ public sealed partial class ChecklistWidgetPage : Page
         _dispatcherQueue = serviceProvider.GetRequiredService<DispatcherQueue>();
         _widget = widget;
 
+        var eventHub = serviceProvider.GetRequiredService<IEventHub>();
         var searchService = serviceProvider.GetRequiredService<ISearchService>();
-        ViewModel = new ChecklistViewModel(searchService, _dispatcherQueue, this, widget);
+        ViewModel = new ChecklistViewModel(eventHub, searchService, _dispatcherQueue, this, widget);
     }
 
     public ChecklistViewModel ViewModel { get; }
@@ -124,5 +126,9 @@ public sealed partial class ChecklistWidgetPage : Page
     }
 
     private void AddTask(NewTaskViewModel viewModel)
-        => _widget.AddTask(viewModel.Title, viewModel.DueDate.HasValue ? DateOnly.FromDateTime(viewModel.DueDate.Value.Date) : null);
+    {
+        var dueDate = viewModel.DueDate.HasValue ? DateOnly.FromDateTime(viewModel.DueDate.Value.Date) : (DateOnly?)null;
+        var uri = viewModel.Url.Trim().Length > 0 ? new Uri(viewModel.Url.Trim()) : null;
+        _widget.AddTask(viewModel.Title, dueDate, uri);
+    }
 }

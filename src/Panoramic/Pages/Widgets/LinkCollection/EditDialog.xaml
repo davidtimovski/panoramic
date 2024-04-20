@@ -23,7 +23,6 @@
 
                     <FontIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
                               ToolTipService.ToolTip="Drag to reorder"
-                             
                               Glyph="&#xE8CB;"
                               FontSize="14" />
                    
@@ -43,7 +42,7 @@
                              PlaceholderText="URL" />
 
                     <HyperlinkButton Grid.Row="1" Grid.Column="2"
-                                     NavigateUri="{x:Bind Uri, Mode=OneWay}"
+                                     NavigateUri="{x:Bind Url, Mode=OneWay}"
                                      IsEnabled="{x:Bind NavigationIsEnabled, Mode=OneWay}"
                                      ToolTipService.ToolTip="Navigate to"
                                      VerticalAlignment="Stretch">

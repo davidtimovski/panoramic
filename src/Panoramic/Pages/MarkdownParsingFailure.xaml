@@ -18,7 +18,7 @@
                    Margin="0 0 0 5">An error occurred during markdown parsing. The following widget file is not correctly formatted:</TextBlock>
 
         <TextBox Grid.Row="1"
-                 Text="{x:Bind FilePath}"
+                 Text="{x:Bind FileName}"
                  Margin="0 0 0 10"
                  IsReadOnly="True" />
 
