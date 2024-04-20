@@ -42,7 +42,7 @@
                              PlaceholderText="URL" />
 
                     <HyperlinkButton Grid.Row="1" Grid.Column="2"
-                                     NavigateUri="{x:Bind Url, Mode=OneWay}"
+                                     NavigateUri="{x:Bind Uri, Mode=OneWay}"
                                      IsEnabled="{x:Bind NavigationIsEnabled, Mode=OneWay}"
                                      ToolTipService.ToolTip="Navigate to"
                                      VerticalAlignment="Stretch">

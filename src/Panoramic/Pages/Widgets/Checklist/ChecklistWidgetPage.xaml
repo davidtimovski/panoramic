@@ -110,7 +110,7 @@
 
                         <RichTextBlock VerticalAlignment="Center">
                             <Paragraph>
-                                <Hyperlink NavigateUri="{x:Bind Uri}" Click="{x:Bind Clicked}">
+                                <Hyperlink NavigateUri="{x:Bind Uri}" Click="{x:Bind Clicked}" ToolTipService.ToolTip="{x:Bind Tooltip}">
                                     <Run Text="{x:Bind Title}" TextDecorations="None" />
                                 </Hyperlink>
                             </Paragraph>

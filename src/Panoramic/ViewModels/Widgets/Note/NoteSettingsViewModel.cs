@@ -54,7 +54,7 @@ public sealed partial class NoteSettingsViewModel
     public void AttachValidationHandler(EventHandler<ValidationEventArgs> handler)
     {
         Validated += handler;
-        Validate();
+        Validated?.Invoke(this, new ValidationEventArgs { Valid = true });
     }
 
     public async Task SubmitAsync()
@@ -78,6 +78,4 @@ public sealed partial class NoteSettingsViewModel
             await _storageService.SaveWidgetAsync(widget);
         }
     }
-
-    private void Validate() => Validated?.Invoke(this, new ValidationEventArgs { Valid = true });
 }

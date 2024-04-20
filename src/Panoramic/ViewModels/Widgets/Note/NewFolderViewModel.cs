@@ -16,7 +16,7 @@ public sealed class NewFolderViewModel(string directory) : ObservableObject
             if (SetProperty(ref name, value))
             {
                 OnPropertyChanged();
-                ValidateAndEmit();
+                Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
             }
         }
     }
@@ -24,6 +24,4 @@ public sealed class NewFolderViewModel(string directory) : ObservableObject
     public event EventHandler<ValidationEventArgs>? Validated;
 
     public bool CanBeCreated() => Name.Trim().Length > 0 && NoteWidget.FolderCanBeCreated(Name.Trim(), directory);
-
-    private void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
 }

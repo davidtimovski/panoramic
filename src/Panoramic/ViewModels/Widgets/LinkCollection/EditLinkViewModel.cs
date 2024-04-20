@@ -11,15 +11,45 @@ public sealed partial class EditLinkViewModel : ObservableObject
         Url = uri.ToString();
     }
 
-    [ObservableProperty]
-    private string title;
+    public event EventHandler<EventArgs>? Updated;
+
+    private string title = string.Empty;
+    public string Title
+    {
+        get => title;
+        set
+        {
+            if (SetProperty(ref title, value))
+            {
+                OnPropertyChanged();
+                Updated?.Invoke(this, EventArgs.Empty);
+            }
+        }
+    }
+
+    private string url = string.Empty;
+    public string Url
+    {
+        get => url;
+        set
+        {
+            if (SetProperty(ref url, value))
+            {
+                OnPropertyChanged();
+
+                Uri = Url.Trim().Length > 0 && Uri.TryCreate(Url.Trim(), UriKind.Absolute, out var createdUri) ? createdUri : null;
+                NavigationIsEnabled = Uri is not null;
+
+                Updated?.Invoke(this, EventArgs.Empty);
+            }
+        }
+    }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Uri))]
-    [NotifyPropertyChangedFor(nameof(NavigationIsEnabled))]
-    private string url;
+    private Uri? uri;
 
-    public Uri? Uri => Url.Trim().Length > 0 && Uri.TryCreate(Url.Trim(), UriKind.Absolute, out var createdUri) ? createdUri : null;
+    [ObservableProperty]
+    private bool navigationIsEnabled;
 
-    public bool NavigationIsEnabled => Uri is not null;
+    public bool IsValid() => Title.Trim().Length > 0 && Url.Trim().Length > 0 && Uri.TryCreate(Url.Trim(), UriKind.Absolute, out var _);
 }

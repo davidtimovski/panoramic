@@ -82,6 +82,8 @@ public sealed partial class ChecklistWidgetPage : Page
             CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })
         };
 
+        vm.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
+
         await dialog.ShowAsync();
     }
 

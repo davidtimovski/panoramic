@@ -55,6 +55,10 @@ public sealed partial class TaskViewModel : ObservableObject
         }
 
         Uri = uri;
+        if (uri is not null)
+        {
+            Tooltip = uri.Host;
+        }
     }
 
     public string Title { get; }
@@ -63,6 +67,7 @@ public sealed partial class TaskViewModel : ObservableObject
     public Visibility DueDateVisibility { get; }
     public SolidColorBrush DueDateBackground { get; }
     public Uri? Uri { get; }
+    public string? Tooltip { get; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TitleForeground))]

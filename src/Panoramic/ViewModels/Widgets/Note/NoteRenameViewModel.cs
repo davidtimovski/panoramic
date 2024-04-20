@@ -19,7 +19,7 @@ public sealed class NoteRenameViewModel(string path) : ObservableObject
             if (SetProperty(ref name, value))
             {
                 OnPropertyChanged();
-                ValidateAndEmit();
+                Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
             }
         }
     }
@@ -27,6 +27,4 @@ public sealed class NoteRenameViewModel(string path) : ObservableObject
     public event EventHandler<ValidationEventArgs>? Validated;
 
     public bool CanBeCreated() => Name.Trim().Length > 0 && NoteWidget.NoteCanBeCreated(Name.Trim(), _directory);
-
-    private void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
 }

@@ -8,6 +8,7 @@ using HtmlAgilityPack;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.LinkCollection;
+using Panoramic.Models.Events;
 using Panoramic.Services.Storage;
 using Panoramic.Utils;
 using Windows.ApplicationModel.DataTransfer;
@@ -34,9 +35,14 @@ public sealed partial class EditViewModel : ObservableObject
 
         foreach (var link in widget.Links)
         {
-            Links.Add(new EditLinkViewModel(link.Title, link.Uri));
+            var vm = new EditLinkViewModel(link.Title, link.Uri);
+            vm.Updated += (object? _, EventArgs e) => { ValidateAndEmit(); };
+
+            Links.Add(vm);
         }
     }
+
+    public event EventHandler<ValidationEventArgs>? Validated;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NewLinkFormValid))]
@@ -125,20 +131,22 @@ public sealed partial class EditViewModel : ObservableObject
     public void Delete(EditLinkViewModel viewModel)
     {
         Links.Remove(viewModel);
+        ValidateAndEmit();
     }
 
     public async Task SaveAsync()
     {
         short order = 1;
         _widget.Links = Links
-            .Where(x => x.Uri is not null)
             .Select(x => new LinkCollectionItem
-        {
-            Title = x.Title.Trim(),
-            Uri = x.Uri!,
-            Order = order++
-        }).ToList();
+            {
+                Title = x.Title.Trim(),
+                Uri = x.Uri!,
+                Order = order++
+            }).ToList();
 
         await _storageService.SaveWidgetAsync(_widget);
     }
+
+    private void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = Links.All(x => x.IsValid()) });
 }

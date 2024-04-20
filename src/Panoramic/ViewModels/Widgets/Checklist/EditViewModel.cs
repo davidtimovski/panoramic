@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Panoramic.Models.Domain.Checklist;
+using Panoramic.Models.Events;
 using Panoramic.Services.Storage;
 
 namespace Panoramic.ViewModels.Widgets.Checklist;
@@ -23,9 +24,14 @@ public sealed partial class EditViewModel : ObservableObject
         foreach (var task in widget.Tasks)
         {
             var dueDate = task.DueDate.HasValue ? (DateTimeOffset?)task.DueDate.Value.ToDateTime(TimeOnly.MinValue) : null;
-            Tasks.Add(new EditTaskViewModel(task.Title, dueDate, task.Uri, task.Created));
+            var vm = new EditTaskViewModel(task.Title, dueDate, task.Uri, task.Created);
+            vm.Updated += (object? _, EventArgs e) => { ValidateAndEmit(); };
+
+            Tasks.Add(vm);
         }
     }
+
+    public event EventHandler<ValidationEventArgs>? Validated;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NewTaskFormValid))]
@@ -56,7 +62,11 @@ public sealed partial class EditViewModel : ObservableObject
         NewTaskDueDate = null;
     }
 
-    public void Delete(EditTaskViewModel viewModel) => Tasks.Remove(viewModel);
+    public void Delete(EditTaskViewModel viewModel)
+    {
+        Tasks.Remove(viewModel);
+        ValidateAndEmit();
+    }
 
     public async Task SaveAsync()
     {
@@ -71,4 +81,6 @@ public sealed partial class EditViewModel : ObservableObject
 
         await _storageService.SaveWidgetAsync(_widget);
     }
+
+    private void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = Tasks.All(x => x.IsValid()) });
 }
