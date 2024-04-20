@@ -6,10 +6,10 @@
 - [ ] Morbi imperdiet consectetur
   Due: 2024-04-03
   Created: 2024-03-31 00:44:30.72
-- [ ] Maecenas auctor
+- [ ] [Maecenas auctor](https://www.google.com/search?q=somequeryhere)
   Due:
   Created: 2024-03-31 00:44:38.85
-- [ ] Suspendisse at dolor
+- [ ] [Suspendisse at dolor](https://www.google.com/search?q=somequeryhere)
   Due: 2024-03-28
   Created: 2024-03-31 00:53:02.74
 - [ ] Vestibulum eget
