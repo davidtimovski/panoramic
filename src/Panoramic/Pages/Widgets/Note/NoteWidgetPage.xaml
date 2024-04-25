@@ -6,20 +6,6 @@
     xmlns:m="using:Panoramic.Models.Domain.Note"
     xmlns:vm="using:Panoramic.ViewModels.Widgets.Note">
 
-    <Page.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.ThemeDictionaries>
-                <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="PanoramicFileSystemIconForegroundBrush" Color="#333" />
-                </ResourceDictionary>
-
-                <ResourceDictionary x:Key="Dark">
-                    <SolidColorBrush x:Key="PanoramicFileSystemIconForegroundBrush" Color="#ddd" />
-                </ResourceDictionary>
-            </ResourceDictionary.ThemeDictionaries>
-        </ResourceDictionary>
-    </Page.Resources>
-
     <Grid Background="{x:Bind ViewModel.Background, Mode=OneWay}" CornerRadius="{StaticResource PanoramicWidgetCornerRadius}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -130,11 +116,11 @@
 
             <Grid>
                 <TreeView ItemsSource="{x:Bind ViewModel.ExplorerItems, Mode=OneWay}"
-                      ItemTemplateSelector="{StaticResource ExplorerItemTemplateSelector}"
-                      Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}"
-                      SelectedItem="{x:Bind ViewModel.SelectedNote, Mode=TwoWay}"
-                      CanDragItems="False"
-                      AllowDrop="False" />
+                          ItemTemplateSelector="{StaticResource ExplorerItemTemplateSelector}"
+                          Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}"
+                          SelectedItem="{x:Bind ViewModel.SelectedNote, Mode=TwoWay}"
+                          CanDragItems="False"
+                          AllowDrop="False" />
 
                 <ScrollView Visibility="{x:Bind ViewModel.NoteVisible, Mode=OneWay}" Height="Auto">
                     <Grid>
@@ -147,31 +133,31 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBox Grid.Row="0"
-                             Grid.Column="0"
-                             x:Name="Editor"
-                             Text="{x:Bind ViewModel.SelectedNote.Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             Visibility="{x:Bind ViewModel.EditorVisibility, Mode=OneWay}"
-                             FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}"
-                             FontSize="{x:Bind ViewModel.FontSize, Mode=OneWay}"
-                             Foreground="{StaticResource PanoramicWidgetForegroundBrush}"
-                             AcceptsReturn="True"
-                             TextWrapping="Wrap" />
+                                 Grid.Column="0"
+                                 x:Name="Editor"
+                                 Text="{x:Bind ViewModel.SelectedNote.Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Visibility="{x:Bind ViewModel.EditorVisibility, Mode=OneWay}"
+                                 FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}"
+                                 FontSize="{x:Bind ViewModel.FontSize, Mode=OneWay}"
+                                 Foreground="{StaticResource PanoramicWidgetForegroundBrush}"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap" />
                         <RichTextBlock Grid.Row="0"
-                                   Grid.Column="0"
-                                   x:Name="Presenter"
-                                   Visibility="{x:Bind ViewModel.PresenterVisibility, Mode=OneWay}"
-                                   FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}"
-                                   Foreground="{StaticResource PanoramicWidgetForegroundBrush}" />
+                                       Grid.Column="0"
+                                       x:Name="Presenter"
+                                       Visibility="{x:Bind ViewModel.PresenterVisibility, Mode=OneWay}"
+                                       FontFamily="{x:Bind ViewModel.FontFamily, Mode=OneWay}"
+                                       Foreground="{StaticResource PanoramicWidgetForegroundBrush}" />
                     </Grid>
                 </ScrollView>
 
                 <TextBlock Visibility="{x:Bind ViewModel.TipVisibility, Mode=OneWay}"
-                       Foreground="{StaticResource PanoramicPaleTextForeground}"
-                       MaxWidth="400"
-                       HorizontalTextAlignment="Center"
-                       VerticalAlignment="Center"
-                       TextWrapping="Wrap"
-                       LineHeight="22">This is your explorer view. Use the top-right menu "..." to add notes or folders to the root level. Right-click on folders to add files inside. Newly added notes will open automatically. Use the same top-right menu to switch back to this view.</TextBlock>
+                           Foreground="{StaticResource PanoramicPaleTextForeground}"
+                           MaxWidth="400"
+                           HorizontalTextAlignment="Center"
+                           VerticalAlignment="Center"
+                           TextWrapping="Wrap"
+                           LineHeight="22">This is your explorer view. Use the top-right menu "..." to add notes or folders to the root level. Right-click on folders to add files inside. Newly added notes will open automatically. Use the same top-right menu to switch back to this view.</TextBlock>
             </Grid>
         </Border>
 

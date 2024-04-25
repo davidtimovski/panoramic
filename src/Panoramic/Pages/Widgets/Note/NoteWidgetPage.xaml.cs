@@ -24,6 +24,7 @@ public sealed partial class NoteWidgetPage : Page
 
         _storageService = serviceProvider.GetRequiredService<IStorageService>();
         _storageService.NoteSelectionChanged += NoteSelectionChanged;
+        _storageService.FileCreated += FileCreated;
 
         _markdownService = serviceProvider.GetRequiredService<IMarkdownService>();
         _dispatcherQueue = serviceProvider.GetRequiredService<DispatcherQueue>();
@@ -73,13 +74,23 @@ public sealed partial class NoteWidgetPage : Page
         }
     }
 
+    private void FileCreated(object? _, FileCreatedEventArgs e)
+    {
+        ViewModel.AddFile(e.WidgetId, e.Name, e.Type, e.Path);
+
+        _dispatcherQueue.TryEnqueue(() =>
+        {
+            Editor.Focus(FocusState.Programmatic);
+        });
+    }
+
     private async void AddNote_Click(object _, RoutedEventArgs e)
     {
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
         var folder = (ExplorerItem)menuItem.DataContext;
 
-        var content = new NewNoteForm(folder.Path.Absolute);
-        void createNote() => _storageService.CreateNote(_widget.Id, folder.Path.Absolute, content.ViewModel.Name);
+        var content = new NewNoteForm(_storageService.FileSystemItems, folder.Path, _storageService.StoragePath);
+        void createNote() => _storageService.CreateNote(_widget.Id, content.ViewModel.SelectedFolder!.Path.Absolute, content.ViewModel.Name);
 
         var dialog = new ContentDialog
         {
@@ -104,8 +115,9 @@ public sealed partial class NoteWidgetPage : Page
 
     private async void AddNoteFromContextMenu_Click(object _, RoutedEventArgs e)
     {
-        var content = new NewNoteForm(_storageService.StoragePath);
-        void createNote() => _storageService.CreateNote(_widget.Id, _storageService.StoragePath, content.ViewModel.Name);
+        var path = new FileSystemItemPath(_storageService.StoragePath, _storageService.StoragePath);
+        var content = new NewNoteForm(_storageService.FileSystemItems, path, _storageService.StoragePath);
+        void createNote() => _storageService.CreateNote(_widget.Id, content.ViewModel.SelectedFolder!.Path.Absolute, content.ViewModel.Name);
 
         var dialog = new ContentDialog
         {
@@ -133,8 +145,8 @@ public sealed partial class NoteWidgetPage : Page
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
         var folder = (ExplorerItem)menuItem.DataContext;
 
-        var content = new NewFolderForm(folder.Path.Absolute);
-        void createFolder() => _storageService.CreateFolder(_widget.Id, folder.Path.Absolute, content.ViewModel.Name);
+        var content = new NewFolderForm(_storageService.FileSystemItems, folder.Path, _storageService.StoragePath);
+        void createFolder() => _storageService.CreateFolder(_widget.Id, content.ViewModel.SelectedFolder!.Path.Absolute, content.ViewModel.Name);
 
         var dialog = new ContentDialog
         {
@@ -159,8 +171,9 @@ public sealed partial class NoteWidgetPage : Page
 
     private async void AddFolderFromContextMenu_Click(object _, RoutedEventArgs e)
     {
-        var content = new NewFolderForm(_storageService.StoragePath);
-        void createFolder() => _storageService.CreateFolder(_widget.Id, _storageService.StoragePath, content.ViewModel.Name);
+        var path = new FileSystemItemPath(_storageService.StoragePath, _storageService.StoragePath);
+        var content = new NewFolderForm(_storageService.FileSystemItems, path, _storageService.StoragePath);
+        void createFolder() => _storageService.CreateFolder(_widget.Id, content.ViewModel.SelectedFolder!.Path.Absolute, content.ViewModel.Name);
 
         var dialog = new ContentDialog
         {

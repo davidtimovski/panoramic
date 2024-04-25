@@ -21,7 +21,7 @@
                  PlaceholderText="Title"
                  MaxLength="60">
             <TextBox.KeyboardAccelerators>
-                <KeyboardAccelerator Key="Enter" Modifiers="None" Invoked="TextBoxEnter_Pressed" />
+                <KeyboardAccelerator Key="Enter" Invoked="TextBoxEnter_Pressed" />
             </TextBox.KeyboardAccelerators>
         </TextBox>
 

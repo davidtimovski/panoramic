@@ -1,18 +1,20 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Panoramic.Services.Storage;
 using Panoramic.ViewModels.Widgets.Note;
 
 namespace Panoramic.Pages.Widgets.Note;
 
 public sealed partial class NewFolderForm : Page
 {
-    public NewFolderForm(string directory)
+    public NewFolderForm(IReadOnlyList<FileSystemItem> fileSystemItems, FileSystemItemPath path, string storagePath)
     {
         InitializeComponent();
 
-        ViewModel = new NewFolderViewModel(directory);
+        ViewModel = new NewFolderViewModel(fileSystemItems, path, storagePath);
 
         NameTextBox.Loaded += NameTextBox_Loaded;
     }

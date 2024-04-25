@@ -9,6 +9,7 @@
         <Grid.KeyboardAccelerators>
             <KeyboardAccelerator Invoked="ControlSHotkey_Invoked" Key="S" Modifiers="Control" ToolTipService.ToolTip="" />
             <KeyboardAccelerator Invoked="EscapeHotkey_Invoked" Key="Escape" ToolTipService.ToolTip="" />
+            <KeyboardAccelerator Invoked="ControlNHotkey_Invoked" Key="N" Modifiers="Control" ToolTipService.ToolTip="" />
             <KeyboardAccelerator Invoked="ControlTHotkey_Invoked" Key="T" Modifiers="Control" ToolTipService.ToolTip="" />
         </Grid.KeyboardAccelerators>
 

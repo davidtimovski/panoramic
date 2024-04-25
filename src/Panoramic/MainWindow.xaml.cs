@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Panoramic.Data.Exceptions;
 using Panoramic.Models;
+using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.Checklist;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Domain.Note;
@@ -182,6 +183,43 @@ public sealed partial class MainWindow : Window
         SearchBox.Text = string.Empty;
 
         args.Handled = true;
+    }
+
+    private async void ControlNHotkey_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        var noteWidgets = _storageService.Widgets.Where(x => x.Value.Type == WidgetType.Note).ToList();
+        if (noteWidgets.Count != 1)
+        {
+            return;
+        }
+
+        args.Handled = true;
+
+        var path = new FileSystemItemPath(_storageService.StoragePath, _storageService.StoragePath);
+        var content = new NewNoteForm(_storageService.FileSystemItems, path, _storageService.StoragePath);
+
+        var firstNoteWidget = noteWidgets[0].Value;
+        void createNote() => _storageService.CreateNote(firstNoteWidget.Id, content.ViewModel.SelectedFolder!.Path.Absolute, content.ViewModel.Name);
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            Title = "New note",
+            Content = content,
+            PrimaryButtonText = "Add",
+            CloseButtonText = "Cancel",
+            PrimaryButtonCommand = new RelayCommand(createNote),
+            IsPrimaryButtonEnabled = false
+        };
+
+        content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
+        content.Submitted += (_, e) =>
+        {
+            createNote();
+            dialog.Hide();
+        };
+
+        await dialog.ShowAsync();
     }
 
     private void ControlTHotkey_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)

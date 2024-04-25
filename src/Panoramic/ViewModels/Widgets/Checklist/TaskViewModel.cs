@@ -10,6 +10,8 @@ namespace Panoramic.ViewModels.Widgets.Checklist;
 
 public sealed partial class TaskViewModel : ObservableObject
 {
+    private const string DueDateFormat = "MMM d";
+
     private readonly IEventHub _eventHub;
     private readonly ChecklistWidget _widget;
     private readonly SolidColorBrush _titleDefaultForeground;
@@ -39,8 +41,14 @@ public sealed partial class TaskViewModel : ObservableObject
         if (dueDate.HasValue)
         {
             var now = DateTime.Now;
-            if (dueDate.Value.Date <= now.Date)
+            if (dueDate.Value.Date < now.Date)
             {
+                DueLabel = dueDate.Value.ToString(DueDateFormat, Global.Culture);
+                DueDateBackground = dueDateOverdueBackground;
+            }
+            if (dueDate.Value.Date == now.Date)
+            {
+                DueLabel = "Today";
                 DueDateBackground = dueDateOverdueBackground;
             }
             else if (dueDate.Value.Date == now.Date.AddDays(1))
@@ -50,7 +58,7 @@ public sealed partial class TaskViewModel : ObservableObject
             }
             else
             {
-                DueLabel = dueDate.Value.ToString("MMM d", Global.Culture);
+                DueLabel = dueDate.Value.ToString(DueDateFormat, Global.Culture);
             }
         }
 

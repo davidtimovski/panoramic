@@ -1,18 +1,20 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Panoramic.Services.Storage;
 using Panoramic.ViewModels.Widgets.Note;
 
 namespace Panoramic.Pages.Widgets.Note;
 
 public sealed partial class NewNoteForm : Page
 {
-    public NewNoteForm(string directory)
+    public NewNoteForm(IReadOnlyList<FileSystemItem> fileSystemItems, FileSystemItemPath path, string storagePath)
     {
         InitializeComponent();
 
-        ViewModel = new NewNoteViewModel(directory);
+        ViewModel = new NewNoteViewModel(fileSystemItems, path, storagePath);
 
         NameTextBox.Loaded += NameTextBox_Loaded;
     }

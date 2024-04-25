@@ -20,7 +20,6 @@ public sealed partial class NoteViewModel : WidgetViewModel
     public NoteViewModel(IStorageService storageService, NoteWidget widget)
     {
         _storageService = storageService;
-        _storageService.FileCreated += FileCreated;
         _storageService.FileDeleted += FileDeleted;
         _storageService.ItemRenamed += ItemRenamed;
         _storageService.NoteSelectionChanged += NoteSelectionChanged;
@@ -116,6 +115,43 @@ public sealed partial class NoteViewModel : WidgetViewModel
         _storageService.ChangeNoteContent(_widget.Id, SelectedNote!.Path.Absolute, SelectedNote!.Text!);
 
         SelectedNote = null;
+    }
+
+    public void AddFile(Guid widgetId, string name, FileType type, FileSystemItemPath path)
+    {
+        var noteCreatedInThisWidget = type == FileType.Note && widgetId == _widget.Id;
+
+        var explorerItem = new ExplorerItem(_storageService, name, type, path, [])
+        {
+            IsEnabled = noteCreatedInThisWidget
+        };
+
+        // Add to root level
+        if (path.Parent.Equals(_storageService.StoragePath))
+        {
+            var itemsCopy = ExplorerItems.ToList();
+            itemsCopy.Add(explorerItem);
+            var ordered = itemsCopy.OrderBy(x => x.Type).ThenBy(x => x.Name).ToList();
+
+            ExplorerItems.Clear();
+            foreach (var child in ordered)
+            {
+                ExplorerItems.Add(child);
+            }
+        }
+        else
+        {
+            AddItem(ExplorerItems, explorerItem, explorerItem.Path.Parent);
+        }
+
+        if (noteCreatedInThisWidget)
+        {
+            _widget.NotePath = path;
+            SelectedNote = GetSelectedNote(ExplorerItems);
+            Editing = true;
+        }
+
+        TipVisibility = ExplorerItems.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void ReloadFiles()
@@ -270,42 +306,6 @@ public sealed partial class NoteViewModel : WidgetViewModel
         }
 
         UpdateNoteContent(ExplorerItems, e.Path, e.Content);
-    }
-
-    private void FileCreated(object? _, FileCreatedEventArgs e)
-    {
-        var noteCreatedInThisWidget = e.Type == FileType.Note && e.WidgetId == _widget.Id;
-
-        var explorerItem = new ExplorerItem(_storageService, e.Name, e.Type, e.Path, [])
-        {
-            IsEnabled = noteCreatedInThisWidget
-        };
-
-        // Add to root level
-        if (e.Path.Parent.Equals(_storageService.StoragePath))
-        {
-            var itemsCopy = ExplorerItems.ToList();
-            itemsCopy.Add(explorerItem);
-            var ordered = itemsCopy.OrderBy(x => x.Type).ThenBy(x => x.Name).ToList();
-
-            ExplorerItems.Clear();
-            foreach (var child in ordered)
-            {
-                ExplorerItems.Add(child);
-            }
-        }
-        else
-        {
-            AddItem(ExplorerItems, explorerItem, explorerItem.Path.Parent);
-        }
-
-        if (noteCreatedInThisWidget)
-        {
-            _widget.NotePath = e.Path;
-            SelectedNote = GetSelectedNote(ExplorerItems);
-        }
-
-        TipVisibility = ExplorerItems.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void FileDeleted(object? _, FileDeletedEventArgs e)

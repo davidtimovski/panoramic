@@ -17,7 +17,7 @@ namespace Panoramic.ViewModels.Widgets.Checklist;
 
 public sealed partial class ChecklistViewModel : WidgetViewModel
 {
-    private static readonly TimeSpan TaskRemovalDebounceInterval = TimeSpan.FromMilliseconds(650);
+    private static readonly TimeSpan TaskRemovalDebounceInterval = TimeSpan.FromMilliseconds(600);
 
     private readonly SolidColorBrush _titleDefaultForeground;
     private readonly SolidColorBrush _titleCompletedForeground;
