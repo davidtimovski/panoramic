@@ -8,7 +8,6 @@ public sealed class RecentLinkViewModel(IEventHub eventHub, string title, Uri ur
     public string Title { get; } = title;
     public Uri Uri { get; } = uri;
     public string Tooltip { get; } = uri.Host;
-   
 
     public void Click()
     {

@@ -45,7 +45,7 @@ An example of how the markdown files are formatted can be seen in the [MarkdownS
 ### General
 
 | Hotkey | Command |
-|-|-|-|
+|-|-|
 | Ctrl+S | Filters the list of links in Link Collection and Recent Links widgets and tasks in the Checklist widgets |
 
 ### Note widget
