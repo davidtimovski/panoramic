@@ -96,7 +96,7 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
     {
         var paragraph = new Paragraph
         {
-            FontSize = fontSize + 5,
+            FontSize = fontSize + 6,
             FontWeight = FontWeights.Bold,
             Margin = new Thickness(0, 0, 0, HeaderMarginBottom)
         };
@@ -111,7 +111,7 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
     {
         var paragraph = new Paragraph
         {
-            FontSize = fontSize + 4,
+            FontSize = fontSize + 5,
             FontWeight = FontWeights.Bold,
             Margin = new Thickness(0, 0, 0, HeaderMarginBottom)
         };
@@ -126,7 +126,7 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
     {
         var paragraph = new Paragraph
         {
-            FontSize = fontSize + 3,
+            FontSize = fontSize + 4,
             FontWeight = FontWeights.Bold,
             Margin = new Thickness(0, 0, 0, HeaderMarginBottom)
         };
@@ -141,7 +141,7 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
     {
         var paragraph = new Paragraph
         {
-            FontSize = fontSize + 2,
+            FontSize = fontSize + 3,
             FontWeight = FontWeights.Bold,
             Margin = new Thickness(0, 0, 0, HeaderMarginBottom)
         };
@@ -156,7 +156,7 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
     {
         var paragraph = new Paragraph
         {
-            FontSize = fontSize + 1,
+            FontSize = fontSize + 2,
             FontWeight = FontWeights.Bold,
             Margin = new Thickness(0, 0, 0, HeaderMarginBottom)
         };
@@ -171,7 +171,7 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
     {
         var paragraph = new Paragraph
         {
-            FontSize = fontSize,
+            FontSize = fontSize + 1,
             FontWeight = FontWeights.Bold,
             Margin = new Thickness(0, 0, 0, HeaderMarginBottom)
         };
