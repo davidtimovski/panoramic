@@ -1,6 +1,6 @@
 ﻿namespace Panoramic.Data;
 
-public enum HeaderHighlight
+public enum HighlightColor
 {
     None,
     Blue,

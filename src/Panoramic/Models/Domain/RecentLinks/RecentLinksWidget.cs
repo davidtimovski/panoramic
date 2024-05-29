@@ -19,7 +19,7 @@ public sealed class RecentLinksWidget : IWidget
     /// <summary>
     /// Constructs a new recent links widget.
     /// </summary>
-    public RecentLinksWidget(IStorageService storageService, Area area, HeaderHighlight headerHighlight, string title, int capacity, bool onlyFromToday, bool searchable)
+    public RecentLinksWidget(IStorageService storageService, Area area, HighlightColor headerHighlight, string title, int capacity, bool onlyFromToday, bool searchable)
     {
         _storageService = storageService;
 
@@ -56,7 +56,7 @@ public sealed class RecentLinksWidget : IWidget
     public Guid Id { get; }
     public WidgetType Type { get; } = WidgetType.RecentLinks;
     public Area Area { get; set; }
-    public HeaderHighlight HeaderHighlight { get; set; }
+    public HighlightColor HeaderHighlight { get; set; }
     public string Title { get; set; }
     public int Capacity { get; set; }
     public bool OnlyFromToday { get; set; }

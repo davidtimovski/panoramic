@@ -60,7 +60,7 @@ public sealed partial class NoteSettingsViewModel
     public async Task SubmitAsync()
     {
         var size = double.Parse(FontSize);
-        var headerHighlight = Enum.Parse<HeaderHighlight>(HeaderHighlight);
+        var headerHighlight = Enum.Parse<HighlightColor>(HeaderHighlight);
 
         if (Id == Guid.Empty)
         {

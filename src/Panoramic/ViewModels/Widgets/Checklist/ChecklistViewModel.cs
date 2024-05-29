@@ -8,6 +8,7 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Panoramic.Data;
 using Panoramic.Models.Domain.Checklist;
 using Panoramic.Services;
 using Panoramic.Services.Search;
@@ -37,7 +38,7 @@ public sealed partial class ChecklistViewModel : WidgetViewModel
         _titleDefaultForeground = ResourceUtil.WidgetForeground;
         _titleCompletedForeground = ResourceUtil.HighlightedForeground;
         _taskDueDateBackground = ResourceUtil.HighlightedBackground;
-        _taskDueDateOverdueBackground = ResourceUtil.GetBrushFromPage("PanoramicTaskOverdueBackgroundBrush", page);
+        _taskDueDateOverdueBackground = ResourceUtil.HighlightBrushes[HighlightColor.Red];
         _taskDueDateAlmostDueBackground = ResourceUtil.GetBrushFromPage("PanoramicTaskAlmostDueBackgroundBrush", page);
 
         _eventHub = eventHub;
@@ -55,7 +56,7 @@ public sealed partial class ChecklistViewModel : WidgetViewModel
         _widget.TaskAdded += TaskAdded;
         _widget.TaskCompleted += TaskCompleted;
 
-        HeaderBackgroundBrush = ResourceUtil.WidgetHeaderBrushes[widget.HeaderHighlight];
+        HeaderBackgroundBrush = ResourceUtil.HighlightBrushes[widget.HeaderHighlight];
         Title = widget.Title;
 
         SetViewModel();

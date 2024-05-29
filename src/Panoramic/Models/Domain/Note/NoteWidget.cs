@@ -19,7 +19,7 @@ public sealed class NoteWidget : IWidget
     /// <summary>
     /// Constructs a new note widget.
     /// </summary>
-    public NoteWidget(IStorageService storageService, Area area, HeaderHighlight headerHighlight, string fontFamily, double fontSize)
+    public NoteWidget(IStorageService storageService, Area area, HighlightColor headerHighlight, string fontFamily, double fontSize)
     {
         _storageService = storageService;
 
@@ -56,7 +56,7 @@ public sealed class NoteWidget : IWidget
     public Guid Id { get; }
     public WidgetType Type { get; } = WidgetType.Note;
     public Area Area { get; set; }
-    public HeaderHighlight HeaderHighlight { get; set; }
+    public HighlightColor HeaderHighlight { get; set; }
     public string FontFamily { get; set; }
     public double FontSize { get; set; }
     public FileSystemItemPath? NotePath { get; set; }

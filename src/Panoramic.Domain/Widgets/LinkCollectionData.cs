@@ -10,7 +10,7 @@ public sealed partial class LinkCollectionData : IWidgetData
 
     public required Guid Id { get; init; }
     public required Area Area { get; init; }
-    public HeaderHighlight HeaderHighlight { get; init; }
+    public HighlightColor HeaderHighlight { get; init; }
     public string Title { get; init; } = "My links";
     public bool Searchable { get; init; } = true;
     public required List<LinkCollectionItemData> Links { get; init; }
@@ -64,7 +64,7 @@ public sealed partial class LinkCollectionData : IWidgetData
             lineIndex++;
 
             var headerHighlightRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            var headerHighlight = Enum.Parse<HeaderHighlight>(headerHighlightRowValues[1]);
+            var headerHighlight = Enum.Parse<HighlightColor>(headerHighlightRowValues[1]);
             lineIndex++;
 
             var searchableRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);

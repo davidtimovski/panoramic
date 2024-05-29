@@ -9,7 +9,7 @@ public sealed class NoteData : IWidgetData
 
     public required Guid Id { get; init; }
     public required Area Area { get; init; }
-    public HeaderHighlight HeaderHighlight { get; init; }
+    public HighlightColor HeaderHighlight { get; init; }
     public string FontFamily { get; init; } = "Default";
     public double FontSize { get; init; } = 15;
     public string? RelativeFilePath { get; init; }
@@ -31,7 +31,7 @@ public sealed class NoteData : IWidgetData
             lineIndex++;
 
             var headerHighlightRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            var headerHighlight = Enum.Parse<HeaderHighlight>(headerHighlightRowValues[1]);
+            var headerHighlight = Enum.Parse<HighlightColor>(headerHighlightRowValues[1]);
             lineIndex++;
 
             var fontFamily = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[1];

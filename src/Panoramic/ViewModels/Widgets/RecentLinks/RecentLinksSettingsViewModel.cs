@@ -53,7 +53,7 @@ public sealed partial class RecentLinksSettingsViewModel(IStorageService storage
 
     public async Task SubmitAsync()
     {
-        var headerHighlight = Enum.Parse<HeaderHighlight>(HeaderHighlight);
+        var headerHighlight = Enum.Parse<HighlightColor>(HeaderHighlight);
 
         if (Id == Guid.Empty)
         {

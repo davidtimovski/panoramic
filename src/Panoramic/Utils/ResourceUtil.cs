@@ -22,16 +22,16 @@ internal static class ResourceUtil
         HighlightedBackground = (appCurrentThemeDict["PanoramicHighlightedBackgroundBrush"] as SolidColorBrush)!;
         PaleTextForeground = (appCurrentThemeDict["PanoramicPaleTextForeground"] as SolidColorBrush)!;
 
-        WidgetHeaderBrushes = new Dictionary<HeaderHighlight, SolidColorBrush>
+        HighlightBrushes = new Dictionary<HighlightColor, SolidColorBrush>
         {
-            { HeaderHighlight.None, (appCurrentThemeDict["PanoramicWidgetBackgroundBrush"] as SolidColorBrush)! },
-            { HeaderHighlight.Blue, (appCurrentThemeDict["PanoramicBlueHeaderHighlight"] as SolidColorBrush)! },
-            { HeaderHighlight.Red, (appCurrentThemeDict["PanoramicRedHeaderHighlight"] as SolidColorBrush)! },
-            { HeaderHighlight.Green, (appCurrentThemeDict["PanoramicGreenHeaderHighlight"] as SolidColorBrush)! },
-            { HeaderHighlight.Yellow, (appCurrentThemeDict["PanoramicYellowHeaderHighlight"] as SolidColorBrush)! },
-            { HeaderHighlight.Orange, (appCurrentThemeDict["PanoramicOrangeHeaderHighlight"] as SolidColorBrush)! },
-            { HeaderHighlight.Purple, (appCurrentThemeDict["PanoramicPurpleHeaderHighlight"] as SolidColorBrush)! },
-            { HeaderHighlight.Teal, (appCurrentThemeDict["PanoramicTealHeaderHighlight"] as SolidColorBrush)! }
+            { HighlightColor.None, (appCurrentThemeDict["PanoramicWidgetBackgroundBrush"] as SolidColorBrush)! },
+            { HighlightColor.Blue, (appCurrentThemeDict["PanoramicBlueHighlight"] as SolidColorBrush)! },
+            { HighlightColor.Red, (appCurrentThemeDict["PanoramicRedHighlight"] as SolidColorBrush)! },
+            { HighlightColor.Green, (appCurrentThemeDict["PanoramicGreenHighlight"] as SolidColorBrush)! },
+            { HighlightColor.Yellow, (appCurrentThemeDict["PanoramicYellowHighlight"] as SolidColorBrush)! },
+            { HighlightColor.Orange, (appCurrentThemeDict["PanoramicOrangeHighlight"] as SolidColorBrush)! },
+            { HighlightColor.Purple, (appCurrentThemeDict["PanoramicPurpleHighlight"] as SolidColorBrush)! },
+            { HighlightColor.Teal, (appCurrentThemeDict["PanoramicTealHighlight"] as SolidColorBrush)! }
         };
     }
 
@@ -42,7 +42,7 @@ internal static class ResourceUtil
     public static SolidColorBrush HighlightedBackground { get; }
     public static SolidColorBrush PaleTextForeground { get; }
 
-    public static readonly IReadOnlyDictionary<HeaderHighlight, SolidColorBrush> WidgetHeaderBrushes;
+    public static readonly IReadOnlyDictionary<HighlightColor, SolidColorBrush> HighlightBrushes;
 
     public static SolidColorBrush GetBrushFromPage(string resourceName, Page page)
     {

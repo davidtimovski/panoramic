@@ -47,7 +47,7 @@ public sealed partial class ChecklistSettingsViewModel(IStorageService storageSe
 
     public async Task SubmitAsync()
     {
-        var headerHighlight = Enum.Parse<HeaderHighlight>(HeaderHighlight);
+        var headerHighlight = Enum.Parse<HighlightColor>(HeaderHighlight);
 
         if (Id == Guid.Empty)
         {

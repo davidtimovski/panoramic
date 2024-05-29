@@ -28,7 +28,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
 
         _widget = widget;
 
-        HeaderBackgroundBrush = ResourceUtil.WidgetHeaderBrushes[widget.HeaderHighlight];
+        HeaderBackgroundBrush = ResourceUtil.HighlightBrushes[widget.HeaderHighlight];
 
         ReloadFiles();
 

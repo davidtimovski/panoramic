@@ -19,7 +19,7 @@ public sealed class LinkCollectionWidget : IWidget
     /// <summary>
     /// Constructs a new link collection widget.
     /// </summary>
-    public LinkCollectionWidget(IStorageService storageService, Area area, HeaderHighlight headerHighlight, string title, bool searchable)
+    public LinkCollectionWidget(IStorageService storageService, Area area, HighlightColor headerHighlight, string title, bool searchable)
     {
         _storageService = storageService;
 
@@ -52,7 +52,7 @@ public sealed class LinkCollectionWidget : IWidget
     public Guid Id { get; }
     public WidgetType Type { get; } = WidgetType.LinkCollection;
     public Area Area { get; set; }
-    public HeaderHighlight HeaderHighlight { get; set; }
+    public HighlightColor HeaderHighlight { get; set; }
     public string Title { get; set; }
     public bool Searchable { get; set; }
 

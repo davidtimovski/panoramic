@@ -33,7 +33,7 @@ public sealed partial class LinkCollectionViewModel : WidgetViewModel
 
         _widget = widget;
 
-        HeaderBackgroundBrush = ResourceUtil.WidgetHeaderBrushes[widget.HeaderHighlight];
+        HeaderBackgroundBrush = ResourceUtil.HighlightBrushes[widget.HeaderHighlight];
         Title = widget.Title;
 
         SetViewModel();

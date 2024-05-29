@@ -10,7 +10,7 @@ public sealed partial class RecentLinksData : IWidgetData
 
     public required Guid Id { get; init; }
     public required Area Area { get; init; }
-    public HeaderHighlight HeaderHighlight { get; init; }
+    public HighlightColor HeaderHighlight { get; init; }
     public string Title { get; init; } = "Recent";
     public int Capacity { get; init; } = 15;
     public bool OnlyFromToday { get; init; }
@@ -66,7 +66,7 @@ public sealed partial class RecentLinksData : IWidgetData
             lineIndex++;
 
             var headerHighlightRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            var headerHighlight = Enum.Parse<HeaderHighlight>(headerHighlightRowValues[1]);
+            var headerHighlight = Enum.Parse<HighlightColor>(headerHighlightRowValues[1]);
             lineIndex++;
 
             var capacityRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
