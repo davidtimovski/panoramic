@@ -50,7 +50,7 @@ public sealed class RecentLinksWidget : IWidget
         Capacity = data.Capacity;
         OnlyFromToday = data.OnlyFromToday;
         Searchable = data.Searchable;
-        links = data.Links.Select(x => new RecentLink { Title = x.Title, Uri = x.Uri, Clicked = x.Clicked }).ToList();
+        links = data.Links.Select(x => new RecentLink { Title = x.Title, Uri = x.Uri, Context = x.Context, Clicked = x.Clicked }).ToList();
     }
 
     public Guid Id { get; }
@@ -76,9 +76,9 @@ public sealed class RecentLinksWidget : IWidget
         }
     }
 
-    public void HyperlinkClicked(string title, Uri uri, DateTime clicked)
+    public void HyperlinkClicked(string title, Uri uri, string context, DateTime clicked)
     {
-        var clickedLink = new RecentLink { Title = title, Uri = uri, Clicked = clicked };
+        var clickedLink = new RecentLink { Title = title, Uri = uri, Context = context, Clicked = clicked };
 
         var link = Links.FirstOrDefault(x => x.Uri.Equals(uri));
         if (link is null)
@@ -92,7 +92,8 @@ public sealed class RecentLinksWidget : IWidget
         }
         else
         {
-            links[links.IndexOf(link)] = clickedLink;
+            var index = links.IndexOf(link);
+            links[index] = clickedLink;
         }
 
         var query = Links.AsEnumerable();
@@ -113,7 +114,7 @@ public sealed class RecentLinksWidget : IWidget
             Capacity = Capacity,
             OnlyFromToday = OnlyFromToday,
             Searchable = Searchable,
-            Links = Links.Select(x => new RecentLinkData { Title = x.Title, Uri = x.Uri, Clicked = x.Clicked }).ToList()
+            Links = Links.Select(x => new RecentLinkData { Title = x.Title, Uri = x.Uri, Context = x.Context, Clicked = x.Clicked }).ToList()
         };
 
     public static RecentLinksWidget Load(IStorageService storageService, string markdown)

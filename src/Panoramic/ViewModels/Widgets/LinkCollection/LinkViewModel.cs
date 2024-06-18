@@ -9,5 +9,5 @@ public sealed class LinkViewModel(IEventHub eventHub, string widgetTitle, string
     public Uri Uri { get; } = uri;
     public string Tooltip { get; } = uri.Host;
 
-    public void Clicked() => eventHub.RaiseHyperlinkClicked($"{Title} - {widgetTitle}", Uri, DateTime.Now);
+    public void Clicked() => eventHub.RaiseHyperlinkClicked(Title, Uri, widgetTitle, DateTime.Now);
 }

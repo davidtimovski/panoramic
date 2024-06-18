@@ -70,7 +70,7 @@ public sealed partial class RecentLinksViewModel : WidgetViewModel
 
     private void HyperlinkClicked(object? _, HyperlinkClickedEventArgs e)
     {
-        _widget.HyperlinkClicked(e.Title, e.Uri, e.Clicked);
+        _widget.HyperlinkClicked(e.Title, e.Uri, e.Context, e.Clicked);
 
         _storageService.EnqueueWidgetWrite(_widget.Id);
 
@@ -101,5 +101,5 @@ public sealed partial class RecentLinksViewModel : WidgetViewModel
     }
 
     private RecentLinkViewModel MapToViewModel(RecentLink recentLink)
-        => new(_eventHub, recentLink.Title, recentLink.Uri, recentLink.Clicked);
+        => new(_eventHub, recentLink.Title, recentLink.Uri, recentLink.Context, recentLink.Clicked);
 }

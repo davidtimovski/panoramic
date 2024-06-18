@@ -28,7 +28,7 @@ public sealed partial class ChecklistWidgetPage : Page
 
         var eventHub = serviceProvider.GetRequiredService<IEventHub>();
         var searchService = serviceProvider.GetRequiredService<ISearchService>();
-        ViewModel = new ChecklistViewModel(eventHub, searchService, _dispatcherQueue, this, widget);
+        ViewModel = new ChecklistViewModel(eventHub, searchService, _dispatcherQueue, widget);
     }
 
     public ChecklistViewModel ViewModel { get; }

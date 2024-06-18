@@ -9,12 +9,10 @@
         <ResourceDictionary>
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="PanoramicTaskAlmostDueBackgroundBrush" Color="#aae9a00b" />
                     <SolidColorBrush x:Key="PanoramicTaskDueDateForeground" Color="#555" />
                 </ResourceDictionary>
 
                 <ResourceDictionary x:Key="Dark">
-                    <SolidColorBrush x:Key="PanoramicTaskAlmostDueBackgroundBrush" Color="#77e9a00b" />
                     <SolidColorBrush x:Key="PanoramicTaskDueDateForeground" Color="#fff" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
@@ -86,10 +84,10 @@
 
                             <Border Grid.Column="0"
                                     Visibility="{x:Bind DueDateVisibility}"
-                                    Background="{x:Bind DueDateBackground}"
+                                    Background="{x:Bind DueDateBackground, Mode=OneWay}"
                                     CornerRadius="5"
                                     Padding="10 0">
-                                <TextBlock Grid.Column="0" Text="{x:Bind DueLabel}" Foreground="{StaticResource PanoramicTaskDueDateForeground}" FontSize="12" VerticalAlignment="Center" />
+                                <TextBlock Text="{x:Bind DueDateLabel, Mode=OneWay}" Foreground="{StaticResource PanoramicTaskDueDateForeground}" FontSize="12" VerticalAlignment="Center" />
                             </Border>
 
                             <Button Grid.Column="1" Click="{x:Bind Complete}" IsEnabled="{x:Bind IsEnabled, Mode=OneWay}">
@@ -125,7 +123,7 @@
                                     Background="{x:Bind DueDateBackground}"
                                     CornerRadius="5"
                                     Padding="10 0">
-                                <TextBlock Grid.Column="0" Text="{x:Bind DueLabel}" Foreground="{StaticResource PanoramicTaskDueDateForeground}" FontSize="12" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="{x:Bind DueDateLabel}" Foreground="{StaticResource PanoramicTaskDueDateForeground}" FontSize="12" VerticalAlignment="Center" />
                             </Border>
 
                             <Button Grid.Column="1" Click="{x:Bind Complete}" IsEnabled="{x:Bind IsEnabled, Mode=OneWay}">
