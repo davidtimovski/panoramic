@@ -104,25 +104,27 @@ public sealed partial class RecentLinksData : IWidgetData
         builder.AppendLine($"# {Title}");
         builder.AppendLine();
 
-        builder.AppendLine("| Link | Context | Clicked |");
-        builder.AppendLine("| - | - | - |");
+        var headers = new Tuple<string, string, string>("Link", "Context", "Clicked");
+        var data = Links.Select(x => new Tuple<string, string, string>($"[{x.Title}]({x.Uri})", x.Context, x.Clicked.ToString(Global.StoredDateTimeFormat))).ToList();
 
-        foreach (var link in Links)
-        {
-            link.ToMarkdown(builder);
-        }
+        MarkdownUtil.CreateThreeColumnTable(builder, headers, data);
         builder.AppendLine();
 
         builder.AppendLine($"## Metadata");
         builder.AppendLine();
-        builder.AppendLine("| Key | Value |");
-        builder.AppendLine("| - | - |");
-        builder.AppendLine($"| {nameof(Id)} | {Id:N} |");
-        builder.AppendLine($"| {nameof(Area)} | {Area} |");
-        builder.AppendLine($"| {nameof(HeaderHighlight)} | {HeaderHighlight} |");
-        builder.AppendLine($"| {nameof(Capacity)} | {Capacity} |");
-        builder.AppendLine($"| {nameof(OnlyFromToday)} | {OnlyFromToday} |");
-        builder.AppendLine($"| {nameof(Searchable)} | {Searchable} |");
+
+        var metadata = new Dictionary<string, string>
+        {
+            { nameof(Id), Id.ToString("N") },
+            { nameof(Area), Area.ToString() },
+            { nameof(HeaderHighlight), HeaderHighlight.ToString() },
+            { nameof(Capacity), Capacity.ToString() },
+            { nameof(OnlyFromToday), OnlyFromToday.ToString() },
+            { nameof(Searchable), Searchable.ToString() }
+        };
+
+        MarkdownUtil.CreateKeyValueTable(builder, metadata);
+
         builder.AppendLine();
         builder.Append($"> Version: {Version}");
     }
@@ -137,9 +139,4 @@ public sealed class RecentLinkData
     public required Uri Uri { get; init; }
     public required string Context { get; init; }
     public required DateTime Clicked { get; init; }
-
-    public void ToMarkdown(StringBuilder builder)
-    {
-        builder.AppendLine($"| [{Title}]({Uri}) | {Context} | {Clicked.ToString(Global.StoredDateTimeFormat)} |");
-    }
 }

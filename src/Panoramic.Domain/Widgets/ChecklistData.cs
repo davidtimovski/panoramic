@@ -106,12 +106,17 @@ public sealed partial class ChecklistData : IWidgetData
 
         builder.AppendLine($"## Metadata");
         builder.AppendLine();
-        builder.AppendLine("| Key | Value |");
-        builder.AppendLine("| - | - |");
-        builder.AppendLine($"| {nameof(Id)} | {Id:N} |");
-        builder.AppendLine($"| {nameof(Area)} | {Area} |");
-        builder.AppendLine($"| {nameof(HeaderHighlight)} | {HeaderHighlight} |");
-        builder.AppendLine($"| {nameof(Searchable)} | {Searchable} |");
+
+        var metadata = new Dictionary<string, string>
+        {
+            { nameof(Id), Id.ToString("N") },
+            { nameof(Area), Area.ToString() },
+            { nameof(HeaderHighlight), HeaderHighlight.ToString() },
+            { nameof(Searchable), Searchable.ToString() }
+        };
+
+        MarkdownUtil.CreateKeyValueTable(builder, metadata);
+
         builder.AppendLine();
         builder.Append($"> Version: {Version}");
     }

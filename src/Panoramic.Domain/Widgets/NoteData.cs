@@ -67,14 +67,19 @@ public sealed class NoteData : IWidgetData
 
         builder.AppendLine($"## Metadata");
         builder.AppendLine();
-        builder.AppendLine("| Key | Value |");
-        builder.AppendLine("| - | - |");
-        builder.AppendLine($"| {nameof(Id)} | {Id:N} |");
-        builder.AppendLine($"| {nameof(Area)} | {Area} |");
-        builder.AppendLine($"| {nameof(HeaderHighlight)} | {HeaderHighlight} |");
-        builder.AppendLine($"| {nameof(FontFamily)} | {FontFamily} |");
-        builder.AppendLine($"| {nameof(FontSize)} | {FontSize} |");
-        builder.AppendLine($"| {nameof(RelativeFilePath)} | {RelativeFilePath} |");
+
+        var metadata = new Dictionary<string, string>
+        {
+            { nameof(Id), Id.ToString("N") },
+            { nameof(Area), Area.ToString() },
+            { nameof(HeaderHighlight), HeaderHighlight.ToString() },
+            { nameof(FontFamily), FontFamily },
+            { nameof(FontSize), FontSize.ToString() },
+            { nameof(RelativeFilePath), RelativeFilePath is null ? string.Empty : RelativeFilePath },
+        };
+
+        MarkdownUtil.CreateKeyValueTable(builder, metadata);
+
         builder.AppendLine();
         builder.Append($"> Version: {Version}");
     }

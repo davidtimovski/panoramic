@@ -12,8 +12,7 @@ using Panoramic.Utils;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 
-public sealed partial class NoteSettingsViewModel
-    : ObservableObject, ISettingsViewModel
+public sealed partial class NoteSettingsViewModel : ObservableObject, ISettingsViewModel
 {
     public NoteSettingsViewModel(IStorageService storageService, NoteData data)
     {
