@@ -77,6 +77,11 @@
                                         PlaceholderText="Due date" />
                 </Grid>
 
+                <TextBox Text="{x:Bind ViewModel.NewTaskUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         MaxLength="5000"
+                         Margin="0 10 0 0"
+                         PlaceholderText="URL" />
+
                 <Button Content="Add"
                         Click="AddButton_Click"
                         IsEnabled="{x:Bind ViewModel.NewTaskFormValid, Mode=OneWay}"

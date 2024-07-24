@@ -42,11 +42,11 @@ public sealed partial class EditViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NewTaskFormValid))]
-    private string newTaskUri = string.Empty;
+    private string newTaskUrl = string.Empty;
 
     public bool NewTaskFormValid =>
         NewTaskTitle.Trim().Length > 0 &&
-        (NewTaskUri.Trim().Length == 0 || Uri.TryCreate(NewTaskUri.Trim(), UriKind.Absolute, out var _));
+        (NewTaskUrl.Trim().Length == 0 || Uri.TryCreate(NewTaskUrl.Trim(), UriKind.Absolute, out var _));
 
     public ObservableCollection<EditTaskViewModel> Tasks { get; } = [];
 
@@ -54,7 +54,7 @@ public sealed partial class EditViewModel : ObservableObject
 
     public void Add()
     {
-        var uri = NewTaskUri.Trim().Length > 0 && Uri.TryCreate(NewTaskUri.Trim(), UriKind.Absolute, out var createdUri) ? createdUri : null;
+        var uri = NewTaskUrl.Trim().Length > 0 && Uri.TryCreate(NewTaskUrl.Trim(), UriKind.Absolute, out var createdUri) ? createdUri : null;
 
         Tasks.Add(new EditTaskViewModel(NewTaskTitle.Trim(), NewTaskDueDate, uri, DateTime.Now));
 
