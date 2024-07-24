@@ -10,5 +10,6 @@
 | FontFamily       | Default                          |
 | FontSize         | 15                               |
 | RelativeFilePath | My note.md                       |
+| Editing          | False                            |
 
 > Version: 1

@@ -30,6 +30,7 @@ public sealed class NoteWidget : IWidget
         HeaderHighlight = headerHighlight;
         FontFamily = fontFamily;
         FontSize = fontSize;
+        Editing = true;
     }
 
     /// <summary>
@@ -45,6 +46,7 @@ public sealed class NoteWidget : IWidget
         HeaderHighlight = data.HeaderHighlight;
         FontFamily = data.FontFamily;
         FontSize = data.FontSize;
+        Editing = data.Editing;
 
         var notePath = data.RelativeFilePath is null ? null : Path.Combine(_storageService.StoragePath, data.RelativeFilePath);
         if (notePath is not null)
@@ -59,6 +61,7 @@ public sealed class NoteWidget : IWidget
     public HighlightColor HeaderHighlight { get; set; }
     public string FontFamily { get; set; }
     public double FontSize { get; set; }
+    public bool Editing { get; set; }
     public FileSystemItemPath? NotePath { get; set; }
 
     public NoteData GetData() =>
@@ -69,7 +72,8 @@ public sealed class NoteWidget : IWidget
             HeaderHighlight = HeaderHighlight,
             FontFamily = FontFamily,
             FontSize = FontSize,
-            RelativeFilePath = NotePath?.Relative
+            RelativeFilePath = NotePath?.Relative,
+            Editing = Editing
         };
 
     public static bool FolderCanBeCreated(string name, string directory)

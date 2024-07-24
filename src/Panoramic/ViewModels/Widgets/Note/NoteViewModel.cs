@@ -35,6 +35,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
         fontFamily = FontFamilyHelper.Get(_widget.FontFamily);
         fontSize = _widget.FontSize;
         title = "Notes";
+        editing = _widget.Editing;
 
         SelectedNote = GetSelectedNote(ExplorerItems);
 
@@ -100,6 +101,12 @@ public sealed partial class NoteViewModel : WidgetViewModel
     [NotifyPropertyChangedFor(nameof(PresenterVisibility))]
     [NotifyPropertyChangedFor(nameof(EditToggleTooltip))]
     private bool editing;
+
+    partial void OnEditingChanged(bool value)
+    {
+        _widget.Editing = value;
+        _storageService.EnqueueWidgetWrite(_widget.Id);
+    }
 
     [ObservableProperty]
     private Visibility tipVisibility;

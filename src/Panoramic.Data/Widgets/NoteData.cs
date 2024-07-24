@@ -13,6 +13,7 @@ public sealed class NoteData : IWidgetData
     public string FontFamily { get; init; } = "Default";
     public double FontSize { get; init; } = 15;
     public string? RelativeFilePath { get; init; }
+    public bool Editing { get; init; }
 
     public static NoteData FromMarkdown(string markdown)
     {
@@ -43,6 +44,10 @@ public sealed class NoteData : IWidgetData
 
             var relativeFilePathRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             var relativeFilePath = relativeFilePathRowValues.Length == 1 ? null : relativeFilePathRowValues[1];
+            lineIndex++;
+
+            var editingRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var editing = bool.Parse(editingRowValues[1]);
 
             return new NoteData
             {
@@ -51,7 +56,8 @@ public sealed class NoteData : IWidgetData
                 HeaderHighlight = headerHighlight,
                 FontFamily = fontFamily,
                 FontSize = fontSize,
-                RelativeFilePath = relativeFilePath
+                RelativeFilePath = relativeFilePath,
+                Editing = editing,
             };
         }
         catch
@@ -76,6 +82,7 @@ public sealed class NoteData : IWidgetData
             { nameof(FontFamily), FontFamily },
             { nameof(FontSize), FontSize.ToString() },
             { nameof(RelativeFilePath), RelativeFilePath is null ? string.Empty : RelativeFilePath },
+            { nameof(Editing), Editing.ToString() },
         };
 
         MarkdownUtil.CreateKeyValueTable(builder, metadata);
