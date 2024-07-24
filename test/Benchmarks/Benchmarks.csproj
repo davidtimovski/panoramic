@@ -12,7 +12,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\src\Panoramic.Domain\Panoramic.Data.csproj" />
+	  <ProjectReference Include="..\..\src\Panoramic.Data\Panoramic.Data.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

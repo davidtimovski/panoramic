@@ -34,7 +34,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Panoramic.Domain\Panoramic.Data.csproj" />
+	  <ProjectReference Include="..\Panoramic.Data\Panoramic.Data.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

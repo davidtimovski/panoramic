@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panoramic", "src\Panoramic\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "test\Benchmarks\Benchmarks.csproj", "{5F0A889F-5CAC-452D-AF63-257043ECD463}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panoramic.Data", "src\Panoramic.Domain\Panoramic.Data.csproj", "{58CB5FAF-EA5D-468C-A7FE-700E9A4B273A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panoramic.Data", "src\Panoramic.Data\Panoramic.Data.csproj", "{58CB5FAF-EA5D-468C-A7FE-700E9A4B273A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E50D4AB2-A134-429B-A29F-8EF6EB34487F}"
 	ProjectSection(SolutionItems) = preProject
