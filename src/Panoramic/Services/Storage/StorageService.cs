@@ -19,6 +19,7 @@ namespace Panoramic.Services.Storage;
 public sealed class StorageService : IStorageService
 {
     private const string DefaultDirectoryName = "Panoramic";
+    private const string SystemDirectoryName = ".panoramic";
 
     /// <summary>
     /// Used to write changed sections widget data to disk.
@@ -66,7 +67,7 @@ public sealed class StorageService : IStorageService
     public event EventHandler<FileDeletedEventArgs>? FileDeleted;
     public event EventHandler<EventArgs>? ItemRenamed;
 
-    public string WidgetsFolderPath => Path.Combine(StoragePath, "widgets");
+    public string WidgetsFolderPath => Path.Combine(StoragePath, SystemDirectoryName, "widgets");
     public string StoragePath { get; private set; }
 
     private Dictionary<string, FileSystemItem> fileSystemItems = [];
