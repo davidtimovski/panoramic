@@ -81,9 +81,9 @@ public sealed class NotesOrchestrator : INotesOrchestrator
         return noteWidgets;
     }
 
-    public async Task SaveNoteWidgetContentAsync(NoteWidget widget)
+    /// <inheritdoc/>
+    public async Task SaveNoteWidgetAsync(NoteWidget widget)
     {
-        // Write out any unsaved note content changes
         if (widget.NotePath is not null && _unsavedNotes.TryGetValue(widget.NotePath.Absolute, out string? content))
         {
             await WriteNoteAsync(widget.NotePath.Absolute, content);

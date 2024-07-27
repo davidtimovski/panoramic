@@ -9,7 +9,6 @@ using Panoramic.Models;
 using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.Checklist;
 using Panoramic.Models.Domain.LinkCollection;
-using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Services.Storage.Models;
 using Panoramic.Utils;
@@ -133,11 +132,6 @@ public sealed class StorageService : IStorageService
 
     public async Task SaveWidgetAsync(IWidget widget)
     {
-        if (widget is NoteWidget noteWidget)
-        {
-            throw new ArgumentException("Note widget saves go through INotesOrchestrator.");
-        }
-
         if (_unsavedWidgets.Contains(widget.Id))
         {
             _unsavedWidgets.Remove(widget.Id);

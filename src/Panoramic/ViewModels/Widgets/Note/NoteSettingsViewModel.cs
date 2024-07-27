@@ -83,7 +83,7 @@ public sealed partial class NoteSettingsViewModel : ObservableObject, ISettingsV
             widget.FontSize = size;
             widget.RecentNotesCapacity = RecentNotesCapacity;
 
-            await _storageService.SaveWidgetAsync(widget);
+            await _notesOrchestrator.SaveNoteWidgetAsync(widget);
         }
     }
 }

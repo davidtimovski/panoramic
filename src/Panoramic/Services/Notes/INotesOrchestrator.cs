@@ -30,9 +30,13 @@ public interface INotesOrchestrator
     /// Reads note widgets from the file system.
     /// </summary>
     Task<IReadOnlyList<IWidget>> ReadWidgetsAsync();
-    Task WriteUnsavedChangesAsync();
 
-    Task SaveNoteWidgetContentAsync(NoteWidget widget);
+    /// <summary>
+    /// Saves the note content before calling the default widget save.
+    /// </summary>
+    Task SaveNoteWidgetAsync(NoteWidget widget);
+
+    Task WriteUnsavedChangesAsync();
 
     /// <summary>
     /// Schedules a note save to disk.
