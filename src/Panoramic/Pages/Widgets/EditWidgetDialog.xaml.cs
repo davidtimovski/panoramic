@@ -13,6 +13,7 @@ using Panoramic.Pages.Widgets.Checklist;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
+using Panoramic.Services.Notes;
 using Panoramic.Services.Storage;
 using Panoramic.UserControls;
 using Panoramic.ViewModels.Widgets;
@@ -27,18 +28,20 @@ public sealed partial class EditWidgetDialog : Page
 {
     private readonly IWidget _widget;
     private readonly IStorageService _storageService;
+    private readonly INotesOrchestrator _notesOrchestrator;
     private readonly AreaPicker _areaPicker;
 
     private IWidgetForm? widgetForm;
     private Page? settingsContent;
     private ISettingsViewModel? settingsVm;
 
-    public EditWidgetDialog(IWidget widget, IStorageService storageService)
+    public EditWidgetDialog(IWidget widget, IStorageService storageService, INotesOrchestrator notesOrchestrator)
     {
         InitializeComponent();
 
         _widget = widget;
         _storageService = storageService;
+        _notesOrchestrator = notesOrchestrator;
 
         EditSettingsTitle = "Settings";
         EditAreaTitle = "Area";
@@ -90,7 +93,7 @@ public sealed partial class EditWidgetDialog : Page
         switch (_widget.Type)
         {
             case WidgetType.Note:
-                var noteVm = new NoteSettingsViewModel(_storageService, ((NoteWidget)_widget).GetData());
+                var noteVm = new NoteSettingsViewModel(_storageService, _notesOrchestrator, ((NoteWidget)_widget).GetData());
                 var noteForm = new NoteSettingsForm(noteVm);
 
                 settingsVm = noteVm;

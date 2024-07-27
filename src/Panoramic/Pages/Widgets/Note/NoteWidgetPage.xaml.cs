@@ -6,7 +6,10 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Services.Markdown;
+using Panoramic.Services.Notes;
+using Panoramic.Services.Notes.Models;
 using Panoramic.Services.Storage;
+using Panoramic.Services.Storage.Models;
 using Panoramic.ViewModels.Widgets.Note;
 
 namespace Panoramic.Pages.Widgets.Note;
@@ -14,6 +17,7 @@ namespace Panoramic.Pages.Widgets.Note;
 public sealed partial class NoteWidgetPage : Page
 {
     private readonly IStorageService _storageService;
+    private readonly INotesOrchestrator _notesOrchestrator;
     private readonly IMarkdownService _markdownService;
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly NoteWidget _widget;
@@ -23,16 +27,18 @@ public sealed partial class NoteWidgetPage : Page
         InitializeComponent();
 
         _storageService = serviceProvider.GetRequiredService<IStorageService>();
-        _storageService.NoteSelectionChanged += NoteSelectionChanged;
-        _storageService.FileCreated += FileCreated;
-
+        _notesOrchestrator = serviceProvider.GetRequiredService<INotesOrchestrator>();
         _markdownService = serviceProvider.GetRequiredService<IMarkdownService>();
         _dispatcherQueue = serviceProvider.GetRequiredService<DispatcherQueue>();
         _widget = widget;
 
-        ViewModel = new NoteViewModel(_storageService, widget);
+        _notesOrchestrator.NoteSelectionChanged += NoteSelectionChanged;
+        _notesOrchestrator.FileCreated += FileCreated;
+
+        ViewModel = new NoteViewModel(_storageService, _notesOrchestrator, widget);
 
         SetPresenterContent();
+        SetRecentNotes();
     }
 
     public NoteViewModel ViewModel { get; }
@@ -50,6 +56,40 @@ public sealed partial class NoteWidgetPage : Page
         foreach (var paragraph in paragraphs)
         {
             Presenter.Blocks.Add(paragraph);
+        }
+    }
+
+    private void SetRecentNotes()
+    {
+        RecentNotesMenuFlyout.Items.Clear();
+
+        if (_widget.RecentNotes.Count == 0)
+        {
+            var emptyMenuItem = new MenuFlyoutItem
+            {
+                Text = "No recently opened notes",
+                IsEnabled = false,
+            };
+            RecentNotesMenuFlyout.Items.Add(emptyMenuItem);
+            return;
+        }
+
+        foreach (var notePath in _widget.RecentNotes)
+        {
+            var note = NoteViewModel.FindNoteRecursively(notePath, ViewModel.ExplorerItems);
+            if (note is not null)
+            {
+                var menuItem = new MenuFlyoutItem
+                {
+                    Text = notePath.Relative
+                };
+
+                menuItem.Click += (_, e) =>
+                {
+                    ViewModel.SelectedNote = note;
+                };
+                RecentNotesMenuFlyout.Items.Add(menuItem);
+            }
         }
     }
 
@@ -72,6 +112,8 @@ public sealed partial class NoteWidgetPage : Page
         {
             _dispatcherQueue.TryEnqueue(SetPresenterContent);
         }
+
+        _dispatcherQueue.TryEnqueue(SetRecentNotes);
     }
 
     private void FileCreated(object? _, FileCreatedEventArgs e)
@@ -89,8 +131,8 @@ public sealed partial class NoteWidgetPage : Page
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
         var folder = (ExplorerItem)menuItem.DataContext;
 
-        var content = new NewNoteForm(_storageService.FileSystemItems, folder.Path, _storageService.StoragePath);
-        void createNote() => _storageService.CreateNote(_widget.Id, content.ViewModel.SelectedFolder!.Path.Absolute, content.ViewModel.Name);
+        var content = new NewNoteForm(_notesOrchestrator.FileSystemItems, folder.Path, _storageService.StoragePath);
+        void createNote() => _notesOrchestrator.CreateNote(_widget.Id, content.ViewModel.SelectedFolder!.Path.Absolute, content.ViewModel.Name);
 
         var dialog = new ContentDialog
         {
@@ -116,8 +158,8 @@ public sealed partial class NoteWidgetPage : Page
     private async void AddNoteFromContextMenu_Click(object _, RoutedEventArgs e)
     {
         var path = new FileSystemItemPath(_storageService.StoragePath, _storageService.StoragePath);
-        var content = new NewNoteForm(_storageService.FileSystemItems, path, _storageService.StoragePath);
-        void createNote() => _storageService.CreateNote(_widget.Id, content.ViewModel.SelectedFolder!.Path.Absolute, content.ViewModel.Name);
+        var content = new NewNoteForm(_notesOrchestrator.FileSystemItems, path, _storageService.StoragePath);
+        void createNote() => _notesOrchestrator.CreateNote(_widget.Id, content.ViewModel.SelectedFolder!.Path.Absolute, content.ViewModel.Name);
 
         var dialog = new ContentDialog
         {
@@ -145,8 +187,8 @@ public sealed partial class NoteWidgetPage : Page
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
         var folder = (ExplorerItem)menuItem.DataContext;
 
-        var content = new NewFolderForm(_storageService.FileSystemItems, folder.Path, _storageService.StoragePath);
-        void createFolder() => _storageService.CreateFolder(_widget.Id, content.ViewModel.SelectedFolder!.Path.Absolute, content.ViewModel.Name);
+        var content = new NewFolderForm(_notesOrchestrator.FileSystemItems, folder.Path, _storageService.StoragePath);
+        void createFolder() => _notesOrchestrator.CreateFolder(_widget.Id, content.ViewModel.SelectedFolder!.Path.Absolute, content.ViewModel.Name);
 
         var dialog = new ContentDialog
         {
@@ -172,8 +214,8 @@ public sealed partial class NoteWidgetPage : Page
     private async void AddFolderFromContextMenu_Click(object _, RoutedEventArgs e)
     {
         var path = new FileSystemItemPath(_storageService.StoragePath, _storageService.StoragePath);
-        var content = new NewFolderForm(_storageService.FileSystemItems, path, _storageService.StoragePath);
-        void createFolder() => _storageService.CreateFolder(_widget.Id, content.ViewModel.SelectedFolder!.Path.Absolute, content.ViewModel.Name);
+        var content = new NewFolderForm(_notesOrchestrator.FileSystemItems, path, _storageService.StoragePath);
+        void createFolder() => _notesOrchestrator.CreateFolder(_widget.Id, content.ViewModel.SelectedFolder!.Path.Absolute, content.ViewModel.Name);
 
         var dialog = new ContentDialog
         {
@@ -202,7 +244,7 @@ public sealed partial class NoteWidgetPage : Page
         var folder = (ExplorerItem)menuItem.DataContext;
 
         var content = new FolderRenameForm(folder.Path.Absolute);
-        void renameFolder() => _storageService.RenameFolder(folder.Path.Absolute, content.ViewModel.Name);
+        void renameFolder() => _notesOrchestrator.RenameFolder(folder.Path, content.ViewModel.Name);
 
         var dialog = new ContentDialog
         {
@@ -236,7 +278,7 @@ public sealed partial class NoteWidgetPage : Page
             Content = $"""Are you sure want to delete the "{folder.Name}" folder and everything in it?""",
             PrimaryButtonText = "Yes, delete",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.DeleteFolder(folder.Path.Absolute))
+            PrimaryButtonCommand = new RelayCommand(() => _notesOrchestrator.DeleteFolder(folder.Path))
         };
 
         await dialog.ShowAsync();
@@ -248,7 +290,7 @@ public sealed partial class NoteWidgetPage : Page
         var note = (ExplorerItem)menuItem.DataContext;
 
         var content = new NoteRenameForm(note.Path.Absolute);
-        void renameNote() => _storageService.RenameNote(note.Path.Absolute, content.ViewModel.Name);
+        void renameNote() => _notesOrchestrator.RenameNote(note.Path, content.ViewModel.Name);
 
         var dialog = new ContentDialog
         {
@@ -282,7 +324,7 @@ public sealed partial class NoteWidgetPage : Page
             Content = $@"Are you sure want to delete the ""{note.Name}"" note?",
             PrimaryButtonText = "Yes, delete",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.DeleteNote(note.Path.Absolute))
+            PrimaryButtonCommand = new RelayCommand(() => _notesOrchestrator.DeleteNote(note.Path))
         };
 
         await dialog.ShowAsync();
@@ -299,7 +341,7 @@ public sealed partial class NoteWidgetPage : Page
             Content = $@"Are you sure want to delete the ""{note.Name}"" note?",
             PrimaryButtonText = "Yes, delete",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new RelayCommand(() => _storageService.DeleteNote(note.Path.Absolute))
+            PrimaryButtonCommand = new RelayCommand(() => _notesOrchestrator.DeleteNote(note.Path))
         };
 
         await dialog.ShowAsync();
@@ -309,7 +351,7 @@ public sealed partial class NoteWidgetPage : Page
     {
         ViewModel.Highlighted = true;
 
-        var content = new EditWidgetDialog(_widget, _storageService);
+        var content = new EditWidgetDialog(_widget, _storageService, _notesOrchestrator);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,

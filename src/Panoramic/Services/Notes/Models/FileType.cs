@@ -1,4 +1,4 @@
-﻿namespace Panoramic.Services.Storage;
+﻿namespace Panoramic.Services.Notes.Models;
 
 public enum FileType
 {

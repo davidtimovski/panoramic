@@ -14,14 +14,28 @@ public sealed class NoteData : IWidgetData
     public double FontSize { get; init; } = 15;
     public string? RelativeFilePath { get; init; }
     public bool Editing { get; init; }
+    public List<string> RecentNotes { get; init; } = [];
+    public int RecentNotesCapacity { get; init; } = 5;
 
     public static NoteData FromMarkdown(string markdown)
     {
-        var lineIndex = 6;
+        var lineIndex = 3;
         var lines = markdown.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
 
         try
         {
+            // RecentNotes
+            var recentNotes = new List<string>();
+            while (lines[lineIndex].StartsWith('-'))
+            {
+                var recentNote = lines[lineIndex][2..];
+                recentNotes.Add(recentNote);
+
+                lineIndex++;
+            }
+
+            lineIndex += 5;
+
             // Metadata
             var idRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             var id = Guid.ParseExact(idRowValues[1], "N");
@@ -48,6 +62,10 @@ public sealed class NoteData : IWidgetData
 
             var editingRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             var editing = bool.Parse(editingRowValues[1]);
+            lineIndex++;
+
+            var recentNotesCapacityRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var recentNotesCapacity = int.Parse(recentNotesCapacityRowValues[1]);
 
             return new NoteData
             {
@@ -58,6 +76,8 @@ public sealed class NoteData : IWidgetData
                 FontSize = fontSize,
                 RelativeFilePath = relativeFilePath,
                 Editing = editing,
+                RecentNotes = recentNotes,
+                RecentNotesCapacity = recentNotesCapacity,
             };
         }
         catch
@@ -69,6 +89,13 @@ public sealed class NoteData : IWidgetData
     public void ToMarkdown(StringBuilder builder)
     {
         builder.AppendLine($"# Note");
+        builder.AppendLine();
+
+        builder.AppendLine($"## Recent notes");
+        foreach (var recentNotePath in RecentNotes)
+        {
+            builder.AppendLine($"- {recentNotePath}");
+        }
         builder.AppendLine();
 
         builder.AppendLine($"## Metadata");
@@ -83,6 +110,7 @@ public sealed class NoteData : IWidgetData
             { nameof(FontSize), FontSize.ToString() },
             { nameof(RelativeFilePath), RelativeFilePath is null ? string.Empty : RelativeFilePath },
             { nameof(Editing), Editing.ToString() },
+            { nameof(RecentNotesCapacity), RecentNotesCapacity.ToString() },
         };
 
         MarkdownUtil.CreateKeyValueTable(builder, metadata);

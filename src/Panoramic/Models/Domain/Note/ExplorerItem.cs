@@ -5,7 +5,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using Panoramic.Services.Storage;
+using Panoramic.Services.Notes;
+using Panoramic.Services.Notes.Models;
+using Panoramic.Services.Storage.Models;
 
 namespace Panoramic.Models.Domain.Note;
 
@@ -14,17 +16,17 @@ public sealed partial class ExplorerItem : ObservableObject
     private static readonly TimeSpan TextChangeEnqueueDebounceInterval = TimeSpan.FromSeconds(3);
 
     private readonly DispatcherQueueTimer _debounceTimer;
-    private readonly IStorageService _storageService;
+    private readonly INotesOrchestrator _notesOrchestrator;
 
     private bool initialized;
 
-    public ExplorerItem(IStorageService storageService, string name, FileType type, FileSystemItemPath path, IReadOnlyList<ExplorerItem> children)
+    public ExplorerItem(INotesOrchestrator notesOrchestrator, string name, FileType type, FileSystemItemPath path, IReadOnlyList<ExplorerItem> children)
     {
         var queueController = DispatcherQueueController.CreateOnDedicatedThread();
         var queue = queueController.DispatcherQueue;
         _debounceTimer = queue.CreateTimer();
 
-        _storageService = storageService;
+        _notesOrchestrator = notesOrchestrator;
 
         Name = name;
         Type = type;
@@ -58,7 +60,7 @@ public sealed partial class ExplorerItem : ObservableObject
 
             if (initialized)
             {
-                _debounceTimer.Debounce(() => _storageService.EnqueueNoteWrite(Path.Absolute, value!), TextChangeEnqueueDebounceInterval);
+                _debounceTimer.Debounce(() => _notesOrchestrator.EnqueueNoteWrite(Path, value!), TextChangeEnqueueDebounceInterval);
             }
             else
             {

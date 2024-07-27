@@ -85,7 +85,7 @@ public sealed class LinkCollectionWidget : IWidget
 
     public async Task WriteAsync()
     {
-        DebugLogger.Log($"Writing {Type} widget with ID: {Id}");
+        DebugLogger.Log($"Writing out {Type} widget to file system. ID: {Id}.");
 
         var data = GetData();
 

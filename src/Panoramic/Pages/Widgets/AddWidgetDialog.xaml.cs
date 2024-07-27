@@ -10,6 +10,7 @@ using Panoramic.Pages.Widgets.Checklist;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
+using Panoramic.Services.Notes;
 using Panoramic.Services.Storage;
 using Panoramic.UserControls;
 using Panoramic.ViewModels.Widgets.Checklist;
@@ -25,6 +26,7 @@ public sealed partial class AddWidgetDialog : Page
     private const string WidgetSettingsTitle = "Add widget - settings";
 
     private readonly IStorageService _storageService;
+    private readonly INotesOrchestrator _notesOrchestrator;
     private readonly AreaPicker _areaPicker;
 
     private short step;
@@ -32,11 +34,12 @@ public sealed partial class AddWidgetDialog : Page
     private WidgetType? selectedWidgetType;
     private IWidgetForm? widgetForm;
 
-    public AddWidgetDialog(IStorageService storageService)
+    public AddWidgetDialog(IStorageService storageService, INotesOrchestrator notesOrchestrator)
     {
         InitializeComponent();
 
         _storageService = storageService;
+        _notesOrchestrator = notesOrchestrator;
 
         _areaPicker = new(_storageService, null);
         _areaPicker.AreaReset += AreaReset;
@@ -93,7 +96,7 @@ public sealed partial class AddWidgetDialog : Page
         switch (selectedWidgetType)
         {
             case WidgetType.Note:
-                var noteVm = new NoteSettingsViewModel(_storageService, new NoteData
+                var noteVm = new NoteSettingsViewModel(_storageService, _notesOrchestrator, new NoteData
                 {
                     Id = Guid.Empty,
                     Area = selectedArea!

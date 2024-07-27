@@ -7,6 +7,7 @@ using Panoramic.Data;
 using Panoramic.Data.Widgets;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Events;
+using Panoramic.Services.Notes;
 using Panoramic.Services.Storage;
 using Panoramic.Utils;
 
@@ -14,9 +15,15 @@ namespace Panoramic.ViewModels.Widgets.Note;
 
 public sealed partial class NoteSettingsViewModel : ObservableObject, ISettingsViewModel
 {
-    public NoteSettingsViewModel(IStorageService storageService, NoteData data)
+    private readonly IStorageService _storageService;
+    private readonly INotesOrchestrator _notesOrchestrator;
+
+    private event EventHandler<ValidationEventArgs>? Validated;
+
+    public NoteSettingsViewModel(IStorageService storageService, INotesOrchestrator notesOrchestrator, NoteData data)
     {
         _storageService = storageService;
+        _notesOrchestrator = notesOrchestrator;
 
         var fontFamilyOptions = FontFamilyHelper.GetAll();
         foreach (var fontFamilyOption in fontFamilyOptions)
@@ -29,10 +36,8 @@ public sealed partial class NoteSettingsViewModel : ObservableObject, ISettingsV
         headerHighlight = data.HeaderHighlight.ToString();
         fontFamily = data.FontFamily;
         fontSize = data.FontSize.ToString(CultureInfo.InvariantCulture);
+        recentNotesCapacity = data.RecentNotesCapacity;
     }
-
-    private readonly IStorageService _storageService;
-    private event EventHandler<ValidationEventArgs>? Validated;
 
     public Guid Id { get; }
 
@@ -50,6 +55,9 @@ public sealed partial class NoteSettingsViewModel : ObservableObject, ISettingsV
     [ObservableProperty]
     private string fontSize;
 
+    [ObservableProperty]
+    private int recentNotesCapacity;
+
     public void AttachValidationHandler(EventHandler<ValidationEventArgs> handler)
     {
         Validated += handler;
@@ -63,7 +71,7 @@ public sealed partial class NoteSettingsViewModel : ObservableObject, ISettingsV
 
         if (Id == Guid.Empty)
         {
-            var widget = new NoteWidget(_storageService, Area, headerHighlight, FontFamily, size);
+            var widget = new NoteWidget(_storageService, _notesOrchestrator, Area, headerHighlight, FontFamily, size, RecentNotesCapacity);
             await _storageService.AddNewWidgetAsync(widget);
         }
         else
@@ -73,6 +81,7 @@ public sealed partial class NoteSettingsViewModel : ObservableObject, ISettingsV
             widget.HeaderHighlight = headerHighlight;
             widget.FontFamily = FontFamily;
             widget.FontSize = size;
+            widget.RecentNotesCapacity = RecentNotesCapacity;
 
             await _storageService.SaveWidgetAsync(widget);
         }

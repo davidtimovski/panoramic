@@ -6,7 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Panoramic.Data;
 using Panoramic.Data.Widgets;
+using Panoramic.Services.Notes;
+using Panoramic.Services.Notes.Models;
 using Panoramic.Services.Storage;
+using Panoramic.Services.Storage.Models;
 using Panoramic.Utils;
 
 namespace Panoramic.Models.Domain.Note;
@@ -14,14 +17,23 @@ namespace Panoramic.Models.Domain.Note;
 public sealed class NoteWidget : IWidget
 {
     private readonly IStorageService _storageService;
+    private readonly INotesOrchestrator _notesOrchestrator;
     private readonly string _dataFileName;
 
     /// <summary>
     /// Constructs a new note widget.
     /// </summary>
-    public NoteWidget(IStorageService storageService, Area area, HighlightColor headerHighlight, string fontFamily, double fontSize)
+    public NoteWidget(
+        IStorageService storageService,
+        INotesOrchestrator notesOrchestrator,
+        Area area,
+        HighlightColor headerHighlight,
+        string fontFamily,
+        double fontSize,
+        int recentNotesCapacity)
     {
         _storageService = storageService;
+        _notesOrchestrator = notesOrchestrator;
 
         Id = Guid.NewGuid();
         _dataFileName = WidgetUtil.CreateDataFileName(Id, WidgetType.Note);
@@ -31,14 +43,18 @@ public sealed class NoteWidget : IWidget
         FontFamily = fontFamily;
         FontSize = fontSize;
         Editing = true;
+        recentNotes = [];
+        RecentNotesCapacity = recentNotesCapacity;
     }
 
     /// <summary>
     /// Constructs a note widget based on existing data.
     /// </summary>
-    private NoteWidget(IStorageService storageService, NoteData data)
+    private NoteWidget(IStorageService storageService, INotesOrchestrator notesOrchestrator, NoteData data)
     {
         _storageService = storageService;
+        _notesOrchestrator = notesOrchestrator;
+
         _dataFileName = WidgetUtil.CreateDataFileName(data.Id, WidgetType.Note);
 
         Id = data.Id;
@@ -47,6 +63,8 @@ public sealed class NoteWidget : IWidget
         FontFamily = data.FontFamily;
         FontSize = data.FontSize;
         Editing = data.Editing;
+        recentNotes = data.RecentNotes.Select(x => new FileSystemItemPath(Path.Combine(_storageService.StoragePath, x), _storageService.StoragePath)).ToList();
+        RecentNotesCapacity = data.RecentNotesCapacity;
 
         var notePath = data.RelativeFilePath is null ? null : Path.Combine(_storageService.StoragePath, data.RelativeFilePath);
         if (notePath is not null)
@@ -61,8 +79,41 @@ public sealed class NoteWidget : IWidget
     public HighlightColor HeaderHighlight { get; set; }
     public string FontFamily { get; set; }
     public double FontSize { get; set; }
+
+    private FileSystemItemPath? notePath;
+    public FileSystemItemPath? NotePath
+    {
+        get => notePath;
+        set
+        {
+            var recent = recentNotes.ToList();
+            if (NotePath is not null)
+            {
+                recent.Insert(0, NotePath);
+            }
+
+            var previousPath = NotePath;
+            notePath = value;
+
+            recentNotes.Clear();
+            var mostRecentThree = recent.Where(x => !x.Equals(value)).Take(RecentNotesCapacity);
+            recentNotes.AddRange(mostRecentThree);
+        }
+    }
+
     public bool Editing { get; set; }
-    public FileSystemItemPath? NotePath { get; set; }
+
+    private readonly List<FileSystemItemPath> recentNotes;
+
+    /// <summary>
+    /// Recently opened notes, excluding notes that are currently open across all Note widgets in the UI.
+    /// </summary>
+    public List<FileSystemItemPath> RecentNotes
+    {
+        get => recentNotes.Where(x => !_notesOrchestrator.OpenNotes.Contains(x)).Take(RecentNotesCapacity).ToList();
+    }
+
+    public int RecentNotesCapacity { get; set; }
 
     public NoteData GetData() =>
         new()
@@ -73,7 +124,9 @@ public sealed class NoteWidget : IWidget
             FontFamily = FontFamily,
             FontSize = FontSize,
             RelativeFilePath = NotePath?.Relative,
-            Editing = Editing
+            Editing = Editing,
+            RecentNotes = recentNotes.Take(RecentNotesCapacity).Select(x => x.Relative).ToList(),
+            RecentNotesCapacity = RecentNotesCapacity
         };
 
     public static bool FolderCanBeCreated(string name, string directory)
@@ -94,19 +147,19 @@ public sealed class NoteWidget : IWidget
     }
 
     public IReadOnlyList<ExplorerItem> GetExplorerItems()
-        => DirectoryToTreeViewNode(_storageService.FileSystemItems, _storageService.StoragePath);
+        => DirectoryToTreeViewNode(_notesOrchestrator.FileSystemItems, _storageService.StoragePath);
 
     private List<ExplorerItem> DirectoryToTreeViewNode(IReadOnlyList<FileSystemItem> fileSystemItems, string currentPath)
     {
         var folders = fileSystemItems
             .Where(x => x.Type == FileType.Folder && x.Path.Parent.Equals(currentPath, StringComparison.OrdinalIgnoreCase))
             .OrderBy(x => x.Name)
-            .Select(x => new ExplorerItem(_storageService, x.Name, FileType.Folder, x.Path, DirectoryToTreeViewNode(fileSystemItems, x.Path.Absolute)));
+            .Select(x => new ExplorerItem(_notesOrchestrator, x.Name, FileType.Folder, x.Path, DirectoryToTreeViewNode(fileSystemItems, x.Path.Absolute)));
 
         var notes = fileSystemItems
             .Where(x => x.Type == FileType.Note && x.Path.Parent.Equals(currentPath, StringComparison.OrdinalIgnoreCase))
             .OrderBy(x => x.Name)
-            .Select(x => new ExplorerItem(_storageService, x.Name, FileType.Note, x.Path, [])
+            .Select(x => new ExplorerItem(_notesOrchestrator, x.Name, FileType.Note, x.Path, [])
             {
                 IsEnabled = x.SelectedInWidgetId is null || x.SelectedInWidgetId == Id
             });
@@ -114,15 +167,15 @@ public sealed class NoteWidget : IWidget
         return folders.Concat(notes).ToList();
     }
 
-    public static NoteWidget Load(IStorageService storageService, string markdown)
+    public static NoteWidget Load(IStorageService storageService, INotesOrchestrator notesOrchestrator, string markdown)
     {
         var data = NoteData.FromMarkdown(markdown);
-        return new(storageService, data);
+        return new(storageService, notesOrchestrator, data);
     }
 
     public async Task WriteAsync()
     {
-        DebugLogger.Log($"Writing {Type} widget with ID: {Id}");
+        DebugLogger.Log($"Writing out {Type} widget to file system. ID: {Id}.");
 
         var data = GetData();
 

@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
 using Panoramic.Services;
 using Panoramic.Services.Markdown;
+using Panoramic.Services.Notes;
 using Panoramic.Services.Preferences;
 using Panoramic.Services.Search;
 using Panoramic.Services.Storage;
@@ -36,16 +37,15 @@ public sealed partial class App : Application
     {
         services.AddSingleton<IPreferencesService, PreferencesService>();
         services.AddSingleton<IStorageService, StorageService>();
-        services.AddSingleton(new HttpClient());
-
-        services.AddSingleton<MainWindow>();
-        services.AddSingleton<MainViewModel>();
-
         services.AddSingleton<IEventHub, EventHub>();
         services.AddSingleton<IMarkdownService, MarkdownService>();
         services.AddSingleton<ISearchService, SearchService>();
-
+        services.AddSingleton<INotesOrchestrator, NotesOrchestrator>();
+        services.AddSingleton(new HttpClient());
         services.AddSingleton(DispatcherQueue.GetForCurrentThread());
+
+        services.AddSingleton<MainWindow>();
+        services.AddSingleton<MainViewModel>();
     }
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)

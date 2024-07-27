@@ -8,6 +8,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <ComboBox Grid.Row="0"
@@ -51,6 +52,13 @@
                 <x:String>24</x:String>
             </ComboBox>
         </Grid>
+
+        <NumberBox Grid.Row="2"
+                   Value="{x:Bind ViewModel.RecentNotesCapacity, Mode=TwoWay}"
+                   Header="Recent notes capacity"
+                   SpinButtonPlacementMode="Compact"
+                   Minimum="1"
+                   Maximum="30" />
     </Grid>
 
 </Page>

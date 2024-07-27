@@ -8,11 +8,11 @@ namespace Panoramic.Pages.Widgets.Note;
 
 public sealed partial class NoteRenameForm : Page
 {
-    public NoteRenameForm(string path)
+    public NoteRenameForm(string absolutePath)
     {
         InitializeComponent();
 
-        ViewModel = new NoteRenameViewModel(path);
+        ViewModel = new NoteRenameViewModel(absolutePath);
 
         NameTextBox.Loaded += NameTextBox_Loaded;
     }

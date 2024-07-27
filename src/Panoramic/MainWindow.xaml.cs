@@ -17,8 +17,10 @@ using Panoramic.Pages.Widgets.Checklist;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
+using Panoramic.Services.Notes;
 using Panoramic.Services.Preferences;
 using Panoramic.Services.Storage;
+using Panoramic.Services.Storage.Models;
 using Panoramic.ViewModels;
 
 namespace Panoramic;
@@ -27,11 +29,13 @@ public sealed partial class MainWindow : Window
 {
     private readonly IPreferencesService _preferencesService;
     private readonly IStorageService _storageService;
+    private readonly INotesOrchestrator _notesOrchestrator;
     private readonly IServiceProvider _serviceProvider;
 
     public MainWindow(
         IPreferencesService preferencesService,
         IStorageService storageService,
+        INotesOrchestrator notesOrchestrator,
         IServiceProvider serviceProvider,
         MainViewModel viewModel)
     {
@@ -50,6 +54,7 @@ public sealed partial class MainWindow : Window
         _storageService.WidgetUpdated += WidgetUpdated;
         _storageService.WidgetDeleted += WidgetDeleted;
 
+        _notesOrchestrator = notesOrchestrator;
         _serviceProvider = serviceProvider;
 
         ViewModel = viewModel;
@@ -61,7 +66,8 @@ public sealed partial class MainWindow : Window
     {
         try
         {
-            await _storageService.ReadAsync();
+            var noteWidgets = await _notesOrchestrator.ReadWidgetsAsync();
+            await _storageService.ReadWidgetsAsync(noteWidgets);
         }
         catch (MarkdownParsingException ex)
         {
@@ -86,12 +92,13 @@ public sealed partial class MainWindow : Window
 
     private async void WindowClosed(object _, WindowEventArgs args)
     {
+        await _notesOrchestrator.WriteUnsavedChangesAsync();
         await _storageService.WriteUnsavedChangesAsync();
     }
 
     private async void AddWidgetButton_Click(object _, RoutedEventArgs e)
     {
-        var content = new AddWidgetDialog(_storageService);
+        var content = new AddWidgetDialog(_storageService, _notesOrchestrator);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -195,10 +202,10 @@ public sealed partial class MainWindow : Window
         args.Handled = true;
 
         var path = new FileSystemItemPath(_storageService.StoragePath, _storageService.StoragePath);
-        var content = new NewNoteForm(_storageService.FileSystemItems, path, _storageService.StoragePath);
+        var content = new NewNoteForm(_notesOrchestrator.FileSystemItems, path, _storageService.StoragePath);
 
         var firstNoteWidget = noteWidgets[0].Value;
-        void createNote() => _storageService.CreateNote(firstNoteWidget.Id, content.ViewModel.SelectedFolder!.Path.Absolute, content.ViewModel.Name);
+        void createNote() => _notesOrchestrator.CreateNote(firstNoteWidget.Id, content.ViewModel.SelectedFolder!.Path.Absolute, content.ViewModel.Name);
 
         var dialog = new ContentDialog
         {

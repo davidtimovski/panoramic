@@ -1,17 +1,17 @@
 ﻿using System;
 using System.IO;
 
-namespace Panoramic.Services.Storage;
+namespace Panoramic.Services.Storage.Models;
 
-public sealed class FileSystemItemPath(string path, string storagePath)
+public sealed class FileSystemItemPath(string absolutePath, string storagePath)
 {
-    public string Absolute { get; } = path;
-    public string Relative { get; } = Path.GetRelativePath(storagePath, path);
-    public string Parent { get; } = Path.GetDirectoryName(path)!;
+    public string Absolute { get; } = absolutePath;
+    public string Relative { get; } = Path.GetRelativePath(storagePath, absolutePath);
+    public string Parent { get; } = Path.GetDirectoryName(absolutePath)!;
 
-    public bool IsSubPathOf(string path)
+    public bool IsSubPathOf(FileSystemItemPath path)
     {
-        var relativePath = Path.GetRelativePath(storagePath, path);
+        var relativePath = Path.GetRelativePath(storagePath, path.Absolute);
         return Relative.StartsWith(relativePath, StringComparison.OrdinalIgnoreCase);
     }
 

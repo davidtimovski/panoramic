@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Services;
+using Panoramic.Services.Notes;
 using Panoramic.Services.Search;
 using Panoramic.Services.Storage;
 using Panoramic.ViewModels.Widgets.RecentLinks;
@@ -15,6 +16,7 @@ namespace Panoramic.Pages.Widgets.RecentLinks;
 public sealed partial class RecentLinksWidgetPage : Page
 {
     private readonly IStorageService _storageService;
+    private readonly INotesOrchestrator _notesOrchestrator;
     private readonly RecentLinksWidget _widget;
 
     public RecentLinksWidgetPage(IServiceProvider serviceProvider, RecentLinksWidget widget)
@@ -22,6 +24,7 @@ public sealed partial class RecentLinksWidgetPage : Page
         InitializeComponent();
 
         _storageService = serviceProvider.GetRequiredService<IStorageService>();
+        _notesOrchestrator = serviceProvider.GetRequiredService<INotesOrchestrator>();
         _widget = widget;
 
         var eventHub = serviceProvider.GetRequiredService<IEventHub>();
@@ -36,7 +39,7 @@ public sealed partial class RecentLinksWidgetPage : Page
     {
         ViewModel.Highlighted = true;
 
-        var content = new EditWidgetDialog(_widget, _storageService);
+        var content = new EditWidgetDialog(_widget, _storageService, _notesOrchestrator);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,

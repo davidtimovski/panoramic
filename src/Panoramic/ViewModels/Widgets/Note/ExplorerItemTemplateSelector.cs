@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.Note;
-using Panoramic.Services.Storage;
+using Panoramic.Services.Notes.Models;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Panoramic.Services.Storage;
+using Panoramic.Services.Storage.Models;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 

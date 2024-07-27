@@ -8,11 +8,11 @@ namespace Panoramic.Pages.Widgets.Note;
 
 public sealed partial class FolderRenameForm : Page
 {
-    public FolderRenameForm(string path)
+    public FolderRenameForm(string absolutePath)
     {
         InitializeComponent();
 
-        ViewModel = new FolderRenameViewModel(path);
+        ViewModel = new FolderRenameViewModel(absolutePath);
 
         NameTextBox.Loaded += NameTextBox_Loaded;
     }

@@ -61,7 +61,7 @@ public sealed partial class RecentLinksViewModel : WidgetViewModel
     public void ClearRecent()
     {
         _widget.Clear();
-        _storageService.EnqueueWidgetWrite(_widget.Id);
+        _storageService.EnqueueWidgetWrite(_widget.Id, "Recent Links cleared");
 
         Recent.Clear();
     }
@@ -72,7 +72,7 @@ public sealed partial class RecentLinksViewModel : WidgetViewModel
     {
         _widget.HyperlinkClicked(e.Title, e.Uri, e.Context, e.Clicked);
 
-        _storageService.EnqueueWidgetWrite(_widget.Id);
+        _storageService.EnqueueWidgetWrite(_widget.Id, "Hyperlink clicked in Recent Links");
 
         SetViewModel();
     }

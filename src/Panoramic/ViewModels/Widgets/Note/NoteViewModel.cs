@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -6,7 +7,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Panoramic.Models.Domain.Note;
+using Panoramic.Services.Notes;
+using Panoramic.Services.Notes.Models;
 using Panoramic.Services.Storage;
+using Panoramic.Services.Storage.Models;
 using Panoramic.Utils;
 
 namespace Panoramic.ViewModels.Widgets.Note;
@@ -14,17 +18,20 @@ namespace Panoramic.ViewModels.Widgets.Note;
 public sealed partial class NoteViewModel : WidgetViewModel
 {
     private readonly IStorageService _storageService;
+    private readonly INotesOrchestrator _notesOrchestrator;
     private readonly NoteWidget _widget;
     private readonly bool _initialized;
 
-    public NoteViewModel(IStorageService storageService, NoteWidget widget)
+    public NoteViewModel(IStorageService storageService, INotesOrchestrator notesOrchestrator, NoteWidget widget)
     {
         _storageService = storageService;
-        _storageService.FileDeleted += FileDeleted;
-        _storageService.ItemRenamed += ItemRenamed;
-        _storageService.NoteSelectionChanged += NoteSelectionChanged;
-        _storageService.NoteContentChanged += NoteContentChanged;
         _storageService.StoragePathChanged += StoragePathChanged;
+
+        _notesOrchestrator = notesOrchestrator;
+        _notesOrchestrator.FileDeleted += FileDeleted;
+        _notesOrchestrator.ItemRenamed += ItemRenamed;
+        _notesOrchestrator.NoteSelectionChanged += NoteSelectionChanged;
+        _notesOrchestrator.NoteContentChanged += NoteContentChanged;
 
         _widget = widget;
 
@@ -36,8 +43,9 @@ public sealed partial class NoteViewModel : WidgetViewModel
         fontSize = _widget.FontSize;
         title = "Notes";
         editing = _widget.Editing;
+        recentNotes = _widget.RecentNotes;
 
-        SelectedNote = GetSelectedNote(ExplorerItems);
+        SelectedNote = FindNoteRecursively(_widget.NotePath, ExplorerItems);
 
         _initialized = true;
     }
@@ -63,7 +71,12 @@ public sealed partial class NoteViewModel : WidgetViewModel
                 return;
             }
 
-            var previousPath = _widget.NotePath?.Absolute;
+            if (!SetProperty(ref selectedNote, value))
+            {
+                return;
+            }
+
+            var previousPath = _widget.NotePath;
 
             if (value is not null && value.Text is null)
             {
@@ -74,11 +87,10 @@ public sealed partial class NoteViewModel : WidgetViewModel
             {
                 _widget.NotePath = value?.Path;
 
-                _storageService.ChangeNoteSelection(_widget.Id, previousPath, value?.Path.Absolute);
-                _storageService.EnqueueWidgetWrite(_widget.Id);
+                _notesOrchestrator.ChangeNoteSelection(_widget.Id, previousPath, value?.Path);
+                _storageService.EnqueueWidgetWrite(_widget.Id, "Note selection changed");
             }
 
-            SetProperty(ref selectedNote, value);
             OnPropertyChanged();
 
             Title = value is null ? "Notes" : value.Name;
@@ -105,8 +117,11 @@ public sealed partial class NoteViewModel : WidgetViewModel
     partial void OnEditingChanged(bool value)
     {
         _widget.Editing = value;
-        _storageService.EnqueueWidgetWrite(_widget.Id);
+        _storageService.EnqueueWidgetWrite(_widget.Id, "Note editing state changed");
     }
+
+    [ObservableProperty]
+    private List<FileSystemItemPath> recentNotes = [];
 
     [ObservableProperty]
     private Visibility tipVisibility;
@@ -119,7 +134,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
 
     public void DeselectNote()
     {
-        _storageService.ChangeNoteContent(_widget.Id, SelectedNote!.Path.Absolute, SelectedNote!.Text!);
+        _notesOrchestrator.ChangeNoteContent(_widget.Id, SelectedNote!.Path, SelectedNote!.Text!);
 
         SelectedNote = null;
     }
@@ -128,7 +143,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
     {
         var noteCreatedInThisWidget = type == FileType.Note && widgetId == _widget.Id;
 
-        var explorerItem = new ExplorerItem(_storageService, name, type, path, [])
+        var explorerItem = new ExplorerItem(_notesOrchestrator, name, type, path, [])
         {
             IsEnabled = noteCreatedInThisWidget
         };
@@ -154,11 +169,38 @@ public sealed partial class NoteViewModel : WidgetViewModel
         if (noteCreatedInThisWidget)
         {
             _widget.NotePath = path;
-            SelectedNote = GetSelectedNote(ExplorerItems);
+            SelectedNote = FindNoteRecursively(path, ExplorerItems);
             Editing = true;
         }
 
         TipVisibility = ExplorerItems.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    public static ExplorerItem? FindNoteRecursively(FileSystemItemPath? path, ObservableCollection<ExplorerItem> items)
+    {
+        if (path is null)
+        {
+            return null;
+        }
+
+        foreach (var item in items)
+        {
+            if (item.Type == FileType.Folder)
+            {
+                var found = FindNoteRecursively(path, item.Children);
+                if (found is not null)
+                {
+                    return found;
+                }
+            }
+
+            if (item.Path.Equals(path))
+            {
+                return item;
+            }
+        }
+
+        return null;
     }
 
     private void ReloadFiles()
@@ -174,34 +216,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
         TipVisibility = ExplorerItems.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
     }
 
-    private ExplorerItem? GetSelectedNote(ObservableCollection<ExplorerItem> items)
-    {
-        if (_widget.NotePath is null)
-        {
-            return null;
-        }
-
-        foreach (var item in items)
-        {
-            if (item.Type == FileType.Folder)
-            {
-                var found = GetSelectedNote(item.Children);
-                if (found is not null)
-                {
-                    return found;
-                }
-            }
-
-            if (item.Path.Equals(_widget.NotePath))
-            {
-                return item;
-            }
-        }
-
-        return null;
-    }
-
-    private static void UpdateNoteSelection(ObservableCollection<ExplorerItem> items, string? previousFilePath, string? newFilePath)
+    private static void UpdateNoteSelection(ObservableCollection<ExplorerItem> items, FileSystemItemPath? previousFilePath, FileSystemItemPath? newFilePath)
     {
         foreach (var item in items)
         {
@@ -223,7 +238,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
         }
     }
 
-    private static void UpdateNoteContent(ObservableCollection<ExplorerItem> items, string path, string content)
+    private static void UpdateNoteContent(ObservableCollection<ExplorerItem> items, FileSystemItemPath path, string content)
     {
         foreach (var item in items)
         {
@@ -271,7 +286,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
         return false;
     }
 
-    private bool RemoveItem(ObservableCollection<ExplorerItem> items, string path)
+    private bool RemoveItem(ObservableCollection<ExplorerItem> items, FileSystemItemPath path)
     {
         if (SelectedNote is not null && SelectedNote.Path.IsSubPathOf(path))
         {

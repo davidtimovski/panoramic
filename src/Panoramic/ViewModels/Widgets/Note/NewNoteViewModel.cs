@@ -5,7 +5,8 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Events;
-using Panoramic.Services.Storage;
+using Panoramic.Services.Notes.Models;
+using Panoramic.Services.Storage.Models;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 

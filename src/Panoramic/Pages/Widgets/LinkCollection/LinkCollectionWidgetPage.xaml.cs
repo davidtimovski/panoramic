@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Services;
+using Panoramic.Services.Notes;
 using Panoramic.Services.Search;
 using Panoramic.Services.Storage;
 using Panoramic.ViewModels.Widgets.LinkCollection;
@@ -16,6 +17,7 @@ namespace Panoramic.Pages.Widgets.LinkCollection;
 public sealed partial class LinkCollectionWidgetPage : Page
 {
     private readonly IStorageService _storageService;
+    private readonly INotesOrchestrator _notesOrchestrator;
     private readonly HttpClient _httpClient;
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly LinkCollectionWidget _widget;
@@ -25,6 +27,7 @@ public sealed partial class LinkCollectionWidgetPage : Page
         InitializeComponent();
 
         _storageService = serviceProvider.GetRequiredService<IStorageService>();
+        _notesOrchestrator = serviceProvider.GetRequiredService<INotesOrchestrator>();
         _httpClient = serviceProvider.GetRequiredService<HttpClient>();
         _dispatcherQueue = serviceProvider.GetRequiredService<DispatcherQueue>();
         _widget = widget;
@@ -63,7 +66,7 @@ public sealed partial class LinkCollectionWidgetPage : Page
     {
         ViewModel.Highlighted = true;
 
-        var content = new EditWidgetDialog(_widget, _storageService);
+        var content = new EditWidgetDialog(_widget, _storageService, _notesOrchestrator);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,

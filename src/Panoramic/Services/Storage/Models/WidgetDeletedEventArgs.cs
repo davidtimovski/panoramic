@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Panoramic.Services.Storage;
+namespace Panoramic.Services.Storage.Models;
 
 public sealed class WidgetDeletedEventArgs : EventArgs
 {

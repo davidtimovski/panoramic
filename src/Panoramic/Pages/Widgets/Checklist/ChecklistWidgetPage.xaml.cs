@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Panoramic.Models.Domain.Checklist;
 using Panoramic.Services;
+using Panoramic.Services.Notes;
 using Panoramic.Services.Search;
 using Panoramic.Services.Storage;
 using Panoramic.ViewModels.Widgets.Checklist;
@@ -15,6 +16,7 @@ namespace Panoramic.Pages.Widgets.Checklist;
 public sealed partial class ChecklistWidgetPage : Page
 {
     private readonly IStorageService _storageService;
+    private readonly INotesOrchestrator _notesOrchestrator;
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly ChecklistWidget _widget;
 
@@ -23,6 +25,7 @@ public sealed partial class ChecklistWidgetPage : Page
         InitializeComponent();
 
         _storageService = serviceProvider.GetRequiredService<IStorageService>();
+        _notesOrchestrator = serviceProvider.GetRequiredService<INotesOrchestrator>();
         _dispatcherQueue = serviceProvider.GetRequiredService<DispatcherQueue>();
         _widget = widget;
 
@@ -91,7 +94,7 @@ public sealed partial class ChecklistWidgetPage : Page
     {
         ViewModel.Highlighted = true;
 
-        var content = new EditWidgetDialog(_widget, _storageService);
+        var content = new EditWidgetDialog(_widget, _storageService, _notesOrchestrator);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,

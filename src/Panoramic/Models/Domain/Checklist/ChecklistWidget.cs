@@ -75,7 +75,7 @@ public sealed class ChecklistWidget : IWidget
     public void AddTask(string title, DateOnly? dueDate, Uri? uri)
     {
         tasks.Add(new ChecklistTask { Title = title, DueDate = dueDate, Uri = uri, Created = DateTime.Now });
-        _storageService.EnqueueWidgetWrite(Id);
+        _storageService.EnqueueWidgetWrite(Id, "Checklist task has been added");
 
         TaskAdded?.Invoke(this, EventArgs.Empty);
     }
@@ -83,7 +83,7 @@ public sealed class ChecklistWidget : IWidget
     public void CompleteTask(string title)
     {
         tasks.RemoveAll(x => x.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
-        _storageService.EnqueueWidgetWrite(Id);
+        _storageService.EnqueueWidgetWrite(Id, "Checklist task has been completed");
 
         TaskCompleted?.Invoke(this, new TaskCompletedEventArgs { Title = title });
     }
@@ -107,7 +107,7 @@ public sealed class ChecklistWidget : IWidget
 
     public async Task WriteAsync()
     {
-        DebugLogger.Log($"Writing {Type} widget with ID: {Id}");
+        DebugLogger.Log($"Writing out {Type} widget to file system. ID: {Id}.");
 
         var data = GetData();
 

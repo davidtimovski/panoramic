@@ -6,11 +6,11 @@ using Panoramic.Models.Events;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 
-public sealed class FolderRenameViewModel(string path) : ObservableObject
+public sealed class FolderRenameViewModel(string absolutePath) : ObservableObject
 {
-    private readonly string _directory = Path.GetDirectoryName(path)!;
+    private readonly string _directory = Path.GetDirectoryName(absolutePath)!;
 
-    private string name = Path.GetFileName(path);
+    private string name = Path.GetFileName(absolutePath);
     public string Name
     {
         get => name;
