@@ -3,9 +3,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using Panoramic.Models.Domain.Checklist;
 using Panoramic.Models.Events;
 using Panoramic.Services.Storage;
+using Panoramic.Utils;
 
 namespace Panoramic.ViewModels.Widgets.Checklist;
 
@@ -13,18 +16,23 @@ public sealed partial class EditViewModel : ObservableObject
 {
     private readonly IStorageService _storageService;
     private readonly ChecklistWidget _widget;
+    private readonly SolidColorBrush _fieldForegroundBrush;
+    private readonly SolidColorBrush _fieldChangedForegroundBrush;
 
     public EditViewModel(
         IStorageService storageService,
-        ChecklistWidget widget)
+        ChecklistWidget widget,
+        Page page)
     {
         _storageService = storageService;
         _widget = widget;
+        _fieldForegroundBrush = ResourceUtil.GetBrushFromPage("FieldForegroundBrush", page);
+        _fieldChangedForegroundBrush = ResourceUtil.GetBrushFromPage("FieldChangedForegroundBrush", page);
 
         foreach (var task in widget.Tasks)
         {
             var dueDate = task.DueDate.HasValue ? (DateTimeOffset?)task.DueDate.Value.ToDateTime(TimeOnly.MinValue) : null;
-            var vm = new EditTaskViewModel(task.Title, dueDate, task.Uri, task.Created);
+            var vm = new EditTaskViewModel(task.Title, dueDate, task.Uri, task.Created, _fieldForegroundBrush, _fieldChangedForegroundBrush);
             vm.Updated += (object? _, EventArgs e) => { ValidateAndEmit(); };
 
             Tasks.Add(vm);
@@ -56,9 +64,19 @@ public sealed partial class EditViewModel : ObservableObject
     {
         var uri = NewTaskUrl.Trim().Length > 0 && Uri.TryCreate(NewTaskUrl.Trim(), UriKind.Absolute, out var createdUri) ? createdUri : null;
 
-        Tasks.Add(new EditTaskViewModel(NewTaskTitle.Trim(), NewTaskDueDate, uri, DateTime.Now));
+        var newTask = new EditTaskViewModel(
+            NewTaskTitle.Trim(),
+            NewTaskDueDate,
+            uri,
+            DateTime.Now,
+            changed: true,
+            _fieldForegroundBrush,
+            _fieldChangedForegroundBrush);
+
+        Tasks.Add(newTask);
 
         NewTaskTitle = string.Empty;
+        NewTaskUrl = string.Empty;
         NewTaskDueDate = null;
     }
 

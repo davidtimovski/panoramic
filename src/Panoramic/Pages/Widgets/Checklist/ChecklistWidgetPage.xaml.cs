@@ -71,9 +71,7 @@ public sealed partial class ChecklistWidgetPage : Page
     {
         ViewModel.Highlighted = true;
 
-        var vm = new EditViewModel(_storageService, _widget);
-
-        var content = new EditDialog(vm);
+        var content = new EditDialog(_storageService, _widget);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -81,11 +79,11 @@ public sealed partial class ChecklistWidgetPage : Page
             Content = content,
             PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new AsyncRelayCommand(vm.SaveAsync),
+            PrimaryButtonCommand = new AsyncRelayCommand(content.ViewModel.SaveAsync),
             CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; })
         };
 
-        vm.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
+        content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
 
         await dialog.ShowAsync();
     }

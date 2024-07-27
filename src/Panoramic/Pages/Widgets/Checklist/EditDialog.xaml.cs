@@ -1,16 +1,18 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Panoramic.Models.Domain.Checklist;
+using Panoramic.Services.Storage;
 using Panoramic.ViewModels.Widgets.Checklist;
 
 namespace Panoramic.Pages.Widgets.Checklist;
 
 public sealed partial class EditDialog : Page
 {
-    public EditDialog(EditViewModel viewModel)
+    public EditDialog(IStorageService storageService, ChecklistWidget widget)
     {
         InitializeComponent();
 
-        ViewModel = viewModel;
+        ViewModel = new EditViewModel(storageService, widget, this);
     }
 
     public EditViewModel ViewModel { get; }

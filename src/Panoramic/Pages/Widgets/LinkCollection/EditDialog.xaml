@@ -5,6 +5,22 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:Panoramic.ViewModels.Widgets.LinkCollection">
 
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="FieldForegroundBrush" Color="{ThemeResource TextFillColorPrimary}" />
+                    <SolidColorBrush x:Key="FieldChangedForegroundBrush" Color="#ac9100" />
+                </ResourceDictionary>
+
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="FieldForegroundBrush" Color="{ThemeResource TextFillColorPrimary}" />
+                    <SolidColorBrush x:Key="FieldChangedForegroundBrush" Color="#ecd100" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
     <Grid Width="450" RowSpacing="15">
         <Grid.Resources>
             <DataTemplate x:Key="LinkViewTemplate" x:DataType="vm:EditLinkViewModel">
@@ -28,6 +44,7 @@
                    
                     <TextBox Grid.Row="0" Grid.Column="1"
                              Text="{x:Bind Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Foreground="{x:Bind TitleForegroundBrush, Mode=OneWay}"
                              PlaceholderText="Title" />
 
                     <Button Grid.Row="0" Grid.Column="2"
@@ -39,6 +56,7 @@
 
                     <TextBox Grid.Row="1" Grid.Column="1"
                              Text="{x:Bind Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Foreground="{x:Bind UrlForegroundBrush, Mode=OneWay}"
                              PlaceholderText="URL" />
 
                     <HyperlinkButton Grid.Row="1" Grid.Column="2"

@@ -1,16 +1,24 @@
+using System.Net.Http;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Panoramic.Models.Domain.LinkCollection;
+using Panoramic.Services.Storage;
 using Panoramic.ViewModels.Widgets.LinkCollection;
 
 namespace Panoramic.Pages.Widgets.LinkCollection;
 
 public sealed partial class EditDialog : Page
 {
-    public EditDialog(EditViewModel viewModel)
+    public EditDialog(
+        HttpClient httpClient,
+        DispatcherQueue dispatcherQueue,
+        IStorageService storageService,
+        LinkCollectionWidget widget)
     {
         InitializeComponent();
 
-        ViewModel = viewModel;
+        ViewModel = new EditViewModel(httpClient, dispatcherQueue, storageService, widget, this);
     }
 
     public EditViewModel ViewModel { get; }

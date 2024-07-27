@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using HtmlAgilityPack;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Events;
 using Panoramic.Services.Storage;
@@ -21,21 +22,26 @@ public sealed partial class EditViewModel : ObservableObject
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly IStorageService _storageService;
     private readonly LinkCollectionWidget _widget;
+    private readonly SolidColorBrush _fieldForegroundBrush;
+    private readonly SolidColorBrush _fieldChangedForegroundBrush;
 
     public EditViewModel(
         HttpClient httpClient,
         DispatcherQueue dispatcherQueue,
         IStorageService storageService,
-        LinkCollectionWidget widget)
+        LinkCollectionWidget widget,
+        Page page)
     {
         _httpClient = httpClient;
         _dispatcherQueue = dispatcherQueue;
         _storageService = storageService;
         _widget = widget;
+        _fieldForegroundBrush = ResourceUtil.GetBrushFromPage("FieldForegroundBrush", page);
+        _fieldChangedForegroundBrush = ResourceUtil.GetBrushFromPage("FieldChangedForegroundBrush", page);
 
         foreach (var link in widget.Links)
         {
-            var vm = new EditLinkViewModel(link.Title, link.Uri);
+            var vm = new EditLinkViewModel(link.Title, link.Uri, _fieldForegroundBrush, _fieldChangedForegroundBrush);
             vm.Updated += (object? _, EventArgs e) => { ValidateAndEmit(); };
 
             Links.Add(vm);
@@ -122,7 +128,14 @@ public sealed partial class EditViewModel : ObservableObject
 
     public void Add()
     {
-        Links.Add(new EditLinkViewModel(NewLinkTitle.Trim(), UriHelper.Create(NewLinkUrl.Trim())!));
+        var newLink = new EditLinkViewModel(
+            NewLinkTitle.Trim(),
+            UriHelper.Create(NewLinkUrl.Trim())!,
+            changed: true,
+            _fieldForegroundBrush,
+            _fieldChangedForegroundBrush);
+
+        Links.Add(newLink);
         NewLinkTitle = string.Empty;
         NewLinkUrl = string.Empty;
         DuplicateLinkTitle = null;
