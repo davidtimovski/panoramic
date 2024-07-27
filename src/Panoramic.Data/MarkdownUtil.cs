@@ -9,6 +9,13 @@ internal static class MarkdownUtil
     /// </summary>
     internal static void CreateKeyValueTable(StringBuilder builder, IReadOnlyDictionary<string, string> data)
     {
+        if (data.Count == 0)
+        {
+            builder.AppendLine("| Key | Value |");
+            builder.AppendLine("| --- | ----- |");
+            return;
+        }
+
         var longestKeyLength = data.Keys.Max(x => x.Length);
         if (longestKeyLength < 3)
         {
@@ -43,6 +50,13 @@ internal static class MarkdownUtil
     /// </summary>
     internal static void CreateThreeColumnTable(StringBuilder builder, Tuple<string, string, string> headers, IReadOnlyList<Tuple<string, string, string>> data)
     {
+        if (data.Count == 0)
+        {
+            builder.AppendLine($"| {headers.Item1} | {headers.Item2} | {headers.Item3} |");
+            builder.AppendLine($"| {new string('-', headers.Item1.Length)} | {new string('-', headers.Item2.Length)} | {new string('-', headers.Item3.Length)} |");
+            return;
+        }
+
         var col1LongestLength = data.Max(x => x.Item1.Length);
         if (col1LongestLength < headers.Item1.Length)
         {
