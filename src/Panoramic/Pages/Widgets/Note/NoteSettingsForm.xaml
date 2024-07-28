@@ -58,7 +58,7 @@
                    Header="Recent notes capacity"
                    SpinButtonPlacementMode="Compact"
                    Minimum="1"
-                   Maximum="30" />
+                   Maximum="20" />
     </Grid>
 
 </Page>

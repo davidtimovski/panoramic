@@ -30,17 +30,6 @@
                         <FontIcon Glyph="&#xE70F;" FontSize="14" />
                     </ToggleButton>
 
-                    <DropDownButton AutomationProperties.Name="Setting"
-                                    Margin="0 0 8 0"
-                                    ToolTipService.ToolTip="Recent">
-                        <DropDownButton.Content>
-                            <FontIcon Glyph="&#xE81C;" FontSize="14" />
-                        </DropDownButton.Content>
-                        <DropDownButton.Flyout>
-                            <MenuFlyout x:Name="RecentNotesMenuFlyout" Placement="Bottom" />
-                        </DropDownButton.Flyout>
-                    </DropDownButton>
-
                     <DropDownButton Visibility="{x:Bind ViewModel.ExplorerVisible, Mode=OneWay}"
                             ToolTipService.ToolTip="Add"
                             Margin="0 0 8 0">
@@ -61,6 +50,17 @@
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                             </MenuFlyout>
+                        </DropDownButton.Flyout>
+                    </DropDownButton>
+
+                    <DropDownButton AutomationProperties.Name="Setting"
+                                    Margin="0 0 8 0"
+                                    ToolTipService.ToolTip="Recent">
+                        <DropDownButton.Content>
+                            <FontIcon Glyph="&#xE81C;" FontSize="14" />
+                        </DropDownButton.Content>
+                        <DropDownButton.Flyout>
+                            <MenuFlyout x:Name="RecentNotesMenuFlyout" Placement="Bottom" />
                         </DropDownButton.Flyout>
                     </DropDownButton>
 
