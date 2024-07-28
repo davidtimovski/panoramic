@@ -10,7 +10,7 @@
   <Identity
     Name="606DavidTimovski.Panoramic"
     Publisher="CN=43B6C682-5195-4A6E-9EE9-F644821A02C8"
-    Version="0.10.0.0" />
+    Version="0.10.1.0" />
 
   <mp:PhoneIdentity PhoneProductId="f76620e6-6c53-4771-80d2-572ec6868e4b" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
