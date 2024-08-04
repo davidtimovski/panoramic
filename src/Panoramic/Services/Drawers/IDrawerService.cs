@@ -27,4 +27,6 @@ public interface IDrawerService
     bool LinkDrawerCanBeCreated(string name, string originalName);
 
     Task SaveLinkDrawerAsync(LinkDrawerData data, string oldName);
+
+    void DeleteLinkDrawer(string name);
 }

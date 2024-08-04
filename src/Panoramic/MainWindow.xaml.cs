@@ -7,6 +7,7 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Panoramic.Data;
 using Panoramic.Data.Exceptions;
 using Panoramic.Models;
 using Panoramic.Models.Domain.Checklist;
@@ -114,26 +115,6 @@ public sealed partial class MainWindow : Window
         await _storageService.WriteUnsavedChangesAsync();
     }
 
-    private async void AddLinkDrawer_Click(object _, RoutedEventArgs e)
-    {
-        var content = new DrawerDialog(_httpClient, _dispatcherQueue, _drawerService, data: null);
-        var dialog = new ContentDialog
-        {
-            XamlRoot = Content.XamlRoot,
-            Title = "New link drawer",
-            Content = content,
-            PrimaryButtonText = "Save",
-            CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new AsyncRelayCommand(content.ViewModel.SaveAsync),
-            //CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; }),
-            IsPrimaryButtonEnabled = false
-        };
-
-        content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
-
-        await dialog.ShowAsync();
-    }
-
     private void WidgetUpdated(object? _, WidgetUpdatedEventArgs e) => RenderWidget(e.Id);
 
     private void WidgetDeleted(object? _, WidgetDeletedEventArgs e)
@@ -170,32 +151,84 @@ public sealed partial class MainWindow : Window
                 var drawerMenuItem = new MenuFlyoutItem
                 {
                     Text = drawer.Name,
-                    Icon = new FontIcon { Glyph = "\uEC59" }
+                    Icon = new FontIcon { Glyph = "\uEC59" },
+                    DataContext = drawer
                 };
 
-                drawerMenuItem.Click += async (_, e) =>
+                var contextFlyout = new MenuBarItemFlyout();
+                var deleteButton = new MenuFlyoutItem
                 {
-                    var content = new DrawerDialog(_httpClient, _dispatcherQueue, _drawerService, data: drawer);
-                    var dialog = new ContentDialog
-                    {
-                        XamlRoot = Content.XamlRoot,
-                        Title = "Edit link drawer",
-                        Content = content,
-                        PrimaryButtonText = "Save",
-                        CloseButtonText = "Cancel",
-                        PrimaryButtonCommand = new AsyncRelayCommand(content.ViewModel.SaveAsync),
-                        //CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; }),
-                        IsPrimaryButtonEnabled = false
-                    };
-
-                    content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
-
-                    await dialog.ShowAsync();
+                    Text = "Delete",
+                    DataContext = drawer
                 };
+                deleteButton.Click += DeleteDrawer_Click;
+                contextFlyout.Items.Add(deleteButton);
+                drawerMenuItem.ContextFlyout = contextFlyout;
+
+                drawerMenuItem.Click += EditDrawer_Click;
 
                 LinkDrawersMenuFlyout.Items.Add(drawerMenuItem);
             }
         });
+    }
+
+    private async void AddLinkDrawer_Click(object _, RoutedEventArgs e)
+    {
+        var content = new DrawerDialog(_httpClient, _dispatcherQueue, _drawerService, data: null);
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            Title = "New link drawer",
+            Content = content,
+            PrimaryButtonText = "Create",
+            CloseButtonText = "Cancel",
+            PrimaryButtonCommand = new AsyncRelayCommand(content.ViewModel.SaveAsync),
+            IsPrimaryButtonEnabled = false
+        };
+
+        content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
+
+        await dialog.ShowAsync();
+    }
+
+    private async void EditDrawer_Click(object _, RoutedEventArgs e)
+    {
+        var menuItem = (MenuFlyoutItem)e.OriginalSource;
+        var drawer = (LinkDrawerData)menuItem.DataContext;
+
+        var content = new DrawerDialog(_httpClient, _dispatcherQueue, _drawerService, data: drawer);
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            Title = "Edit link drawer",
+            Content = content,
+            PrimaryButtonText = "Save",
+            CloseButtonText = "Close",
+            PrimaryButtonCommand = new AsyncRelayCommand(content.ViewModel.SaveAsync),
+            IsPrimaryButtonEnabled = false
+        };
+
+        content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
+
+        await dialog.ShowAsync();
+    }
+
+    private async void DeleteDrawer_Click(object _, RoutedEventArgs e)
+    {
+        var menuItem = (MenuFlyoutItem)e.OriginalSource;
+        var drawer = (LinkDrawerData)menuItem.DataContext;
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            Title = "Delete link drawer",
+            Content = $"""Are you sure want to delete the "{drawer.Name}" link drawer and everything in it?""",
+            PrimaryButtonText = "Yes, delete",
+            CloseButtonText = "Cancel",
+            PrimaryButtonCommand = new RelayCommand(() => _drawerService.DeleteLinkDrawer(drawer.Name))
+        };
+
+        await dialog.ShowAsync();
     }
 
     private void RenderWidget(Guid id)

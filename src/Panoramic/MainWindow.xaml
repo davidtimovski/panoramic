@@ -34,17 +34,33 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Column="0" Content="Link drawers">
+                    <Button Grid.Column="0">
                         <Button.Flyout>
                             <MenuFlyout x:Name="LinkDrawersMenuFlyout" Placement="Bottom" />
                         </Button.Flyout>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock>Link drawers</TextBlock>
+                            <FontIcon Glyph="&#xE70D;" Margin="10 0 0 0" FontSize="16" />
+                        </StackPanel>
                     </Button>
 
                     <TextBox Grid.Column="1" Name="SearchBox" Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                     <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Click="AddWidgetButton_Click" Margin="0 0 10 0">Add widget</Button>
-                        <Button Click="PreferencesButton_Click">Preferences</Button>
+                        <Button Click="AddWidgetButton_Click" Margin="0 0 10 0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock>Add widget</TextBlock>
+                                <FontIcon Glyph="&#xF7ED;" Margin="10 0 0 0" FontSize="16" />
+                            </StackPanel>
+                        </Button>
+                        
+                        <Button Click="PreferencesButton_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock>Preferences</TextBlock>
+                                <FontIcon Glyph="&#xE713;" Margin="10 0 0 0" FontSize="16" />
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
                 </Grid>
 

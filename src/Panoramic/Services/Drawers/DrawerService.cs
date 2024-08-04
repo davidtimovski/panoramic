@@ -78,13 +78,24 @@ public sealed class DrawerService : IDrawerService
         data.ToMarkdown(builder);
 
         await File.WriteAllTextAsync(Path.Combine(_linkDrawersFolderPath, $"{data.Name}.md"), builder.ToString());
-        _drawers.Add(data.Name, data);
+        if (!_drawers.TryAdd(data.Name, data))
+        {
+            _drawers[data.Name] = data;
+        }
 
         if (oldName != string.Empty && !string.Equals(data.Name, oldName, StringComparison.Ordinal))
         {
             File.Delete(Path.Combine(_linkDrawersFolderPath, $"{oldName}.md"));
             _drawers.Remove(oldName);
         }
+
+        LinkDrawersLoaded?.Invoke(this, new LinkDrawersLoadedEventArgs { Drawers = _drawers.Values });
+    }
+
+    public void DeleteLinkDrawer(string name)
+    {
+        File.Delete(Path.Combine(_linkDrawersFolderPath, $"{name}.md"));
+        _drawers.Remove(name);
 
         LinkDrawersLoaded?.Invoke(this, new LinkDrawersLoadedEventArgs { Drawers = _drawers.Values });
     }

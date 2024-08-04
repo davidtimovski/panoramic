@@ -50,7 +50,7 @@ public sealed partial class EditTaskViewModel : ObservableObject
     private string title = string.Empty;
     partial void OnTitleChanged(string value) => Updated?.Invoke(this, EventArgs.Empty);
 
-    public SolidColorBrush TitleForegroundBrush => Title.Equals(_originalTitle, StringComparison.Ordinal) && DueDateHasNotChanged()
+    public SolidColorBrush TitleForegroundBrush => Title.Trim().Equals(_originalTitle, StringComparison.Ordinal) && DueDateHasNotChanged()
         ? _fieldForegroundBrush
         : _fieldChangedForegroundBrush;
 
@@ -74,7 +74,7 @@ public sealed partial class EditTaskViewModel : ObservableObject
         Updated?.Invoke(this, EventArgs.Empty);
     }
 
-    public SolidColorBrush UrlForegroundBrush => Url.Equals(_originalUrl, StringComparison.Ordinal) && DueDateHasNotChanged()
+    public SolidColorBrush UrlForegroundBrush => Url.Trim().Equals(_originalUrl, StringComparison.Ordinal) && DueDateHasNotChanged()
         ? _fieldForegroundBrush
         : _fieldChangedForegroundBrush;
 

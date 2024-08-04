@@ -6,8 +6,6 @@ namespace Panoramic.Data;
 
 public sealed partial class LinkDrawerData
 {
-    private const string SearchTermsSeparator = ", ";
-
     public required string Name { get; init; }
     public required IReadOnlyList<LinkDrawerLinkData> Links { get; init; }
 
@@ -33,7 +31,7 @@ public sealed partial class LinkDrawerData
 
                 var titleGroup = match.Groups[1];
                 var uriGroup = match.Groups[2];
-                var searchTerms = linkLineParts.Length == 2 ? linkLineParts[1].Split(SearchTermsSeparator) : [];
+                var searchTerms = linkLineParts.Length == 2 ? linkLineParts[1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) : [];
 
                 links.Add(new LinkDrawerLinkData
                 {
@@ -64,7 +62,7 @@ public sealed partial class LinkDrawerData
     public void ToMarkdown(StringBuilder builder)
     {
         var headers = new Tuple<string, string>("Link", "Search terms");
-        var data = Links.Select(x => new Tuple<string, string>($"[{x.Title}]({x.Uri})", string.Join(SearchTermsSeparator, x.SearchTerms))).ToList();
+        var data = Links.Select(x => new Tuple<string, string>($"[{x.Title}]({x.Uri})", string.Join(", ", x.SearchTerms))).ToList();
 
         MarkdownUtil.CreateTwoColumnTable(builder, headers, data);
     }
@@ -78,5 +76,5 @@ public sealed class LinkDrawerLinkData
     public required string Title { get; init; }
     public required Uri Uri { get; init; }
     public required short Order { get; init; }
-    public required IReadOnlyList<string> SearchTerms { get; init; }
+    public required IReadOnlyCollection<string> SearchTerms { get; init; }
 }
