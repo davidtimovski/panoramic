@@ -11,7 +11,7 @@ using Panoramic.Services.Storage.Models;
 namespace Panoramic.ViewModels.Widgets.Note;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-public sealed class NewNoteViewModel : ObservableObject
+public sealed partial class NewNoteViewModel : ObservableObject
 {
     public NewNoteViewModel(IReadOnlyList<FileSystemItem> fileSystemItems, FileSystemItemPath path, string storagePath)
     {
@@ -24,33 +24,13 @@ public sealed class NewNoteViewModel : ObservableObject
 
     public event EventHandler<ValidationEventArgs>? Validated;
 
+    [ObservableProperty]
     private string name = string.Empty;
-    public string Name
-    {
-        get => name;
-        set
-        {
-            if (SetProperty(ref name, value))
-            {
-                OnPropertyChanged();
-                Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
-            }
-        }
-    }
+    partial void OnNameChanged(string value) => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
 
+    [ObservableProperty]
     private ExplorerFolder selectedFolder;
-    public ExplorerFolder SelectedFolder
-    {
-        get => selectedFolder;
-        set
-        {
-            if (SetProperty(ref selectedFolder, value))
-            {
-                OnPropertyChanged();
-                Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
-            }
-        }
-    }
+    partial void OnSelectedFolderChanged(ExplorerFolder value) => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
 
     public IReadOnlyList<ExplorerFolder> ExplorerFolders { get; } = [];
 

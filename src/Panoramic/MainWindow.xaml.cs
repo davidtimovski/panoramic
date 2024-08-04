@@ -1,7 +1,9 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -12,11 +14,14 @@ using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Pages;
+using Panoramic.Pages.LinkDrawers;
 using Panoramic.Pages.Widgets;
 using Panoramic.Pages.Widgets.Checklist;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
+using Panoramic.Services.Drawers;
+using Panoramic.Services.Drawers.Models;
 using Panoramic.Services.Notes;
 using Panoramic.Services.Preferences;
 using Panoramic.Services.Storage;
@@ -30,13 +35,19 @@ public sealed partial class MainWindow : Window
     private readonly IPreferencesService _preferencesService;
     private readonly IStorageService _storageService;
     private readonly INotesOrchestrator _notesOrchestrator;
+    private readonly IDrawerService _drawerService;
     private readonly IServiceProvider _serviceProvider;
+    private readonly HttpClient _httpClient;
+    private readonly DispatcherQueue _dispatcherQueue;
 
     public MainWindow(
         IPreferencesService preferencesService,
         IStorageService storageService,
         INotesOrchestrator notesOrchestrator,
+        IDrawerService drawerService,
         IServiceProvider serviceProvider,
+        HttpClient httpClient,
+        DispatcherQueue dispatcherQueue,
         MainViewModel viewModel)
     {
         InitializeComponent();
@@ -55,7 +66,13 @@ public sealed partial class MainWindow : Window
         _storageService.WidgetDeleted += WidgetDeleted;
 
         _notesOrchestrator = notesOrchestrator;
+
+        _drawerService = drawerService;
+        _drawerService.LinkDrawersLoaded += LinkDrawersLoaded;
+
         _serviceProvider = serviceProvider;
+        _httpClient = httpClient;
+        _dispatcherQueue = dispatcherQueue;
 
         ViewModel = viewModel;
     }
@@ -68,10 +85,11 @@ public sealed partial class MainWindow : Window
         {
             var noteWidgets = await _notesOrchestrator.ReadWidgetsAsync();
             await _storageService.ReadWidgetsAsync(noteWidgets);
+            await _drawerService.ReadLinkDrawersAsync();
         }
         catch (MarkdownParsingException ex)
         {
-            var content = new MarkdownParsingFailure(ex.FileName!, ex.Lines, ex.PotentialErrorLine);
+            var content = new MarkdownParsingFailure(ex.RelativeFilePath, ex.Lines, ex.PotentialErrorLine);
             var dialog = new ContentDialog
             {
                 XamlRoot = Content.XamlRoot,
@@ -96,22 +114,22 @@ public sealed partial class MainWindow : Window
         await _storageService.WriteUnsavedChangesAsync();
     }
 
-    private async void AddWidgetButton_Click(object _, RoutedEventArgs e)
+    private async void AddLinkDrawer_Click(object _, RoutedEventArgs e)
     {
-        var content = new AddWidgetDialog(_storageService, _notesOrchestrator);
+        var content = new DrawerDialog(_httpClient, _dispatcherQueue, _drawerService, data: null);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
-            Title = AddWidgetDialog.AreaPickerTitle,
+            Title = "New link drawer",
             Content = content,
-            PrimaryButtonText = "Add",
+            PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
-            PrimaryButtonCommand = new AsyncRelayCommand(content.SubmitAsync),
+            PrimaryButtonCommand = new AsyncRelayCommand(content.ViewModel.SaveAsync),
+            //CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; }),
             IsPrimaryButtonEnabled = false
         };
 
-        content.StepChanged += (_, e) => { dialog.Title = e.DialogTitle; };
-        content.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
+        content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
 
         await dialog.ShowAsync();
     }
@@ -122,6 +140,62 @@ public sealed partial class MainWindow : Window
     {
         var widget = Grid.Children.OfType<Page>().FirstOrDefault(x => x.Name == e.Id.ToString("N"));
         Grid.Children.Remove(widget);
+    }
+
+    private void LinkDrawersLoaded(object? _, LinkDrawersLoadedEventArgs e)
+    {
+        _dispatcherQueue.TryEnqueue(() =>
+        {
+            LinkDrawersMenuFlyout.Items.Clear();
+
+            var newMenuItem = new MenuFlyoutItem
+            {
+                Text = "New",
+                Icon = new FontIcon { Glyph = "\uE710" }
+            };
+            newMenuItem.Click += AddLinkDrawer_Click;
+
+            LinkDrawersMenuFlyout.Items.Add(newMenuItem);
+
+            if (e.Drawers.Count == 0)
+            {
+                return;
+            }
+
+            LinkDrawersMenuFlyout.Items.Add(new MenuFlyoutSeparator());
+
+            var orderedDrawers = e.Drawers.OrderBy(x => x.Name).ToList();
+            foreach (var drawer in orderedDrawers)
+            {
+                var drawerMenuItem = new MenuFlyoutItem
+                {
+                    Text = drawer.Name,
+                    Icon = new FontIcon { Glyph = "\uEC59" }
+                };
+
+                drawerMenuItem.Click += async (_, e) =>
+                {
+                    var content = new DrawerDialog(_httpClient, _dispatcherQueue, _drawerService, data: drawer);
+                    var dialog = new ContentDialog
+                    {
+                        XamlRoot = Content.XamlRoot,
+                        Title = "Edit link drawer",
+                        Content = content,
+                        PrimaryButtonText = "Save",
+                        CloseButtonText = "Cancel",
+                        PrimaryButtonCommand = new AsyncRelayCommand(content.ViewModel.SaveAsync),
+                        //CloseButtonCommand = new RelayCommand(() => { ViewModel.Highlighted = false; }),
+                        IsPrimaryButtonEnabled = false
+                    };
+
+                    content.ViewModel.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
+
+                    await dialog.ShowAsync();
+                };
+
+                LinkDrawersMenuFlyout.Items.Add(drawerMenuItem);
+            }
+        });
     }
 
     private void RenderWidget(Guid id)
@@ -151,6 +225,26 @@ public sealed partial class MainWindow : Window
         }
 
         Grid.Children.Add(content);
+    }
+
+    private async void AddWidgetButton_Click(object _, RoutedEventArgs e)
+    {
+        var content = new AddWidgetDialog(_storageService, _notesOrchestrator);
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            Title = AddWidgetDialog.AreaPickerTitle,
+            Content = content,
+            PrimaryButtonText = "Add",
+            CloseButtonText = "Cancel",
+            PrimaryButtonCommand = new AsyncRelayCommand(content.SubmitAsync),
+            IsPrimaryButtonEnabled = false
+        };
+
+        content.StepChanged += (_, e) => { dialog.Title = e.DialogTitle; };
+        content.Validated += (_, e) => { dialog.IsPrimaryButtonEnabled = e.Valid; };
+
+        await dialog.ShowAsync();
     }
 
     private async void PreferencesButton_Click(object _, RoutedEventArgs e)

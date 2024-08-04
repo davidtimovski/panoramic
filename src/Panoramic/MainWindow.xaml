@@ -34,9 +34,18 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Column="0" Click="AddWidgetButton_Click">Add widget</Button>
+                    <Button Grid.Column="0" Content="Link drawers">
+                        <Button.Flyout>
+                            <MenuFlyout x:Name="LinkDrawersMenuFlyout" Placement="Bottom" />
+                        </Button.Flyout>
+                    </Button>
+
                     <TextBox Grid.Column="1" Name="SearchBox" Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <Button Grid.Column="2" Click="PreferencesButton_Click" HorizontalAlignment="Right">Preferences</Button>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Click="AddWidgetButton_Click" Margin="0 0 10 0">Add widget</Button>
+                        <Button Click="PreferencesButton_Click">Preferences</Button>
+                    </StackPanel>
                 </Grid>
 
                 <Grid x:Name="Grid" Grid.Row="1" RowSpacing="10" ColumnSpacing="10">

@@ -20,11 +20,11 @@ public class Checklist
         var mdFilePath = Path.Combine(Directory.GetCurrentDirectory(), Global.SamplesFolderName, SampleFileName);
         markdown = File.ReadAllText(mdFilePath);
 
-        model = ChecklistData.FromMarkdown(markdown!);
+        model = ChecklistData.FromMarkdown(SampleFileName, markdown!);
     }
 
     [Benchmark]
-    public ChecklistData FromMarkdown() => ChecklistData.FromMarkdown(markdown!);
+    public ChecklistData FromMarkdown() => ChecklistData.FromMarkdown(SampleFileName, markdown!);
 
     [Benchmark]
     public void ToMarkdown()

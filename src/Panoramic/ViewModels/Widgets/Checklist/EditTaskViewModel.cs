@@ -48,7 +48,6 @@ public sealed partial class EditTaskViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TitleForegroundBrush))]
     private string title = string.Empty;
-
     partial void OnTitleChanged(string value) => Updated?.Invoke(this, EventArgs.Empty);
 
     public SolidColorBrush TitleForegroundBrush => Title.Equals(_originalTitle, StringComparison.Ordinal) && DueDateHasNotChanged()
@@ -67,7 +66,6 @@ public sealed partial class EditTaskViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(UrlForegroundBrush))]
     private string url = string.Empty;
-
     partial void OnUrlChanged(string value)
     {
         Uri = Url.Trim().Length > 0 && Uri.TryCreate(Url.Trim(), UriKind.Absolute, out var createdUri) ? createdUri : null;

@@ -1,18 +1,18 @@
 ﻿using System.Text;
 using BenchmarkDotNet.Attributes;
-using Panoramic.Data.Widgets;
+using Panoramic.Data;
 
 namespace Benchmarks.MarkdownConversion;
 
 [SimpleJob]
 [MemoryDiagnoser]
 [HtmlExporter]
-public class LinkCollection
+public class LinkDrawer
 {
-    private const string SampleFileName = "linkcollection.md";
+    private const string SampleFileName = "linkdrawer.md";
 
     private string? markdown;
-    private LinkCollectionData? model;
+    private LinkDrawerData? model;
 
     [GlobalSetup]
     public void Setup()
@@ -20,11 +20,11 @@ public class LinkCollection
         var mdFilePath = Path.Combine(Directory.GetCurrentDirectory(), Global.SamplesFolderName, SampleFileName);
         markdown = File.ReadAllText(mdFilePath);
 
-        model = LinkCollectionData.FromMarkdown(SampleFileName, markdown!);
+        model = LinkDrawerData.FromMarkdown(SampleFileName, markdown!);
     }
 
     [Benchmark]
-    public LinkCollectionData FromMarkdown() => LinkCollectionData.FromMarkdown(SampleFileName, markdown!);
+    public LinkDrawerData FromMarkdown() => LinkDrawerData.FromMarkdown(SampleFileName, markdown!);
 
     [Benchmark]
     public void ToMarkdown()

@@ -17,17 +17,18 @@ public class MarkdownUtilTests
 
 """;
 
-        var tableData = new Dictionary<string, string>
+        var headers = new Tuple<string, string>("Key", "Value");
+        var data = new List<Tuple<string, string>>
         {
-            { "SomeKey1", "SomeValue1" },
-            { "SomeKey2", "SomeValue2" },
-            { "SomeKey1000", "SomeValue1000" },
+            new("SomeKey1", "SomeValue1"),
+            new("SomeKey2", "SomeValue2"),
+            new("SomeKey1000", "SomeValue1000")
         };
 
         var builder = new StringBuilder();
 
         // Act
-        MarkdownUtil.CreateKeyValueTable(builder, tableData);
+        MarkdownUtil.CreateTwoColumnTable(builder, headers, data);
 
         // Assert
         var actualMarkdown = builder.ToString();
@@ -44,11 +45,12 @@ public class MarkdownUtilTests
 
 """;
 
-        var tableData = new Dictionary<string, string>();
+        var headers = new Tuple<string, string>("Key", "Value");
+        var data = new List<Tuple<string, string>>();
         var builder = new StringBuilder();
 
         // Act
-        MarkdownUtil.CreateKeyValueTable(builder, tableData);
+        MarkdownUtil.CreateTwoColumnTable(builder, headers, data);
 
         // Assert
         var actualMarkdown = builder.ToString();
@@ -67,9 +69,9 @@ public class MarkdownUtilTests
 | Column1Value1000 | Column2Value2000 | Column3Value3000 |
 
 """;
-        var headers = new Tuple<string, string, string>("Header1", "Header2", "Header3");
 
-        var tableData = new List<Tuple<string, string, string>>
+        var headers = new Tuple<string, string, string>("Header1", "Header2", "Header3");
+        var data = new List<Tuple<string, string, string>>
         {
             new("Column1Value1", "Column2Value1", "Column3Value1"),
             new("Column1Value2", "Column2Value2", "Column3Value2"),
@@ -79,7 +81,7 @@ public class MarkdownUtilTests
         var builder = new StringBuilder();
 
         // Act
-        MarkdownUtil.CreateThreeColumnTable(builder, headers, tableData);
+        MarkdownUtil.CreateThreeColumnTable(builder, headers, data);
 
         // Assert
         var actualMarkdown = builder.ToString();
@@ -95,13 +97,13 @@ public class MarkdownUtilTests
 | ------- | ------- | ------- |
 
 """;
-        var headers = new Tuple<string, string, string>("Header1", "Header2", "Header3");
 
-        var tableData = new List<Tuple<string, string, string>>();
+        var headers = new Tuple<string, string, string>("Header1", "Header2", "Header3");
+        var data = new List<Tuple<string, string, string>>();
         var builder = new StringBuilder();
 
         // Act
-        MarkdownUtil.CreateThreeColumnTable(builder, headers, tableData);
+        MarkdownUtil.CreateThreeColumnTable(builder, headers, data);
 
         // Assert
         var actualMarkdown = builder.ToString();

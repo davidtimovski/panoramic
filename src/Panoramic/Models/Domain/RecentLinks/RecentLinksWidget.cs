@@ -117,9 +117,9 @@ public sealed class RecentLinksWidget : IWidget
             Links = Links.Select(x => new RecentLinkData { Title = x.Title, Uri = x.Uri, Context = x.Context, Clicked = x.Clicked }).ToList()
         };
 
-    public static RecentLinksWidget Load(IStorageService storageService, string markdown)
+    public static RecentLinksWidget Load(IStorageService storageService, string relativeFilePath, string markdown)
     {
-        var data = RecentLinksData.FromMarkdown(markdown);
+        var data = RecentLinksData.FromMarkdown(relativeFilePath, markdown);
         return new(storageService, data);
     }
 

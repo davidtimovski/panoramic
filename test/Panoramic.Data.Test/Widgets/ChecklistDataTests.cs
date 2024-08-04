@@ -41,7 +41,7 @@ public class ChecklistDataTests
         Sut.ToMarkdown(builder);
         string asMarkdown = builder.ToString();
 
-        ChecklistData asObject = ChecklistData.FromMarkdown(asMarkdown);
+        ChecklistData asObject = ChecklistData.FromMarkdown(string.Empty, asMarkdown);
         var actualData = JsonSerializer.Serialize(asObject);
 
         Assert.Equal(expectedData, actualData);

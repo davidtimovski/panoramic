@@ -99,9 +99,9 @@ public sealed class ChecklistWidget : IWidget
             Tasks = tasks.Select(x => new ChecklistTaskData { Title = x.Title, DueDate = x.DueDate, Uri = x.Uri, Created = x.Created }).ToList()
         };
 
-    public static ChecklistWidget Load(IStorageService storageService, string markdown)
+    public static ChecklistWidget Load(IStorageService storageService, string relativeFilePath, string markdown)
     {
-        var data = ChecklistData.FromMarkdown(markdown);
+        var data = ChecklistData.FromMarkdown(relativeFilePath, markdown);
         return new(storageService, data);
     }
 

@@ -17,7 +17,7 @@ public sealed class NoteData : IWidgetData
     public List<string> RecentNotes { get; init; } = [];
     public int RecentNotesCapacity { get; init; } = 5;
 
-    public static NoteData FromMarkdown(string markdown)
+    public static NoteData FromMarkdown(string relativeFilePath, string markdown)
     {
         var lineIndex = 3;
         var lines = markdown.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
@@ -56,8 +56,8 @@ public sealed class NoteData : IWidgetData
             var fontSize = double.Parse(fontSizeRowValues[1]);
             lineIndex++;
 
-            var relativeFilePathRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            var relativeFilePath = relativeFilePathRowValues.Length == 1 ? null : relativeFilePathRowValues[1];
+            var noteRelativeFilePathRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var noteRelativeFilePath = noteRelativeFilePathRowValues.Length == 1 ? null : noteRelativeFilePathRowValues[1];
             lineIndex++;
 
             var editingRowValues = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -74,7 +74,7 @@ public sealed class NoteData : IWidgetData
                 HeaderHighlight = headerHighlight,
                 FontFamily = fontFamily,
                 FontSize = fontSize,
-                RelativeFilePath = relativeFilePath,
+                RelativeFilePath = noteRelativeFilePath,
                 Editing = editing,
                 RecentNotes = recentNotes,
                 RecentNotesCapacity = recentNotesCapacity,
@@ -82,7 +82,7 @@ public sealed class NoteData : IWidgetData
         }
         catch
         {
-            throw new MarkdownParsingException(lines, lineIndex);
+            throw new MarkdownParsingException(relativeFilePath, lines, lineIndex);
         }
     }
 
@@ -101,19 +101,20 @@ public sealed class NoteData : IWidgetData
         builder.AppendLine($"## Metadata");
         builder.AppendLine();
 
-        var metadata = new Dictionary<string, string>
+        var headers = new Tuple<string, string>("Key", "Value");
+        var metadata = new List<Tuple<string, string>>
         {
-            { nameof(Id), Id.ToString("N") },
-            { nameof(Area), Area.ToString() },
-            { nameof(HeaderHighlight), HeaderHighlight.ToString() },
-            { nameof(FontFamily), FontFamily },
-            { nameof(FontSize), FontSize.ToString() },
-            { nameof(RelativeFilePath), RelativeFilePath is null ? string.Empty : RelativeFilePath },
-            { nameof(Editing), Editing.ToString() },
-            { nameof(RecentNotesCapacity), RecentNotesCapacity.ToString() },
+            new(nameof(Id), Id.ToString("N")),
+            new(nameof(Area), Area.ToString()),
+            new(nameof(HeaderHighlight), HeaderHighlight.ToString()),
+            new(nameof(FontFamily), FontFamily),
+            new(nameof(FontSize), FontSize.ToString()),
+            new(nameof(RelativeFilePath), RelativeFilePath is null ? string.Empty : RelativeFilePath),
+            new(nameof(Editing), Editing.ToString()),
+            new(nameof(RecentNotesCapacity), RecentNotesCapacity.ToString())
         };
 
-        MarkdownUtil.CreateKeyValueTable(builder, metadata);
+        MarkdownUtil.CreateTwoColumnTable(builder, headers, metadata);
 
         builder.AppendLine();
         builder.Append($"> Version: {Version}");

@@ -167,9 +167,9 @@ public sealed class NoteWidget : IWidget
         return folders.Concat(notes).ToList();
     }
 
-    public static NoteWidget Load(IStorageService storageService, INotesOrchestrator notesOrchestrator, string markdown)
+    public static NoteWidget Load(IStorageService storageService, INotesOrchestrator notesOrchestrator, string relativeFilePath, string markdown)
     {
-        var data = NoteData.FromMarkdown(markdown);
+        var data = NoteData.FromMarkdown(relativeFilePath, markdown);
         return new(storageService, notesOrchestrator, data);
     }
 

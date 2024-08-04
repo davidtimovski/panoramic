@@ -32,7 +32,7 @@ public class NoteDataTests
         Sut.ToMarkdown(builder);
         string asMarkdown = builder.ToString();
 
-        NoteData asObject = NoteData.FromMarkdown(asMarkdown);
+        NoteData asObject = NoteData.FromMarkdown(string.Empty, asMarkdown);
         var actualData = JsonSerializer.Serialize(asObject);
 
         Assert.Equal(expectedData, actualData);

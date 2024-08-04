@@ -1,31 +1,28 @@
 using System.Text;
 using System.Text.Json;
-using Panoramic.Data.Widgets;
 
-namespace Panoramic.Data.Test.Widgets;
+namespace Panoramic.Data.Test;
 
-public class LinkCollectionDataTests
+public class LinkDrawerDataTests
 {
-    private static readonly LinkCollectionData Sut = new()
+    private static readonly LinkDrawerData Sut = new()
     {
-        Id = Guid.NewGuid(),
-        Area = new Area("33-54"),
-        HeaderHighlight = HighlightColor.Red,
-        Title = "Link collection",
-        Searchable = true,
+        Name = "My links",
         Links =
         [
-            new LinkCollectionItemData
+            new LinkDrawerLinkData
             {
                 Title = "Quisque sollicitudin",
                 Uri = new Uri("https://www.google.com/search?q=somequeryhere1"),
                 Order = 0,
+                SearchTerms = ["term1", "term2"]
             },
-            new LinkCollectionItemData
+            new LinkDrawerLinkData
             {
                 Title = "Vestibulum erat nulla",
                 Uri = new Uri("https://www.google.com/search?q=somequeryhere2"),
                 Order = 1,
+                SearchTerms = ["term3", "term4", "term5"]
             }
         ]
     };
@@ -39,7 +36,7 @@ public class LinkCollectionDataTests
         Sut.ToMarkdown(builder);
         string asMarkdown = builder.ToString();
 
-        LinkCollectionData asObject = LinkCollectionData.FromMarkdown(string.Empty, asMarkdown);
+        LinkDrawerData asObject = LinkDrawerData.FromMarkdown($"{Sut.Name}.md", asMarkdown);
         var actualData = JsonSerializer.Serialize(asObject);
 
         Assert.Equal(expectedData, actualData);

@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Media;
 
-namespace Panoramic.ViewModels.Widgets.LinkCollection;
+namespace Panoramic.ViewModels.LinkDrawers;
 
 public sealed partial class EditLinkViewModel : ObservableObject
 {

@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
-using Panoramic.Data.Exceptions;
 using Panoramic.Models;
 using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.Checklist;
@@ -16,6 +15,7 @@ using Windows.Storage;
 
 namespace Panoramic.Services.Storage;
 
+/// <inheritdoc/>
 public sealed class StorageService : IStorageService
 {
     private const string DefaultDirectoryName = "Panoramic";
@@ -72,9 +72,9 @@ public sealed class StorageService : IStorageService
 
         var widgetFilePaths = Directory.GetFiles(WidgetsFolderPath, "*.md");
 
-        var readWidgetTasks = widgetFilePaths.Select(ReadWidgetAsync);
+        var tasks = widgetFilePaths.Select(ReadWidgetAsync);
 
-        await Task.WhenAll(readWidgetTasks).ConfigureAwait(false);
+        await Task.WhenAll(tasks).ConfigureAwait(false);
     }
 
     public async Task WriteUnsavedChangesAsync()
@@ -164,41 +164,34 @@ public sealed class StorageService : IStorageService
         StoragePathChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    private async Task ReadWidgetAsync(string widgetFilePath)
+    private async Task ReadWidgetAsync(string filePath)
     {
-        var type = WidgetUtil.GetType(widgetFilePath);
+        var type = WidgetUtil.GetType(filePath);
         if (type == WidgetType.Note)
         {
             // Skip Note widgets as they're read by INotesOrchestrator
             return;
         }
 
-        var markdown = await File.ReadAllTextAsync(widgetFilePath);
+        var relativeFilePath = Path.GetRelativePath(StoragePath, filePath);
+        var markdown = await File.ReadAllTextAsync(filePath);
 
-        try
+        switch (type)
         {
-            switch (type)
-            {
-                case WidgetType.LinkCollection:
-                    var linkCollectionWidget = LinkCollectionWidget.Load(this, markdown);
-                    Widgets.Add(linkCollectionWidget.Id, linkCollectionWidget);
-                    break;
-                case WidgetType.RecentLinks:
-                    var recentLinksWidget = RecentLinksWidget.Load(this, markdown);
-                    Widgets.Add(recentLinksWidget.Id, recentLinksWidget);
-                    break;
-                case WidgetType.Checklist:
-                    var checklistWidget = ChecklistWidget.Load(this, markdown);
-                    Widgets.Add(checklistWidget.Id, checklistWidget);
-                    break;
-                default:
-                    throw new InvalidOperationException("Unsupported widget type");
-            }
-        }
-        catch (MarkdownParsingException ex)
-        {
-            ex.FileName = Path.GetFileName(widgetFilePath);
-            throw;
+            case WidgetType.LinkCollection:
+                var linkCollectionWidget = LinkCollectionWidget.Load(this, relativeFilePath, markdown);
+                Widgets.Add(linkCollectionWidget.Id, linkCollectionWidget);
+                break;
+            case WidgetType.RecentLinks:
+                var recentLinksWidget = RecentLinksWidget.Load(this, relativeFilePath, markdown);
+                Widgets.Add(recentLinksWidget.Id, recentLinksWidget);
+                break;
+            case WidgetType.Checklist:
+                var checklistWidget = ChecklistWidget.Load(this, relativeFilePath, markdown);
+                Widgets.Add(checklistWidget.Id, checklistWidget);
+                break;
+            default:
+                throw new InvalidOperationException("Unsupported widget type");
         }
     }
 

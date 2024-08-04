@@ -10,11 +10,11 @@ public sealed partial class MarkdownParsingFailure : Page
 {
     private static readonly FontFamily MonospacedFontFamily = new("Consolas");
 
-    public MarkdownParsingFailure(string fileName, IReadOnlyList<string> markdownLines, int potentialErrorLine)
+    public MarkdownParsingFailure(string relativeFilePath, IReadOnlyList<string> markdownLines, int potentialErrorLine)
     {
         InitializeComponent();
 
-        FileName = fileName;
+        RelativeFilePath = relativeFilePath;
 
         for (int i = 0; i < markdownLines.Count; i++)
         {
@@ -31,5 +31,5 @@ public sealed partial class MarkdownParsingFailure : Page
         }
     }
 
-    public string FileName { get; }
+    public string RelativeFilePath { get; }
 }
