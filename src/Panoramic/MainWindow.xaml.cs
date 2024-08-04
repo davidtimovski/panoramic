@@ -21,6 +21,7 @@ using Panoramic.Pages.Widgets.Checklist;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
+using Panoramic.Services;
 using Panoramic.Services.Drawers;
 using Panoramic.Services.Drawers.Models;
 using Panoramic.Services.Notes;
@@ -35,6 +36,7 @@ public sealed partial class MainWindow : Window
 {
     private readonly IPreferencesService _preferencesService;
     private readonly IStorageService _storageService;
+    private readonly IEventHub _eventHub;
     private readonly INotesOrchestrator _notesOrchestrator;
     private readonly IDrawerService _drawerService;
     private readonly IServiceProvider _serviceProvider;
@@ -44,6 +46,7 @@ public sealed partial class MainWindow : Window
     public MainWindow(
         IPreferencesService preferencesService,
         IStorageService storageService,
+        IEventHub eventHub,
         INotesOrchestrator notesOrchestrator,
         IDrawerService drawerService,
         IServiceProvider serviceProvider,
@@ -66,6 +69,7 @@ public sealed partial class MainWindow : Window
         _storageService.WidgetUpdated += WidgetUpdated;
         _storageService.WidgetDeleted += WidgetDeleted;
 
+        _eventHub = eventHub;
         _notesOrchestrator = notesOrchestrator;
 
         _drawerService = drawerService;
@@ -156,6 +160,15 @@ public sealed partial class MainWindow : Window
                 };
 
                 var contextFlyout = new MenuBarItemFlyout();
+
+                var editButton = new MenuFlyoutItem
+                {
+                    Text = "Edit",
+                    DataContext = drawer
+                };
+                editButton.Click += EditDrawer_Click;
+                contextFlyout.Items.Add(editButton);
+
                 var deleteButton = new MenuFlyoutItem
                 {
                     Text = "Delete",
@@ -163,9 +176,9 @@ public sealed partial class MainWindow : Window
                 };
                 deleteButton.Click += DeleteDrawer_Click;
                 contextFlyout.Items.Add(deleteButton);
-                drawerMenuItem.ContextFlyout = contextFlyout;
 
-                drawerMenuItem.Click += EditDrawer_Click;
+                drawerMenuItem.ContextFlyout = contextFlyout;
+                drawerMenuItem.Click += OpenDrawer_Click;
 
                 LinkDrawersMenuFlyout.Items.Add(drawerMenuItem);
             }
@@ -174,7 +187,7 @@ public sealed partial class MainWindow : Window
 
     private async void AddLinkDrawer_Click(object _, RoutedEventArgs e)
     {
-        var content = new DrawerDialog(_httpClient, _dispatcherQueue, _drawerService, data: null);
+        var content = new EditDrawerDialog(_httpClient, _dispatcherQueue, _drawerService, data: null);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
@@ -191,16 +204,35 @@ public sealed partial class MainWindow : Window
         await dialog.ShowAsync();
     }
 
+    private async void OpenDrawer_Click(object _, RoutedEventArgs e)
+    {
+        var menuItem = (MenuFlyoutItem)e.OriginalSource;
+        var drawer = (LinkDrawerData)menuItem.DataContext;
+
+        var content = new ViewDrawerDialog(_eventHub, data: drawer);
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            Title = drawer.Name,
+            Content = content,
+            CloseButtonText = "Close"
+        };
+
+        content.ViewModel.LinkClicked += (_, e) => { dialog.Hide(); };
+
+        await dialog.ShowAsync();
+    }
+
     private async void EditDrawer_Click(object _, RoutedEventArgs e)
     {
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
         var drawer = (LinkDrawerData)menuItem.DataContext;
 
-        var content = new DrawerDialog(_httpClient, _dispatcherQueue, _drawerService, data: drawer);
+        var content = new EditDrawerDialog(_httpClient, _dispatcherQueue, _drawerService, data: drawer);
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
-            Title = "Edit link drawer",
+            Title = $"Edit {drawer.Name} drawer",
             Content = content,
             PrimaryButtonText = "Save",
             CloseButtonText = "Close",
@@ -221,7 +253,7 @@ public sealed partial class MainWindow : Window
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,
-            Title = "Delete link drawer",
+            Title = $"Delete {drawer.Name} drawer",
             Content = $"""Are you sure want to delete the "{drawer.Name}" link drawer and everything in it?""",
             PrimaryButtonText = "Yes, delete",
             CloseButtonText = "Cancel",

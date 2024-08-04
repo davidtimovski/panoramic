@@ -50,10 +50,10 @@
                 <DataTemplate x:Key="LinkCollectionViewTemplate" x:DataType="vm:LinkViewModel">
                     <HyperlinkButton Content="{x:Bind Title}"
                                  NavigateUri="{x:Bind Uri}"
+                                 Click="{x:Bind Click}"
                                  ToolTipService.ToolTip="{x:Bind Tooltip}"
                                  HorizontalAlignment="Stretch"
-                                 HorizontalContentAlignment="Left"
-                                 Click="{x:Bind Clicked}" />
+                                 HorizontalContentAlignment="Left" />
                 </DataTemplate>
             </Border.Resources>
 

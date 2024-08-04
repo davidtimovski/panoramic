@@ -8,9 +8,9 @@ using Panoramic.ViewModels.LinkDrawers;
 
 namespace Panoramic.Pages.LinkDrawers;
 
-public sealed partial class DrawerDialog : Page
+public sealed partial class EditDrawerDialog : Page
 {
-    public DrawerDialog(
+    public EditDrawerDialog(
         HttpClient httpClient,
         DispatcherQueue dispatcherQueue,
         IDrawerService drawerService,
@@ -18,10 +18,10 @@ public sealed partial class DrawerDialog : Page
     {
         InitializeComponent();
 
-        ViewModel = new DrawerViewModel(httpClient, dispatcherQueue, drawerService, data, this);
+        ViewModel = new EditDrawerViewModel(httpClient, dispatcherQueue, drawerService, data, this);
     }
 
-    public DrawerViewModel ViewModel { get; }
+    public EditDrawerViewModel ViewModel { get; }
 
     private void AddButton_Click(object sender, RoutedEventArgs e)
     {

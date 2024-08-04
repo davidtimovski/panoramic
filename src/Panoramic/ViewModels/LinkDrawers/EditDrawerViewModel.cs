@@ -16,7 +16,7 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace Panoramic.ViewModels.LinkDrawers;
 
-public sealed partial class DrawerViewModel : ObservableObject
+public sealed partial class EditDrawerViewModel : ObservableObject
 {
     private readonly HttpClient _httpClient;
     private readonly DispatcherQueue _dispatcherQueue;
@@ -26,7 +26,7 @@ public sealed partial class DrawerViewModel : ObservableObject
     private readonly SolidColorBrush _fieldChangedForegroundBrush;
     private readonly bool _isNew;
 
-    public DrawerViewModel(
+    public EditDrawerViewModel(
         HttpClient httpClient,
         DispatcherQueue dispatcherQueue,
         IDrawerService drawerService,
