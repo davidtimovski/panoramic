@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Xaml;
 using Panoramic.Data;
 using Panoramic.Services;
 
@@ -17,23 +19,63 @@ public sealed partial class ViewDrawerViewModel : ObservableObject
         _data = data;
 
         Name = _data.Name;
-        foreach (var link in _data.Links)
-        {
-            var searchTermsString = string.Join(", ", link.SearchTerms);
-            var vm = new LinkViewModel(_eventHub, _data.Name, link.Title, link.Uri);
-            vm.Clicked += (object? _, EventArgs e) => { LinkClicked?.Invoke(this, EventArgs.Empty); };
 
-            Links.Add(vm);
-        }
+        SetLinks(string.Empty);
     }
 
     public event EventHandler<EventArgs>? LinkClicked;
 
     public string Name { get; }
 
-    // TODO: Make links searchable
     [ObservableProperty]
     private string searchText = string.Empty;
 
+    partial void OnSearchTextChanged(string value) => SetLinks(value);
+
+    public GridLength LinksListViewHeight => CalculateLinksListViewHeight();
+
     public ObservableCollection<LinkViewModel> Links { get; } = [];
+
+    private void SetLinks(string searchText)
+    {
+        var source = _data.Links.AsEnumerable();
+
+        var trimmed = searchText.Trim();
+        if (trimmed.Length > 0)
+        {
+            source = source.Where(x => x.Matches(trimmed));
+        }
+
+        var filteredLinkVms = source.Select(MapToLinkViewModel).ToList();
+
+        Links.Clear();
+        foreach (var linkVm in filteredLinkVms)
+        {
+            Links.Add(linkVm);
+        }
+    }
+
+    private LinkViewModel MapToLinkViewModel(LinkDrawerLinkData link)
+    {
+        var searchTermsString = string.Join(", ", link.SearchTerms);
+        var vm = new LinkViewModel(_eventHub, _data.Name, link.Title, link.Uri);
+        vm.Clicked += (object? _, EventArgs e) => { LinkClicked?.Invoke(this, EventArgs.Empty); };
+
+        return vm;
+    }
+
+    private GridLength CalculateLinksListViewHeight()
+    {
+        if (Links.Count < 4)
+        {
+            return new GridLength(120);
+        }
+
+        if (Links.Count < 15)
+        {
+            return GridLength.Auto;
+        }
+
+        return new GridLength(500);
+    }
 }

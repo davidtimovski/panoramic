@@ -77,4 +77,10 @@ public sealed class LinkDrawerLinkData
     public required Uri Uri { get; init; }
     public required short Order { get; init; }
     public required IReadOnlyCollection<string> SearchTerms { get; init; }
+
+    /// <summary>
+    /// Used for link search functionality.
+    /// </summary>
+    public bool Matches(string searchText)
+        => Title.Contains(searchText, StringComparison.OrdinalIgnoreCase) || Uri.Host.Contains(searchText, StringComparison.OrdinalIgnoreCase);
 }
