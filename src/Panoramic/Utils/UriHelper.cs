@@ -4,7 +4,10 @@ namespace Panoramic.Utils;
 
 internal static class UriHelper
 {
-    internal static Uri? Create(string url)
+    /// <summary>
+    /// If the URL is not empty creates a <see cref="Uri"/> from it, otherwise returns null.
+    /// </summary>
+    internal static Uri? CreateOrDefault(string url)
     {
         if (url.Trim().Length == 0)
         {

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
-using HtmlAgilityPack;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -67,7 +66,7 @@ public sealed partial class EditViewModel : ObservableObject
 
     public string NewLinkTitlePlaceholder => NewLinkTitleIsReadOnly ? "Loading.." : "Title";
 
-    public bool NewLinkFormValid => NewLinkTitle.Trim().Length > 0 && UriHelper.Create(NewLinkUrl) is not null;
+    public bool NewLinkFormValid => NewLinkTitle.Trim().Length > 0 && UriHelper.CreateOrDefault(NewLinkUrl) is not null;
 
     public ObservableCollection<EditLinkViewModel> Links { get; } = [];
 
@@ -90,20 +89,11 @@ public sealed partial class EditViewModel : ObservableObject
         var text = await package.GetTextAsync();
         if (Uri.TryCreate(text, UriKind.Absolute, out var uri))
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, uri);
-            using var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
-
-            var html = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(html);
-
-            var htmlBody = htmlDoc.DocumentNode.SelectSingleNode("//head");
-            var node = htmlBody.Element("title");
+            var pageTitle = await HttpUtil.GetPageTitleAsync(_httpClient, uri).ConfigureAwait(false);
 
             _dispatcherQueue.TryEnqueue(() =>
             {
-                NewLinkTitle = node.InnerText;
+                NewLinkTitle = pageTitle;
                 NewLinkTitleIsReadOnly = false;
             });
         }
@@ -133,7 +123,7 @@ public sealed partial class EditViewModel : ObservableObject
     {
         var newLink = new EditLinkViewModel(
             NewLinkTitle.Trim(),
-            UriHelper.Create(NewLinkUrl.Trim())!,
+            UriHelper.CreateOrDefault(NewLinkUrl.Trim())!,
             changed: true,
             _fieldForegroundBrush,
             _fieldChangedForegroundBrush);

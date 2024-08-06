@@ -31,7 +31,7 @@ public sealed partial class LinkDrawerData
 
                 var titleGroup = match.Groups[1];
                 var uriGroup = match.Groups[2];
-                var searchTerms = linkLineParts.Length == 2 ? linkLineParts[1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) : [];
+                var searchTerms = linkLineParts.Length == 2 ? linkLineParts[1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList() : [];
 
                 links.Add(new LinkDrawerLinkData
                 {
@@ -62,7 +62,7 @@ public sealed partial class LinkDrawerData
     public void ToMarkdown(StringBuilder builder)
     {
         var headers = new Tuple<string, string>("Link", "Search terms");
-        var data = Links.Select(x => new Tuple<string, string>($"[{x.Title}]({x.Uri})", string.Join(", ", x.SearchTerms))).ToList();
+        var data = Links.Select(x => new Tuple<string, string>($"[{x.Title}]({x.Uri})", string.Join(LinkDrawerLinkData.SearchTermsSeparator, x.SearchTerms))).ToList();
 
         MarkdownUtil.CreateTwoColumnTable(builder, headers, data);
     }
@@ -73,14 +73,42 @@ public sealed partial class LinkDrawerData
 
 public sealed class LinkDrawerLinkData
 {
+    public const string SearchTermsSeparator = ", ";
+
     public required string Title { get; init; }
     public required Uri Uri { get; init; }
     public required short Order { get; init; }
-    public required IReadOnlyCollection<string> SearchTerms { get; init; }
+    public required List<string> SearchTerms { get; init; }
 
     /// <summary>
     /// Used for link search functionality.
     /// </summary>
-    public bool Matches(string searchText)
-        => Title.Contains(searchText, StringComparison.OrdinalIgnoreCase) || Uri.Host.Contains(searchText, StringComparison.OrdinalIgnoreCase);
+    public WeighedSearchResult<LinkDrawerLinkData> Matches(string searchText)
+    {
+        var weight = 0;
+
+        if (Title.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+        {
+            weight += 1;
+        }
+
+        if (Uri.ToString().Contains(searchText, StringComparison.OrdinalIgnoreCase))
+        {
+            weight += 1;
+        }
+
+        weight += SearchTerms.Count(x => x.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+
+        return new WeighedSearchResult<LinkDrawerLinkData>
+        {
+            Weight = weight,
+            Result = this
+        };
+    }
+}
+
+public sealed class WeighedSearchResult<T>
+{
+    public required int Weight { get; init; }
+    public required T Result { get; init; }
 }

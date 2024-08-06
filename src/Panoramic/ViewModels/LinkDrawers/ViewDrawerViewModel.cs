@@ -43,7 +43,7 @@ public sealed partial class ViewDrawerViewModel : ObservableObject
         var trimmed = searchText.Trim();
         if (trimmed.Length > 0)
         {
-            source = source.Where(x => x.Matches(trimmed));
+            source = source.Select(x => x.Matches(trimmed)).OrderByDescending(x => x.Weight).Select(x => x.Result);
         }
 
         var filteredLinkVms = source.Select(MapToLinkViewModel).ToList();
@@ -57,7 +57,7 @@ public sealed partial class ViewDrawerViewModel : ObservableObject
 
     private LinkViewModel MapToLinkViewModel(LinkDrawerLinkData link)
     {
-        var searchTermsString = string.Join(", ", link.SearchTerms);
+        var searchTermsString = string.Join(LinkDrawerLinkData.SearchTermsSeparator, link.SearchTerms);
         var vm = new LinkViewModel(_eventHub, _data.Name, link.Title, link.Uri);
         vm.Clicked += (object? _, EventArgs e) => { LinkClicked?.Invoke(this, EventArgs.Empty); };
 

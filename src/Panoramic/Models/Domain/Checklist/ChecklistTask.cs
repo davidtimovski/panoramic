@@ -12,5 +12,6 @@ public sealed class ChecklistTask
     /// <summary>
     /// Used for global search functionality.
     /// </summary>
-    public bool Matches(string searchText) => Title.Contains(searchText, StringComparison.OrdinalIgnoreCase);
+    public bool Matches(string searchText) => Title.Contains(searchText, StringComparison.OrdinalIgnoreCase)
+        || (Uri is not null && Uri.ToString().Contains(searchText, StringComparison.OrdinalIgnoreCase));
 }

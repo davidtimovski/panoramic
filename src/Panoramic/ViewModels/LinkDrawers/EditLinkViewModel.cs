@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Media;
 
@@ -71,6 +72,6 @@ public sealed partial class EditLinkViewModel : ObservableObject
 
     public bool IsValid() => Title.Trim().Length > 0 && Url.Trim().Length > 0 && Uri.TryCreate(Url.Trim(), UriKind.Absolute, out var _);
 
-    public IReadOnlyCollection<string> GetSearchTerms()
-        => SearchTerms.Trim().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    public List<string> GetSearchTerms()
+        => SearchTerms.Trim().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
 }

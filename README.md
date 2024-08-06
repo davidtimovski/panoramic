@@ -2,7 +2,10 @@
 
 A productivity app that revolves around a high-level view of notes, links, and checklists.
 
-Organized as a grid system, it allows you to add widgets in a layout that you prefer.
+Revolves around two concepts:
+
+1. [Widgets](#widgets) - different types of functionalities organized as a grid system, in a layout that you prefer
+2. [Link drawers](#link-drawers) - collections of links that are less frequently accessed, tucked away in a menu
 
 ![Preview (Dark)](design/preview-dark.webp)
 
@@ -30,13 +33,9 @@ Links that were recently clicked within the app.
 
 A collection of tasks (to-dos).
 
----
+## Link drawers
 
-## Storage
-
-I wanted to make the app easy to onboard to, but I also wanted to make it easy to off-board from. All of the data is stored in markdown files in the folder specified in Preferences, so if you decide to dip out it should be fairly easy to do so without losing your data to a proprietary format.
-
-An example of how the markdown files are formatted can be seen in the [MarkdownSamples folder](/test/Benchmarks/MarkdownSamples).
+All of the links that you don't need to always see on your screen, reachable using the top-left "Link drawers" menu. *Soon to be easily searchable using a hotkey.*
 
 ---
 
@@ -62,6 +61,8 @@ An example of how the markdown files are formatted can be seen in the [MarkdownS
 
 ---
 
-## License
+## Storage
 
-This project is licensed under the GNU GPLv3 License - see the [LICENSE](LICENSE) file for details.
+I wanted to make the app easy to onboard to, but I also wanted to make it easy to off-board from. All of the data is stored in markdown files in the folder specified in Preferences, so if you decide to dip out it should be fairly easy to do so without losing your data to a proprietary format.
+
+An example of how the markdown files are formatted can be seen in the [MarkdownSamples folder](/test/Benchmarks/MarkdownSamples).
