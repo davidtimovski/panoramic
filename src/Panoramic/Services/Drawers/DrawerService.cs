@@ -38,9 +38,8 @@ public sealed class DrawerService : IDrawerService
 
         var tasks = drawerFilePaths.Select(ReadLinkDrawerAsync);
 
-        await Task.WhenAll(tasks).ConfigureAwait(false);
+        var drawers = await Task.WhenAll(tasks).ConfigureAwait(false);
 
-        var drawers = tasks.Select(x => x.Result).ToList();
         foreach (var drawer in drawers)
         {
             _drawers.Add(drawer.Name, drawer);

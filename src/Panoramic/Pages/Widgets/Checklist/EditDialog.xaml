@@ -110,7 +110,7 @@
 
                 <FlyoutBase.AttachedFlyout>
                     <Flyout x:Name="DuplicateLinkFlyout">
-                        <TextBlock TextWrapping="Wrap">The task already exists in the checklist</TextBlock>
+                        <TextBlock TextWrapping="Wrap">A task with the same name already exists in the checklist</TextBlock>
                     </Flyout>
                 </FlyoutBase.AttachedFlyout>
             </StackPanel>

@@ -137,14 +137,17 @@ public sealed partial class EditDrawerViewModel : ObservableObject
 
     public bool UrlExists()
     {
-        var existing = Links.FirstOrDefault(x => string.Equals(x.Url, NewLinkUrl, StringComparison.Ordinal));
+        var existing = Links.FirstOrDefault(x =>
+            string.Equals(x.Title.Trim(), NewLinkTitle.Trim(), StringComparison.OrdinalIgnoreCase)
+            || string.Equals(x.Url.Trim(), NewLinkUrl.Trim(), StringComparison.Ordinal));
+
         if (existing is null)
         {
             DuplicateLinkTitle = null;
             return false;
         }
 
-        DuplicateLinkTitle = $@"""{existing.Title}""";
+        DuplicateLinkTitle = $@"""{existing.Title.Trim()}""";
         return true;
     }
 
@@ -161,7 +164,10 @@ public sealed partial class EditDrawerViewModel : ObservableObject
         Links.Add(newLink);
         NewLinkTitle = string.Empty;
         NewLinkUrl = string.Empty;
+        NewLinkSearchTerms = string.Empty;
         DuplicateLinkTitle = null;
+
+        ValidateAndEmit();
     }
 
     public void Delete(EditLinkViewModel viewModel)

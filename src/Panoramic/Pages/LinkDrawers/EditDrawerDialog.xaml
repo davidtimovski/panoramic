@@ -118,7 +118,7 @@
                 <FlyoutBase.AttachedFlyout>
                     <Flyout x:Name="DuplicateLinkFlyout">
                         <TextBlock TextWrapping="Wrap">
-                            <Run>The URL already exists in the collection as:</Run>
+                            <Run>The link already exists in the collection as:</Run>
                             <LineBreak/>
                             <Run Text="{x:Bind ViewModel.DuplicateLinkTitle, Mode=OneWay}" />
                         </TextBlock>

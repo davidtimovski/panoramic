@@ -70,7 +70,7 @@ public sealed class ChecklistWidget : IWidget
     public event EventHandler<TaskCompletedEventArgs>? TaskCompleted;
 
     public bool TaskCanBeCreated(string title)
-        => !tasks.Any(x => x.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
+        => !tasks.Any(x => x.Title.Trim().Equals(title, StringComparison.OrdinalIgnoreCase));
 
     public void AddTask(string title, DateOnly? dueDate, Uri? uri)
     {

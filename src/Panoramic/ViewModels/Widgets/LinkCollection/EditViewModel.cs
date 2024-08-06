@@ -115,14 +115,17 @@ public sealed partial class EditViewModel : ObservableObject
 
     public bool UrlExists()
     {
-        var existing = Links.FirstOrDefault(x => string.Equals(x.Url, NewLinkUrl, StringComparison.Ordinal));
+        var existing = Links.FirstOrDefault(x => 
+            string.Equals(x.Title.Trim(), NewLinkTitle.Trim(), StringComparison.OrdinalIgnoreCase)
+            || string.Equals(x.Url.Trim(), NewLinkUrl.Trim(), StringComparison.Ordinal));
+
         if (existing is null)
         {
             DuplicateLinkTitle = null;
             return false;
         }
 
-        DuplicateLinkTitle = $@"""{existing.Title}""";
+        DuplicateLinkTitle = $@"""{existing.Title.Trim()}""";
         return true;
     }
 
@@ -161,5 +164,29 @@ public sealed partial class EditViewModel : ObservableObject
         await _storageService.SaveWidgetAsync(_widget);
     }
 
-    private void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = Links.All(x => x.IsValid()) });
+    private void ValidateAndEmit()
+    {
+        var valid = Links.All(x => x.IsValid());
+        if (valid)
+        {
+            foreach (var link in Links)
+            {
+                var sameTitle = Links.Count(x => string.Equals(x.Title.Trim(), link.Title.Trim(), StringComparison.OrdinalIgnoreCase));
+                if (sameTitle > 1)
+                {
+                    valid = false;
+                    break;
+                }
+
+                var sameUrl = Links.Count(x => string.Equals(x.Url.Trim(), link.Url.Trim(), StringComparison.Ordinal));
+                if (sameUrl > 1)
+                {
+                    valid = false;
+                    break;
+                }
+            }
+        }
+
+        Validated?.Invoke(this, new ValidationEventArgs { Valid = valid });
+    }
 }
