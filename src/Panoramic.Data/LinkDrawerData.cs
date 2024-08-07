@@ -89,12 +89,12 @@ public sealed class LinkDrawerLinkData
 
         if (Title.Contains(searchText, StringComparison.OrdinalIgnoreCase))
         {
-            weight += 1;
+            weight++;
         }
 
         if (Uri.ToString().Contains(searchText, StringComparison.OrdinalIgnoreCase))
         {
-            weight += 1;
+            weight++;
         }
 
         weight += SearchTerms.Count(x => x.Contains(searchText, StringComparison.OrdinalIgnoreCase));

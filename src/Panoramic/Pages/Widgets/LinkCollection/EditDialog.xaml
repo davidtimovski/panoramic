@@ -73,7 +73,7 @@
 
         <Grid.RowDefinitions>
             <RowDefinition />
-            <RowDefinition />
+            <RowDefinition Height="350" />
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" Padding="0 10 0 20" BorderThickness="0 0 0 1" BorderBrush="#666">
@@ -85,18 +85,25 @@
                          PlaceholderText="{x:Bind ViewModel.NewLinkTitlePlaceholder, Mode=OneWay}"
                          MaxLength="100" />
 
-                <TextBox Text="{x:Bind ViewModel.NewLinkUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         Paste="{x:Bind ViewModel.PasteNewLinkUrl}"
-                         MaxLength="5000"
-                         Margin="0 10 0 0"
-                         PlaceholderText="URL" />
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-                <Button Content="Add"
-                        Click="AddButton_Click"
-                        IsEnabled="{x:Bind ViewModel.NewLinkFormValid, Mode=OneWay}"
-                        Margin="0 10 0 0"
-                        HorizontalAlignment="Right">
-                </Button>
+                    <TextBox Grid.Column="0"
+                             Text="{x:Bind ViewModel.NewLinkUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Paste="{x:Bind ViewModel.PasteNewLinkUrl}"
+                             MaxLength="5000"
+                             Margin="0 10 0 0"
+                             PlaceholderText="URL" />
+
+                    <Button Grid.Column="1"
+                            Click="AddButton_Click"
+                            IsEnabled="{x:Bind ViewModel.NewLinkFormValid, Mode=OneWay}"
+                            Margin="0 10 0 0"
+                            HorizontalAlignment="Right">Add</Button>
+                </Grid>
 
                 <FlyoutBase.AttachedFlyout>
                     <Flyout x:Name="DuplicateLinkFlyout">

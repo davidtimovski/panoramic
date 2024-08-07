@@ -3,11 +3,24 @@ using Panoramic.Services;
 
 namespace Panoramic.ViewModels.Widgets.LinkCollection;
 
-public sealed class LinkViewModel(IEventHub eventHub, string widgetTitle, string title, Uri uri)
+public sealed class LinkViewModel
 {
-    public string Title { get; } = title;
-    public Uri Uri { get; } = uri;
-    public string Tooltip { get; } = uri.Host;
+    private readonly IEventHub _eventHub;
+    private readonly string _widgetTitle;
 
-    public void Click() => eventHub.RaiseHyperlinkClicked(Title, Uri, widgetTitle, DateTime.Now);
+    public LinkViewModel(IEventHub eventHub, string widgetTitle, string title, Uri uri)
+    {
+        _eventHub = eventHub;
+        _widgetTitle = widgetTitle;
+
+        Title = title;
+        Uri = uri;
+        Tooltip = uri.ToString();
+    }
+
+    public string Title { get; }
+    public Uri Uri { get; }
+    public string Tooltip { get; }
+
+    public void Click() => _eventHub.RaiseHyperlinkClicked(Title, Uri, _widgetTitle, DateTime.Now);
 }
