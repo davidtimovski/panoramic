@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
-using HtmlAgilityPack;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -67,7 +66,7 @@ public sealed partial class EditViewModel : ObservableObject
 
     public string NewLinkTitlePlaceholder => NewLinkTitleIsReadOnly ? "Loading.." : "Title";
 
-    public bool NewLinkFormValid => NewLinkTitle.Trim().Length > 0 && UriHelper.Create(NewLinkUrl) is not null;
+    public bool NewLinkFormValid => NewLinkTitle.Trim().Length > 0 && UriHelper.CreateOrDefault(NewLinkUrl) is not null;
 
     public ObservableCollection<EditLinkViewModel> Links { get; } = [];
 
@@ -90,20 +89,11 @@ public sealed partial class EditViewModel : ObservableObject
         var text = await package.GetTextAsync();
         if (Uri.TryCreate(text, UriKind.Absolute, out var uri))
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, uri);
-            using var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
-
-            var html = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(html);
-
-            var htmlBody = htmlDoc.DocumentNode.SelectSingleNode("//head");
-            var node = htmlBody.Element("title");
+            var pageTitle = await HttpUtil.GetPageTitleAsync(_httpClient, uri).ConfigureAwait(false);
 
             _dispatcherQueue.TryEnqueue(() =>
             {
-                NewLinkTitle = node.InnerText;
+                NewLinkTitle = pageTitle;
                 NewLinkTitleIsReadOnly = false;
             });
         }
@@ -115,14 +105,17 @@ public sealed partial class EditViewModel : ObservableObject
 
     public bool UrlExists()
     {
-        var existing = Links.FirstOrDefault(x => string.Equals(x.Url, NewLinkUrl, StringComparison.Ordinal));
+        var existing = Links.FirstOrDefault(x => 
+            string.Equals(x.Title.Trim(), NewLinkTitle.Trim(), StringComparison.OrdinalIgnoreCase)
+            || string.Equals(x.Url.Trim(), NewLinkUrl.Trim(), StringComparison.Ordinal));
+
         if (existing is null)
         {
             DuplicateLinkTitle = null;
             return false;
         }
 
-        DuplicateLinkTitle = $@"""{existing.Title}""";
+        DuplicateLinkTitle = $@"""{existing.Title.Trim()}""";
         return true;
     }
 
@@ -130,7 +123,7 @@ public sealed partial class EditViewModel : ObservableObject
     {
         var newLink = new EditLinkViewModel(
             NewLinkTitle.Trim(),
-            UriHelper.Create(NewLinkUrl.Trim())!,
+            UriHelper.CreateOrDefault(NewLinkUrl.Trim())!,
             changed: true,
             _fieldForegroundBrush,
             _fieldChangedForegroundBrush);
@@ -161,5 +154,29 @@ public sealed partial class EditViewModel : ObservableObject
         await _storageService.SaveWidgetAsync(_widget);
     }
 
-    private void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = Links.All(x => x.IsValid()) });
+    private void ValidateAndEmit()
+    {
+        var valid = Links.All(x => x.IsValid());
+        if (valid)
+        {
+            foreach (var link in Links)
+            {
+                var sameTitle = Links.Count(x => string.Equals(x.Title.Trim(), link.Title.Trim(), StringComparison.OrdinalIgnoreCase));
+                if (sameTitle > 1)
+                {
+                    valid = false;
+                    break;
+                }
+
+                var sameUrl = Links.Count(x => string.Equals(x.Url.Trim(), link.Url.Trim(), StringComparison.Ordinal));
+                if (sameUrl > 1)
+                {
+                    valid = false;
+                    break;
+                }
+            }
+        }
+
+        Validated?.Invoke(this, new ValidationEventArgs { Valid = valid });
+    }
 }

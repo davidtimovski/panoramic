@@ -99,7 +99,7 @@ public sealed partial class TaskViewModel : ObservableObject
         {
             if (DueDate.Value.Date == now.Date.AddDays(-1))
             {
-                DueDateLabel = "Yesterday";              
+                DueDateLabel = "Yesterday";
             }
             else
             {

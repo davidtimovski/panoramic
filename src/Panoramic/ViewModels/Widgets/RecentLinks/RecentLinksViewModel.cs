@@ -101,5 +101,5 @@ public sealed partial class RecentLinksViewModel : WidgetViewModel
     }
 
     private RecentLinkViewModel MapToViewModel(RecentLink recentLink)
-        => new(_eventHub, recentLink.Title, recentLink.Uri, recentLink.Context, recentLink.Clicked);
+        => new(_eventHub, recentLink.Title, recentLink.Uri, recentLink.Context);
 }

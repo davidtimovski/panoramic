@@ -39,7 +39,7 @@ public class LinkCollectionDataTests
         Sut.ToMarkdown(builder);
         string asMarkdown = builder.ToString();
 
-        LinkCollectionData asObject = LinkCollectionData.FromMarkdown(asMarkdown);
+        LinkCollectionData asObject = LinkCollectionData.FromMarkdown(string.Empty, asMarkdown);
         var actualData = JsonSerializer.Serialize(asObject);
 
         Assert.Equal(expectedData, actualData);

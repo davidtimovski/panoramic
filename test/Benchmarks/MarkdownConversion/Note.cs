@@ -20,11 +20,11 @@ public class Note
         var mdFilePath = Path.Combine(Directory.GetCurrentDirectory(), Global.SamplesFolderName, SampleFileName);
         markdown = File.ReadAllText(mdFilePath);
 
-        model = NoteData.FromMarkdown(markdown!);
+        model = NoteData.FromMarkdown(SampleFileName, markdown!);
     }
 
     [Benchmark]
-    public NoteData FromMarkdown() => NoteData.FromMarkdown(markdown!);
+    public NoteData FromMarkdown() => NoteData.FromMarkdown(SampleFileName, markdown!);
 
     [Benchmark]
     public void ToMarkdown()

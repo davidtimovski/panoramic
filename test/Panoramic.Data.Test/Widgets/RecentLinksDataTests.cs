@@ -43,7 +43,7 @@ public class RecentLinksDataTests
         Sut.ToMarkdown(builder);
         string asMarkdown = builder.ToString();
 
-        RecentLinksData asObject = RecentLinksData.FromMarkdown(asMarkdown);
+        RecentLinksData asObject = RecentLinksData.FromMarkdown(string.Empty, asMarkdown);
         var actualData = JsonSerializer.Serialize(asObject);
 
         Assert.Equal(expectedData, actualData);

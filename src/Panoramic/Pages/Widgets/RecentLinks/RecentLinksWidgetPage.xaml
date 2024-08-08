@@ -57,8 +57,8 @@
                         <HyperlinkButton Grid.Column="0"
                                          Content="{x:Bind Title}"
                                          NavigateUri="{x:Bind Uri}"
-                                         ToolTipService.ToolTip="{x:Bind Tooltip}"
                                          Click="{x:Bind Click}"
+                                         ToolTipService.ToolTip="{x:Bind Tooltip}"
                                          HorizontalAlignment="Stretch"
                                          HorizontalContentAlignment="Left" />
 

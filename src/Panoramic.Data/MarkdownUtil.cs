@@ -5,43 +5,43 @@ namespace Panoramic.Data;
 internal static class MarkdownUtil
 {
     /// <summary>
-    /// Creates a markdown table with two columns (with headers Key and Value) which are of equal width.
+    /// Creates a markdown table with two columns which are of equal width.
     /// </summary>
-    internal static void CreateKeyValueTable(StringBuilder builder, IReadOnlyDictionary<string, string> data)
+    internal static void CreateTwoColumnTable(StringBuilder builder, Tuple<string, string> headers, IReadOnlyList<Tuple<string, string>> data)
     {
         if (data.Count == 0)
         {
-            builder.AppendLine("| Key | Value |");
-            builder.AppendLine("| --- | ----- |");
+            builder.AppendLine($"| {headers.Item1} | {headers.Item2} |");
+            builder.AppendLine($"| {new string('-', headers.Item1.Length)} | {new string('-', headers.Item2.Length)} |");
             return;
         }
 
-        var longestKeyLength = data.Keys.Max(x => x.Length);
-        if (longestKeyLength < 3)
+        var col1LongestLength = data.Max(x => x.Item1.Length);
+        if (col1LongestLength < headers.Item1.Length)
         {
-            longestKeyLength = 3;
+            col1LongestLength = headers.Item1.Length;
         }
 
-        var longestValueLength = data.Values.Max(x => x.Length);
-        if (longestValueLength < 5)
+        var col2LongestLength = data.Max(x => x.Item2.Length);
+        if (col2LongestLength < headers.Item2.Length)
         {
-            longestValueLength = 5;
+            col2LongestLength = headers.Item2.Length;
         }
 
-        var keyHeaderContent = $"Key{new string(' ', longestKeyLength - 3)}";
-        var valueHeaderContent = $"Value{new string(' ', longestValueLength - 5)}";
-        var firstColumnBorderLine = new string('-', longestKeyLength);
-        var secondColumnBorderLine = new string('-', longestValueLength);
+        var col1HeaderContent = headers.Item1 + new string(' ', col1LongestLength - headers.Item1.Length);
+        var col2HeaderContent = headers.Item2 + new string(' ', col2LongestLength - headers.Item2.Length);
+        var col1BorderLine = new string('-', col1LongestLength);
+        var col2BorderLine = new string('-', col2LongestLength);
 
-        builder.AppendLine($"| {keyHeaderContent} | {valueHeaderContent} |");
-        builder.AppendLine($"| {firstColumnBorderLine} | {secondColumnBorderLine} |");
+        builder.AppendLine($"| {col1HeaderContent} | {col2HeaderContent} |");
+        builder.AppendLine($"| {col1BorderLine} | {col2BorderLine} |");
 
         foreach (var field in data)
         {
-            var keyContent = field.Key + new string(' ', longestKeyLength - field.Key.Length);
-            var valueContent = field.Value + new string(' ', longestValueLength - field.Value.Length);
+            var col1Content = field.Item1 + new string(' ', col1LongestLength - field.Item1.Length);
+            var col2Content = field.Item2 + new string(' ', col2LongestLength - field.Item2.Length);
 
-            builder.AppendLine($"| {keyContent} | {valueContent} |");
+            builder.AppendLine($"| {col1Content} | {col2Content} |");
         }
     }
 

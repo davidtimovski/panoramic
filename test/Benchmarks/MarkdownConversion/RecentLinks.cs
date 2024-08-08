@@ -20,11 +20,11 @@ public class RecentLinks
         var mdFilePath = Path.Combine(Directory.GetCurrentDirectory(), Global.SamplesFolderName, SampleFileName);
         markdown = File.ReadAllText(mdFilePath);
 
-        model = RecentLinksData.FromMarkdown(markdown!);
+        model = RecentLinksData.FromMarkdown(SampleFileName, markdown!);
     }
 
     [Benchmark]
-    public RecentLinksData FromMarkdown() => RecentLinksData.FromMarkdown(markdown!);
+    public RecentLinksData FromMarkdown() => RecentLinksData.FromMarkdown(SampleFileName, markdown!);
 
     [Benchmark]
     public void ToMarkdown()

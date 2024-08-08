@@ -7,6 +7,7 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
 using Panoramic.Services;
+using Panoramic.Services.Drawers;
 using Panoramic.Services.Markdown;
 using Panoramic.Services.Notes;
 using Panoramic.Services.Preferences;
@@ -41,6 +42,7 @@ public sealed partial class App : Application
         services.AddSingleton<IMarkdownService, MarkdownService>();
         services.AddSingleton<ISearchService, SearchService>();
         services.AddSingleton<INotesOrchestrator, NotesOrchestrator>();
+        services.AddSingleton<IDrawerService, DrawerService>();
         services.AddSingleton(new HttpClient());
         services.AddSingleton(DispatcherQueue.GetForCurrentThread());
 

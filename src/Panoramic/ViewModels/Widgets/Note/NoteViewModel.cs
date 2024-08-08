@@ -71,27 +71,25 @@ public sealed partial class NoteViewModel : WidgetViewModel
                 return;
             }
 
-            if (!SetProperty(ref selectedNote, value))
+            if (SetProperty(ref selectedNote, value))
             {
-                return;
+                var previousPath = _widget.NotePath;
+
+                if (value is not null && value.Text is null)
+                {
+                    value.Text = File.ReadAllText(value.Path.Absolute);
+                }
+
+                if (_initialized)
+                {
+                    _widget.NotePath = value?.Path;
+
+                    _notesOrchestrator.ChangeNoteSelection(_widget.Id, previousPath, value?.Path);
+                    _storageService.EnqueueWidgetWrite(_widget.Id, "Note selection changed");
+                }
+
+                OnPropertyChanged();
             }
-
-            var previousPath = _widget.NotePath;
-
-            if (value is not null && value.Text is null)
-            {
-                value.Text = File.ReadAllText(value.Path.Absolute);
-            }
-
-            if (_initialized)
-            {
-                _widget.NotePath = value?.Path;
-
-                _notesOrchestrator.ChangeNoteSelection(_widget.Id, previousPath, value?.Path);
-                _storageService.EnqueueWidgetWrite(_widget.Id, "Note selection changed");
-            }
-
-            OnPropertyChanged();
 
             Title = value is null ? "Notes" : value.Name;
             ExplorerVisible = value is null;

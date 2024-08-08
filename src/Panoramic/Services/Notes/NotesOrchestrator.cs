@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
-using Panoramic.Data.Exceptions;
 using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Services.Notes.Models;
@@ -271,17 +270,10 @@ public sealed class NotesOrchestrator : INotesOrchestrator
 
     private async Task<IWidget> ReadNoteWidgetAsync(string widgetFilePath)
     {
+        var relativeFilePath = Path.GetRelativePath(_storageService.StoragePath, widgetFilePath);
         var markdown = await File.ReadAllTextAsync(widgetFilePath);
 
-        try
-        {
-            return NoteWidget.Load(_storageService, this, markdown);
-        }
-        catch (MarkdownParsingException ex)
-        {
-            ex.FileName = Path.GetFileName(widgetFilePath);
-            throw;
-        }
+        return NoteWidget.Load(_storageService, this, relativeFilePath, markdown);
     }
 
     private void LoadFileSystemItems() => LoadFileSystemItemsRecursive(_storageService.StoragePath, _storageService.StoragePath);

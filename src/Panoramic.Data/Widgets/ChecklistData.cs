@@ -15,7 +15,7 @@ public sealed partial class ChecklistData : IWidgetData
     public bool Searchable { get; init; } = true;
     public required List<ChecklistTaskData> Tasks { get; init; }
 
-    public static ChecklistData FromMarkdown(string markdown)
+    public static ChecklistData FromMarkdown(string relativeFilePath, string markdown)
     {
         var lineIndex = 0;
         var lines = markdown.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
@@ -89,7 +89,7 @@ public sealed partial class ChecklistData : IWidgetData
         }
         catch
         {
-            throw new MarkdownParsingException(lines, lineIndex);
+            throw new MarkdownParsingException(relativeFilePath, lines, lineIndex);
         }
     }
 
@@ -107,15 +107,16 @@ public sealed partial class ChecklistData : IWidgetData
         builder.AppendLine($"## Metadata");
         builder.AppendLine();
 
-        var metadata = new Dictionary<string, string>
+        var headers = new Tuple<string, string>("Key", "Value");
+        var metadata = new List<Tuple<string, string>>
         {
-            { nameof(Id), Id.ToString("N") },
-            { nameof(Area), Area.ToString() },
-            { nameof(HeaderHighlight), HeaderHighlight.ToString() },
-            { nameof(Searchable), Searchable.ToString() }
+            new(nameof(Id), Id.ToString("N")),
+            new(nameof(Area), Area.ToString()),
+            new(nameof(HeaderHighlight), HeaderHighlight.ToString()),
+            new(nameof(Searchable), Searchable.ToString())
         };
 
-        MarkdownUtil.CreateKeyValueTable(builder, metadata);
+        MarkdownUtil.CreateTwoColumnTable(builder, headers, metadata);
 
         builder.AppendLine();
         builder.Append($"> Version: {Version}");

@@ -77,9 +77,9 @@ public sealed class LinkCollectionWidget : IWidget
             Links = links.Select(x => new LinkCollectionItemData { Title = x.Title, Uri = x.Uri, Order = x.Order }).ToList()
         };
 
-    public static LinkCollectionWidget Load(IStorageService storageService, string markdown)
+    public static LinkCollectionWidget Load(IStorageService storageService, string relativeFilePath, string markdown)
     {
-        var data = LinkCollectionData.FromMarkdown(markdown);
+        var data = LinkCollectionData.FromMarkdown(relativeFilePath, markdown);
         return new(storageService, data);
     }
 

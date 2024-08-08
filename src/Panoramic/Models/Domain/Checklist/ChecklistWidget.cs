@@ -70,7 +70,7 @@ public sealed class ChecklistWidget : IWidget
     public event EventHandler<TaskCompletedEventArgs>? TaskCompleted;
 
     public bool TaskCanBeCreated(string title)
-        => !tasks.Any(x => x.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
+        => !tasks.Any(x => x.Title.Trim().Equals(title, StringComparison.OrdinalIgnoreCase));
 
     public void AddTask(string title, DateOnly? dueDate, Uri? uri)
     {
@@ -99,9 +99,9 @@ public sealed class ChecklistWidget : IWidget
             Tasks = tasks.Select(x => new ChecklistTaskData { Title = x.Title, DueDate = x.DueDate, Uri = x.Uri, Created = x.Created }).ToList()
         };
 
-    public static ChecklistWidget Load(IStorageService storageService, string markdown)
+    public static ChecklistWidget Load(IStorageService storageService, string relativeFilePath, string markdown)
     {
-        var data = ChecklistData.FromMarkdown(markdown);
+        var data = ChecklistData.FromMarkdown(relativeFilePath, markdown);
         return new(storageService, data);
     }
 

@@ -20,11 +20,11 @@ public class LinkCollection
         var mdFilePath = Path.Combine(Directory.GetCurrentDirectory(), Global.SamplesFolderName, SampleFileName);
         markdown = File.ReadAllText(mdFilePath);
 
-        model = LinkCollectionData.FromMarkdown(markdown!);
+        model = LinkCollectionData.FromMarkdown(SampleFileName, markdown!);
     }
 
     [Benchmark]
-    public LinkCollectionData FromMarkdown() => LinkCollectionData.FromMarkdown(markdown!);
+    public LinkCollectionData FromMarkdown() => LinkCollectionData.FromMarkdown(SampleFileName, markdown!);
 
     [Benchmark]
     public void ToMarkdown()

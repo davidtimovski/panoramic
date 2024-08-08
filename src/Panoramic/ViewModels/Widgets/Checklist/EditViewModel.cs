@@ -58,7 +58,7 @@ public sealed partial class EditViewModel : ObservableObject
 
     public ObservableCollection<EditTaskViewModel> Tasks { get; } = [];
 
-    public bool TaskExists() => Tasks.Any(x => string.Equals(x.Title, NewTaskTitle, StringComparison.Ordinal));
+    public bool TaskExists() => Tasks.Any(x => string.Equals(x.Title.Trim(), NewTaskTitle.Trim(), StringComparison.OrdinalIgnoreCase));
 
     public void Add()
     {
@@ -100,5 +100,22 @@ public sealed partial class EditViewModel : ObservableObject
         await _storageService.SaveWidgetAsync(_widget);
     }
 
-    private void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = Tasks.All(x => x.IsValid()) });
+    private void ValidateAndEmit()
+    {
+        var valid = Tasks.All(x => x.IsValid());
+        if (valid)
+        {
+            foreach (var task in Tasks)
+            {
+                var sameTitle = Tasks.Count(x => string.Equals(x.Title.Trim(), task.Title.Trim(), StringComparison.OrdinalIgnoreCase));
+                if (sameTitle > 1)
+                {
+                    valid = false;
+                    break;
+                }
+            }
+        }
+
+        Validated?.Invoke(this, new ValidationEventArgs { Valid = valid });
+    }
 }

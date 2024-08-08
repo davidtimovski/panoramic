@@ -6,6 +6,9 @@ using Panoramic.Services.Storage.Models;
 
 namespace Panoramic.Services.Storage;
 
+/// <summary>
+/// Handles general storage and widgets.
+/// </summary>
 public interface IStorageService
 {
     event EventHandler<WidgetUpdatedEventArgs>? WidgetUpdated;
