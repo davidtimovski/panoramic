@@ -6,12 +6,18 @@ using Panoramic.Models.Events;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 
-public sealed partial class FolderRenameViewModel(string absolutePath) : ObservableObject
+public sealed partial class FolderRenameViewModel : ObservableObject
 {
-    private readonly string _directory = Path.GetDirectoryName(absolutePath)!;
+    private readonly string _directory;
+
+    public FolderRenameViewModel(string absolutePath)
+    {
+        _directory = Path.GetDirectoryName(absolutePath)!;
+        name = Path.GetFileName(absolutePath);
+    }
 
     [ObservableProperty]
-    private string name = Path.GetFileName(absolutePath);
+    private string name;
     partial void OnNameChanged(string value) => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
 
     public event EventHandler<ValidationEventArgs>? Validated;
