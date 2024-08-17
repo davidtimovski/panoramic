@@ -3,12 +3,37 @@
     x:Class="Panoramic.Pages.LinkDrawers.SearchDrawersDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:vm="using:Panoramic.ViewModels.LinkDrawers">
+    xmlns:vm="using:Panoramic.ViewModels.LinkDrawers"
+    KeyboardAcceleratorPlacementMode="Hidden">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="LinkBorderBrush" Color="{ThemeResource ButtonBorderBrush}" />
+                    <SolidColorBrush x:Key="SelectedLinkBorderBrush" Color="{ThemeResource SystemAccentColorDark1}" />
+                </ResourceDictionary>
+
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="LinkBorderBrush" Color="{ThemeResource ButtonBorderBrush}" />
+                    <SolidColorBrush x:Key="SelectedLinkBorderBrush" Color="{ThemeResource SystemAccentColorLight2}" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Page.KeyboardAccelerators>
+        <KeyboardAccelerator Invoked="DownHotkey_Invoked" Key="Down" />
+        <KeyboardAccelerator Invoked="UpHotkey_Invoked" Key="Up" />
+        <KeyboardAccelerator Invoked="EnterHotkey_Invoked" Key="Enter" />
+    </Page.KeyboardAccelerators>
 
     <Grid Width="450" RowSpacing="15">
         <Grid.Resources>
             <DataTemplate x:Key="LinkViewTemplate" x:DataType="vm:SearchedLinkViewModel">
                 <Button Click="{x:Bind Click}"
+                        BorderBrush="{x:Bind BorderBrush, Mode=OneWay}"
+                        IsTabStop="False"
                         Margin="0 5"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Stretch">
@@ -45,12 +70,12 @@
         </Grid.RowDefinitions>
 
         <TextBox Grid.Row="0"
+                 Name="SearchTextBox"
                  Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  PlaceholderText="Search"
                  KeyboardAcceleratorPlacementMode="Hidden" />
 
         <ListView Grid.Row="1"
-                  Name="LinksListView"
                   ItemsSource="{x:Bind ViewModel.Links}"
                   ItemTemplate="{StaticResource LinkViewTemplate}"
                   SelectionMode="None">
