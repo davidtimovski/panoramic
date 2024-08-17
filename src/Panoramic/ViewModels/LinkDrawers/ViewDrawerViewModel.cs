@@ -43,7 +43,7 @@ public sealed partial class ViewDrawerViewModel : ObservableObject
         var trimmed = searchText.Trim();
         if (trimmed.Length > 0)
         {
-            source = source.Select(x => x.Matches(trimmed))
+            source = source.Select(x => x.Matches(trimmed, Name))
                 .Where(x => x.Weight > 0)
                 .OrderByDescending(x => x.Weight)
                 .Select(x => x.Result);

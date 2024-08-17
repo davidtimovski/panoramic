@@ -19,7 +19,8 @@
                  x:Name="TitleTextBox"
                  Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  PlaceholderText="Title"
-                 MaxLength="60">
+                 MaxLength="60"
+                 KeyboardAcceleratorPlacementMode="Hidden">
             <TextBox.KeyboardAccelerators>
                 <KeyboardAccelerator Key="Enter" Invoked="TextBoxEnter_Pressed" />
             </TextBox.KeyboardAccelerators>

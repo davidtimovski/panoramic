@@ -46,6 +46,7 @@ All of the links that you don't need to always see on your screen, reachable usi
 | Hotkey | Command |
 |-|-|
 | Ctrl+S | Filters the list of links in Link Collection and Recent Links widgets and tasks in the Checklist widgets |
+| Ctrl+D | Opens a dialog to search for links from the link drawers |
 
 ### Note widget
 

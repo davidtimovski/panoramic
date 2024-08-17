@@ -5,12 +5,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:uc="using:Panoramic.UserControls">
 
-    <Grid Background="{StaticResource PanoramicMainWindowBackgroundBrush}" x:Name="RootElement">
+    <Grid Background="{StaticResource PanoramicMainWindowBackgroundBrush}" x:Name="RootElement" KeyboardAcceleratorPlacementMode="Hidden">
         <Grid.KeyboardAccelerators>
-            <KeyboardAccelerator Invoked="ControlSHotkey_Invoked" Key="S" Modifiers="Control" ToolTipService.ToolTip="" />
-            <KeyboardAccelerator Invoked="EscapeHotkey_Invoked" Key="Escape" ToolTipService.ToolTip="" />
-            <KeyboardAccelerator Invoked="ControlNHotkey_Invoked" Key="N" Modifiers="Control" ToolTipService.ToolTip="" />
-            <KeyboardAccelerator Invoked="ControlTHotkey_Invoked" Key="T" Modifiers="Control" ToolTipService.ToolTip="" />
+            <KeyboardAccelerator Invoked="ControlSHotkey_Invoked" Key="S" Modifiers="Control" />
+            <KeyboardAccelerator Invoked="EscapeHotkey_Invoked" Key="Escape" />
+            <KeyboardAccelerator Invoked="ControlDHotkey_Invoked" Key="D" Modifiers="Control" />
+            <KeyboardAccelerator Invoked="ControlNHotkey_Invoked" Key="N" Modifiers="Control" />
+            <KeyboardAccelerator Invoked="ControlTHotkey_Invoked" Key="T" Modifiers="Control" />
         </Grid.KeyboardAccelerators>
 
         <Grid.RowDefinitions>

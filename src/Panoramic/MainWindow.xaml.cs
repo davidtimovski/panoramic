@@ -218,7 +218,7 @@ public sealed partial class MainWindow : Window
             CloseButtonText = "Close"
         };
 
-        content.ViewModel.LinkClicked += (_, e) => { dialog.Hide(); };
+        content.ViewModel.LinkClicked += (_, e) => dialog.Hide();
 
         await dialog.ShowAsync();
     }
@@ -346,6 +346,27 @@ public sealed partial class MainWindow : Window
         }
 
         SearchBox.Text = string.Empty;
+
+        args.Handled = true;
+    }
+
+    private void ControlDHotkey_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        var content = new SearchDrawersDialog(_drawerService, _eventHub);
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            Title = "Search link drawers",
+            Content = content,
+            CloseButtonText = "Close"
+        };
+
+        content.ViewModel.NavigatedToLink += (_, e) => dialog.Hide();
+
+        _dispatcherQueue.TryEnqueue(async () =>
+        {
+            await dialog.ShowAsync();
+        });
 
         args.Handled = true;
     }
