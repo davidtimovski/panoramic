@@ -99,6 +99,8 @@ public sealed class DrawerService : IDrawerService
         LinkDrawersLoaded?.Invoke(this, new LinkDrawersLoadedEventArgs { Drawers = _drawers.Values });
     }
 
+    public bool HasDrawers() => _drawers.Count > 0;
+
     /// <inheritdoc/>
     public List<WeighedSearchResult<LinkDrawerLinkData>> SearchDrawers(string searchText)
     {

@@ -31,6 +31,8 @@ public interface IDrawerService
 
     void DeleteLinkDrawer(string name);
 
+    bool HasDrawers();
+
     /// <summary>
     /// Searches through the drawers and returns the links ordered by weight and link title.
     /// </summary>

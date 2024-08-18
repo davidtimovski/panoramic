@@ -70,13 +70,12 @@
         </Grid.RowDefinitions>
 
         <TextBox Grid.Row="0"
-                 Name="SearchTextBox"
                  Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  PlaceholderText="Search"
                  KeyboardAcceleratorPlacementMode="Hidden" />
 
         <ListView Grid.Row="1"
-                  Name="LinksListView"
+                  x:Name="LinksListView"
                   ItemsSource="{x:Bind ViewModel.Links}"
                   ItemTemplate="{StaticResource LinkViewTemplate}"
                   SelectionMode="None">

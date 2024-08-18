@@ -46,7 +46,7 @@
                         </StackPanel>
                     </Button>
 
-                    <TextBox Grid.Column="1" Name="SearchBox" Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBox Grid.Column="1" x:Name="SearchBox" Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                     <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Click="AddWidgetButton_Click" Margin="0 0 10 0">
