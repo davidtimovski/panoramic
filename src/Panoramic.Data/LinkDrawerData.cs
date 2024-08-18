@@ -83,7 +83,7 @@ public sealed class LinkDrawerLinkData
     /// <summary>
     /// Used for link search functionality.
     /// </summary>
-    public WeighedSearchResult<LinkDrawerLinkData> Matches(string searchText)
+    public WeighedSearchResult<LinkDrawerLinkData> Matches(string searchText, string drawerName)
     {
         var weight = 0;
 
@@ -102,7 +102,8 @@ public sealed class LinkDrawerLinkData
         return new WeighedSearchResult<LinkDrawerLinkData>
         {
             Weight = weight,
-            Result = this
+            Result = this,
+            DrawerName = drawerName
         };
     }
 }
@@ -111,4 +112,5 @@ public sealed class WeighedSearchResult<T>
 {
     public required int Weight { get; init; }
     public required T Result { get; init; }
+    public required string DrawerName { get; init; }
 }

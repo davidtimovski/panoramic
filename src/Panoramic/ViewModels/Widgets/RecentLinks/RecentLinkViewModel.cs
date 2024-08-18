@@ -14,7 +14,7 @@ public sealed class RecentLinkViewModel
         Title = title;
         Uri = uri;
         Context = context;
-        Tooltip = uri.Host;
+        Tooltip = uri.ToString();
     }
 
     public string Title { get; }

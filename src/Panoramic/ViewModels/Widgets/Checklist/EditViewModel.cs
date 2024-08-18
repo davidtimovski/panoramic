@@ -107,7 +107,8 @@ public sealed partial class EditViewModel : ObservableObject
         {
             foreach (var task in Tasks)
             {
-                var sameTitle = Tasks.Count(x => string.Equals(x.Title.Trim(), task.Title.Trim(), StringComparison.OrdinalIgnoreCase));
+                var trimmedTaskTitle = task.Title.Trim();
+                var sameTitle = Tasks.Count(x => string.Equals(x.Title.Trim(), trimmedTaskTitle, StringComparison.OrdinalIgnoreCase));
                 if (sameTitle > 1)
                 {
                     valid = false;

@@ -111,11 +111,15 @@ public sealed partial class EditDrawerViewModel : ObservableObject
         var text = await package.GetTextAsync();
         if (Uri.TryCreate(text, UriKind.Absolute, out var uri))
         {
-            var pageTitle = await HttpUtil.GetPageTitleAsync(_httpClient, uri).ConfigureAwait(false);
+            var pageTitle = await HttpUtil.TryGetPageTitleAsync(_httpClient, uri).ConfigureAwait(false);
 
             _dispatcherQueue.TryEnqueue(() =>
             {
-                NewLinkTitle = pageTitle;
+                if (pageTitle is not null)
+                {
+                    NewLinkTitle = pageTitle;
+                }
+                
                 NewLinkTitleIsReadOnly = false;
             });
         }

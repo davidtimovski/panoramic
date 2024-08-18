@@ -89,11 +89,15 @@ public sealed partial class EditViewModel : ObservableObject
         var text = await package.GetTextAsync();
         if (Uri.TryCreate(text, UriKind.Absolute, out var uri))
         {
-            var pageTitle = await HttpUtil.GetPageTitleAsync(_httpClient, uri).ConfigureAwait(false);
+            var pageTitle = await HttpUtil.TryGetPageTitleAsync(_httpClient, uri).ConfigureAwait(false);
 
             _dispatcherQueue.TryEnqueue(() =>
             {
-                NewLinkTitle = pageTitle;
+                if (pageTitle is not null)
+                {
+                    NewLinkTitle = pageTitle;
+                }
+
                 NewLinkTitleIsReadOnly = false;
             });
         }
@@ -161,14 +165,16 @@ public sealed partial class EditViewModel : ObservableObject
         {
             foreach (var link in Links)
             {
-                var sameTitle = Links.Count(x => string.Equals(x.Title.Trim(), link.Title.Trim(), StringComparison.OrdinalIgnoreCase));
+                var trimmedLinkTitle = link.Title.Trim();
+                var sameTitle = Links.Count(x => string.Equals(x.Title.Trim(), trimmedLinkTitle, StringComparison.OrdinalIgnoreCase));
                 if (sameTitle > 1)
                 {
                     valid = false;
                     break;
                 }
 
-                var sameUrl = Links.Count(x => string.Equals(x.Url.Trim(), link.Url.Trim(), StringComparison.Ordinal));
+                var trimmedLinkUrl = link.Url.Trim();
+                var sameUrl = Links.Count(x => string.Equals(x.Url.Trim(), trimmedLinkUrl, StringComparison.Ordinal));
                 if (sameUrl > 1)
                 {
                     valid = false;

@@ -52,7 +52,7 @@ public sealed partial class TaskViewModel : ObservableObject
         Uri = uri;
         if (uri is not null)
         {
-            Tooltip = uri.Host;
+            Tooltip = uri.ToString();
         }
     }
 
