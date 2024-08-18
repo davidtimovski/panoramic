@@ -99,6 +99,25 @@ public sealed class DrawerService : IDrawerService
         LinkDrawersLoaded?.Invoke(this, new LinkDrawersLoadedEventArgs { Drawers = _drawers.Values });
     }
 
+    public bool HasDrawers() => _drawers.Count > 0;
+
+    /// <inheritdoc/>
+    public List<WeighedSearchResult<LinkDrawerLinkData>> SearchDrawers(string searchText)
+    {
+        var result = new List<WeighedSearchResult<LinkDrawerLinkData>>();
+
+        foreach (var drawer in _drawers.Values)
+        {
+            var matched = drawer.Links.Select(x => x.Matches(searchText, drawer.Name));
+            result.AddRange(matched);
+        }
+
+        return result.Where(x => x.Weight > 0)
+            .OrderByDescending(x => x.Weight)
+            .ThenBy(x => x.Result.Title)
+            .ToList();
+    }
+
     private async Task<LinkDrawerData> ReadLinkDrawerAsync(string fileName)
     {
         var relativeFilePath = Path.GetRelativePath(_storageService.StoragePath, fileName);

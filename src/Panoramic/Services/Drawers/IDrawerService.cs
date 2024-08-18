@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Panoramic.Data;
 using Panoramic.Services.Drawers.Models;
@@ -29,4 +30,11 @@ public interface IDrawerService
     Task SaveLinkDrawerAsync(LinkDrawerData data, string oldName);
 
     void DeleteLinkDrawer(string name);
+
+    bool HasDrawers();
+
+    /// <summary>
+    /// Searches through the drawers and returns the links ordered by weight and link title.
+    /// </summary>
+    List<WeighedSearchResult<LinkDrawerLinkData>> SearchDrawers(string searchText);
 }

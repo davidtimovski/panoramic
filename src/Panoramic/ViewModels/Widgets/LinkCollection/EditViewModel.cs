@@ -165,14 +165,16 @@ public sealed partial class EditViewModel : ObservableObject
         {
             foreach (var link in Links)
             {
-                var sameTitle = Links.Count(x => string.Equals(x.Title.Trim(), link.Title.Trim(), StringComparison.OrdinalIgnoreCase));
+                var trimmedLinkTitle = link.Title.Trim();
+                var sameTitle = Links.Count(x => string.Equals(x.Title.Trim(), trimmedLinkTitle, StringComparison.OrdinalIgnoreCase));
                 if (sameTitle > 1)
                 {
                     valid = false;
                     break;
                 }
 
-                var sameUrl = Links.Count(x => string.Equals(x.Url.Trim(), link.Url.Trim(), StringComparison.Ordinal));
+                var trimmedLinkUrl = link.Url.Trim();
+                var sameUrl = Links.Count(x => string.Equals(x.Url.Trim(), trimmedLinkUrl, StringComparison.Ordinal));
                 if (sameUrl > 1)
                 {
                     valid = false;

@@ -139,13 +139,21 @@ public sealed partial class MainWindow : Window
                 Icon = new FontIcon { Glyph = "\uE710" }
             };
             newMenuItem.Click += AddLinkDrawer_Click;
-
             LinkDrawersMenuFlyout.Items.Add(newMenuItem);
 
             if (e.Drawers.Count == 0)
             {
                 return;
             }
+
+            var searchMenuItem = new MenuFlyoutItem
+            {
+                Text = "Search",
+                Icon = new FontIcon { Glyph = "\uE721" },
+                KeyboardAcceleratorTextOverride = "Ctrl+D"
+            };
+            searchMenuItem.Click += SearchLinkDrawers_Click;
+            LinkDrawersMenuFlyout.Items.Add(searchMenuItem);
 
             LinkDrawersMenuFlyout.Items.Add(new MenuFlyoutSeparator());
 
@@ -204,6 +212,8 @@ public sealed partial class MainWindow : Window
         await dialog.ShowAsync();
     }
 
+    private void SearchLinkDrawers_Click(object _, RoutedEventArgs e) => OpenSearchLinkDrawersDialog();
+
     private async void OpenDrawer_Click(object _, RoutedEventArgs e)
     {
         var menuItem = (MenuFlyoutItem)e.OriginalSource;
@@ -218,7 +228,7 @@ public sealed partial class MainWindow : Window
             CloseButtonText = "Close"
         };
 
-        content.ViewModel.LinkClicked += (_, e) => { dialog.Hide(); };
+        content.ViewModel.LinkClicked += (_, e) => dialog.Hide();
 
         await dialog.ShowAsync();
     }
@@ -350,6 +360,13 @@ public sealed partial class MainWindow : Window
         args.Handled = true;
     }
 
+    private void ControlDHotkey_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        OpenSearchLinkDrawersDialog();
+
+        args.Handled = true;
+    }
+
     private async void ControlNHotkey_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
     {
         var noteWidgets = _storageService.Widgets.Where(x => x.Value.Type == WidgetType.Note).ToList();
@@ -400,5 +417,29 @@ public sealed partial class MainWindow : Window
         checklistWidgetPage?.OpenNewTaskDialog();
 
         args.Handled = true;
+    }
+
+    private void OpenSearchLinkDrawersDialog()
+    {
+        if (!_drawerService.HasDrawers())
+        {
+            return;
+        }
+
+        var content = new SearchDrawersDialog(_drawerService, _eventHub);
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            Title = "Search link drawers",
+            Content = content,
+            CloseButtonText = "Close"
+        };
+
+        content.ViewModel.NavigatedToLink += (_, e) => dialog.Hide();
+
+        _dispatcherQueue.TryEnqueue(async () =>
+        {
+            await dialog.ShowAsync();
+        });
     }
 }
