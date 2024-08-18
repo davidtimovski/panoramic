@@ -35,7 +35,7 @@ A collection of tasks (to-dos).
 
 ## Link drawers
 
-All of the links that you don't need to always see on your screen, reachable using the top-left "Link drawers" menu. *Soon to be easily searchable using a hotkey.*
+All of the links that you don't need to always see on your screen, reachable using the top-left "Link drawers" menu or the `Ctrl+D` hotkey.
 
 ---
 
