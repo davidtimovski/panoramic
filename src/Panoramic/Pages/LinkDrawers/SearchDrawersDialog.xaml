@@ -76,6 +76,7 @@
                  KeyboardAcceleratorPlacementMode="Hidden" />
 
         <ListView Grid.Row="1"
+                  Name="LinksListView"
                   ItemsSource="{x:Bind ViewModel.Links}"
                   ItemTemplate="{StaticResource LinkViewTemplate}"
                   SelectionMode="None">

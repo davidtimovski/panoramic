@@ -17,7 +17,6 @@ public sealed partial class SearchDrawersViewModel : ObservableObject
     private readonly IEventHub _eventHub;
     private readonly SolidColorBrush _linkBackgroundBrush;
     private readonly SolidColorBrush _selectedLinkBorderBrush;
-    private int selectedIndex;
 
     public SearchDrawersViewModel(IDrawerService drawerService, IEventHub eventHub, Page page)
     {
@@ -38,37 +37,39 @@ public sealed partial class SearchDrawersViewModel : ObservableObject
 
     public ObservableCollection<SearchedLinkViewModel> Links { get; } = [];
 
+    public int SelectedIndex { get; private set; }
+
     public void SelectNextLink()
     {
-        if (selectedIndex == Links.Count - 1)
+        if (SelectedIndex == Links.Count - 1)
         {
             return;
         }
 
-        var currentlySelectedLink = Links[selectedIndex];
+        var currentlySelectedLink = Links[SelectedIndex];
         currentlySelectedLink.Selected = false;
 
-        selectedIndex++;
+        SelectedIndex++;
 
-        Links[selectedIndex].Selected = true;
+        Links[SelectedIndex].Selected = true;
     }
 
     public void SelectPreviousLink()
     {
-        if (selectedIndex == 0)
+        if (SelectedIndex == 0)
         {
             return;
         }
 
-        var currentlySelectedLink = Links[selectedIndex];
+        var currentlySelectedLink = Links[SelectedIndex];
         currentlySelectedLink.Selected = false;
 
-        selectedIndex--;
+        SelectedIndex--;
 
-        Links[selectedIndex].Selected = true;
+        Links[SelectedIndex].Selected = true;
     }
 
-    public void NavigateToCurrentLink() => Links[selectedIndex].Click();
+    public void NavigateToCurrentLink() => Links[SelectedIndex].Click();
 
     private void SetLinks(string searchText)
     {
@@ -94,7 +95,7 @@ public sealed partial class SearchDrawersViewModel : ObservableObject
             Links.Add(linkVm);
         }
 
-        selectedIndex = 0;
+        SelectedIndex = 0;
     }
 
     private SearchedLinkViewModel MapToLinkViewModel(LinkDrawerLinkData link, string drawerName, bool selected)

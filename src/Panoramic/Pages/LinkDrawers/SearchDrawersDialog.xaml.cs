@@ -1,3 +1,4 @@
+using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Panoramic.Services;
@@ -17,15 +18,19 @@ public sealed partial class SearchDrawersDialog : Page
 
     public SearchDrawersViewModel ViewModel { get; }
 
-    private void DownHotkey_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
+    private async void DownHotkey_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
     {
         ViewModel.SelectNextLink();
+        await LinksListView.SmoothScrollIntoViewWithIndexAsync(ViewModel.SelectedIndex, scrollIfVisible: false);
+
         args.Handled = true;
     }
 
-    private void UpHotkey_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
+    private async void UpHotkey_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
     {
         ViewModel.SelectPreviousLink();
+        await LinksListView.SmoothScrollIntoViewWithIndexAsync(ViewModel.SelectedIndex, scrollIfVisible: false);
+
         args.Handled = true;
     }
 
