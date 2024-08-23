@@ -18,66 +18,73 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
 
     public IReadOnlyList<Paragraph> TextToMarkdownParagraphs(string text, string noteName, double fontSize)
     {
-        var lines = text.Split('\r').Where(x => x.Trim().Length > 0).ToList();
-        var result = new List<Paragraph>(lines.Count);
-
-        for (var i = 0; i < lines.Count; i++)
+        try
         {
-            var line = lines[i];
+            var lines = text.Split('\r').Where(x => x.Trim().Length > 0).ToList();
+            var result = new List<Paragraph>(lines.Count);
 
-            if (IsHeader1(line))
+            for (var i = 0; i < lines.Count; i++)
             {
-                result.Add(ToHeader1(line, noteName, fontSize));
-            }
-            else if (IsHeader2(line))
-            {
-                result.Add(ToHeader2(line, noteName, fontSize));
-            }
-            else if (IsHeader3(line))
-            {
-                result.Add(ToHeader3(line, noteName, fontSize));
-            }
-            else if (IsHeader4(line))
-            {
-                result.Add(ToHeader4(line, noteName, fontSize));
-            }
-            else if (IsHeader5(line))
-            {
-                result.Add(ToHeader5(line, noteName, fontSize));
-            }
-            else if (IsHeader6(line))
-            {
-                result.Add(ToHeader6(line, noteName, fontSize));
-            }
-            else if (IsBulletPoint(line))
-            {
-                var lastBulletPoint = true;
-                if (i < lines.Count - 1)
+                var line = lines[i];
+
+                if (IsHeader1(line))
                 {
-                    var nextLine = lines[i + 1];
-                    lastBulletPoint = !(IsBulletPoint(nextLine) || IsNestedBulletPoint(nextLine));
+                    result.Add(ToHeader1(line, noteName, fontSize));
                 }
-
-                result.Add(ToBulletPoint(line, lastBulletPoint, noteName, fontSize));
-            }
-            else if (IsNestedBulletPoint(line))
-            {
-                var lastBulletPoint = true;
-                if (i < lines.Count - 1)
+                else if (IsHeader2(line))
                 {
-                    var nextLine = lines[i + 1];
-                    lastBulletPoint = !(IsBulletPoint(nextLine) || IsNestedBulletPoint(nextLine));
+                    result.Add(ToHeader2(line, noteName, fontSize));
                 }
+                else if (IsHeader3(line))
+                {
+                    result.Add(ToHeader3(line, noteName, fontSize));
+                }
+                else if (IsHeader4(line))
+                {
+                    result.Add(ToHeader4(line, noteName, fontSize));
+                }
+                else if (IsHeader5(line))
+                {
+                    result.Add(ToHeader5(line, noteName, fontSize));
+                }
+                else if (IsHeader6(line))
+                {
+                    result.Add(ToHeader6(line, noteName, fontSize));
+                }
+                else if (IsBulletPoint(line))
+                {
+                    var lastBulletPoint = true;
+                    if (i < lines.Count - 1)
+                    {
+                        var nextLine = lines[i + 1];
+                        lastBulletPoint = !(IsBulletPoint(nextLine) || IsNestedBulletPoint(nextLine));
+                    }
 
-                result.Add(ToNestedBulletPoint(line, lastBulletPoint, noteName, fontSize));
+                    result.Add(ToBulletPoint(line, lastBulletPoint, noteName, fontSize));
+                }
+                else if (IsNestedBulletPoint(line))
+                {
+                    var lastBulletPoint = true;
+                    if (i < lines.Count - 1)
+                    {
+                        var nextLine = lines[i + 1];
+                        lastBulletPoint = !(IsBulletPoint(nextLine) || IsNestedBulletPoint(nextLine));
+                    }
+
+                    result.Add(ToNestedBulletPoint(line, lastBulletPoint, noteName, fontSize));
+                }
+                else
+                {
+                    result.Add(ToNormalText(line, noteName, fontSize));
+                }
             }
-            else
-            {
-                result.Add(ToNormalText(line, noteName, fontSize));
-            }
+
+            return result;
         }
-
-        return result;
+        catch (Exception ex)
+        {
+            throw new MarkdownException(ex);
+        }
     }
 
     private Paragraph ToNormalText(string text, string noteName, double fontSize)

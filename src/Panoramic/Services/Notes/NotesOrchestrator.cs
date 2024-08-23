@@ -67,86 +67,126 @@ public sealed class NotesOrchestrator : INotesOrchestrator
     /// <inheritdoc/>
     public async Task<IReadOnlyList<IWidget>> ReadWidgetsAsync()
     {
-        LoadFileSystemItems();
+        try
+        {
+            LoadFileSystemItems();
 
-        var noteWidgetFilePaths = Directory.GetFiles(_storageService.WidgetsFolderPath, "note-*.md");
+            var noteWidgetFilePaths = Directory.GetFiles(_storageService.WidgetsFolderPath, "note-*.md");
 
-        var readNoteWidgetTasks = noteWidgetFilePaths.Select(ReadNoteWidgetAsync);
+            var readNoteWidgetTasks = noteWidgetFilePaths.Select(ReadNoteWidgetAsync);
 
-        var noteWidgets = await Task.WhenAll(readNoteWidgetTasks).ConfigureAwait(false);
+            var noteWidgets = await Task.WhenAll(readNoteWidgetTasks).ConfigureAwait(false);
 
-        SetSelectedNotes(noteWidgets.OfType<NoteWidget>().ToList());
+            SetSelectedNotes(noteWidgets.OfType<NoteWidget>().ToList());
 
-        return noteWidgets;
+            return noteWidgets;
+        }
+        catch (Exception ex)
+        {
+            throw new NotesException(ex);
+        }
     }
 
     /// <inheritdoc/>
     public async Task SaveNoteWidgetAsync(NoteWidget widget)
     {
-        if (widget.NotePath is not null && _unsavedNotes.TryGetValue(widget.NotePath.Absolute, out string? content))
+        try
         {
-            await WriteNoteAsync(widget.NotePath.Absolute, content);
-        }
+            if (widget.NotePath is not null && _unsavedNotes.TryGetValue(widget.NotePath.Absolute, out string? content))
+            {
+                await WriteNoteAsync(widget.NotePath.Absolute, content);
+            }
 
-        await _storageService.SaveWidgetAsync(widget);
+            await _storageService.SaveWidgetAsync(widget);
+        }
+        catch (Exception ex)
+        {
+            throw new NotesException(ex);
+        }
     }
 
     public async Task WriteUnsavedChangesAsync()
     {
-        _timer.Stop();
-
-        var tasks = new List<Task>(_unsavedNotes.Count);
-
-        foreach (var note in _unsavedNotes)
+        try
         {
-            tasks.Add(WriteNoteAsync(note.Key, note.Value));
+            _timer.Stop();
+
+            var tasks = new List<Task>(_unsavedNotes.Count);
+
+            foreach (var note in _unsavedNotes)
+            {
+                tasks.Add(WriteNoteAsync(note.Key, note.Value));
+            }
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            _unsavedNotes.Clear();
         }
-
-        await Task.WhenAll(tasks).ConfigureAwait(false);
-
-        _unsavedNotes.Clear();
+        catch (Exception ex)
+        {
+            throw new NotesException(ex);
+        }
     }
 
     /// <inheritdoc/>
     public void EnqueueNoteWrite(FileSystemItemPath path, string text)
     {
-        DebugLogger.Log($"Enqueuing note content write: {path}");
-
-        if (!_unsavedNotes.TryAdd(path.Absolute, text))
+        try
         {
-            _unsavedNotes[path.Absolute] = text;
-        }
+            DebugLogger.Log($"Enqueuing note content write: {path}");
 
-        _timer.Stop();
-        _timer.Start();
+            if (!_unsavedNotes.TryAdd(path.Absolute, text))
+            {
+                _unsavedNotes[path.Absolute] = text;
+            }
+
+            _timer.Stop();
+            _timer.Start();
+        }
+        catch (Exception ex)
+        {
+            throw new NotesException(ex);
+        }
     }
 
     public void ChangeNoteSelection(Guid widgetId, FileSystemItemPath? previousFilePath, FileSystemItemPath? newFilePath)
     {
-        if (previousFilePath is not null && fileSystemItems.TryGetValue(previousFilePath.Absolute, out FileSystemItem? value))
+        try
         {
-            value.SelectedInWidgetId = null;
-            OpenNotes.Remove(previousFilePath);
-        }
+            if (previousFilePath is not null && fileSystemItems.TryGetValue(previousFilePath.Absolute, out FileSystemItem? value))
+            {
+                value.SelectedInWidgetId = null;
+                OpenNotes.Remove(previousFilePath);
+            }
 
-        if (newFilePath is not null)
-        {
-            fileSystemItems[newFilePath.Absolute].SelectedInWidgetId = widgetId;
-            OpenNotes.Add(newFilePath);
-        }
+            if (newFilePath is not null)
+            {
+                fileSystemItems[newFilePath.Absolute].SelectedInWidgetId = widgetId;
+                OpenNotes.Add(newFilePath);
+            }
 
-        NoteSelectionChanged?.Invoke(this, new NoteSelectionChangedEventArgs
+            NoteSelectionChanged?.Invoke(this, new NoteSelectionChangedEventArgs
+            {
+                WidgetId = widgetId,
+                PreviousFilePath = previousFilePath,
+                NewFilePath = newFilePath
+            });
+        }
+        catch (Exception ex)
         {
-            WidgetId = widgetId,
-            PreviousFilePath = previousFilePath,
-            NewFilePath = newFilePath
-        });
+            throw new NotesException(ex);
+        }
     }
 
     public void ChangeNoteContent(Guid widgetId, FileSystemItemPath path, string content)
     {
-        if (fileSystemItems.ContainsKey(path.Absolute))
+        try
         {
+            if (!fileSystemItems.ContainsKey(path.Absolute))
+            {
+                return;
+            }
+
             NoteContentChanged?.Invoke(this, new NoteContentChangedEventArgs
             {
                 WidgetId = widgetId,
@@ -154,118 +194,164 @@ public sealed class NotesOrchestrator : INotesOrchestrator
                 Content = content
             });
         }
+        catch (Exception ex)
+        {
+            throw new NotesException(ex);
+        }
     }
 
     public void CreateFolder(Guid widgetId, string directory, string name)
     {
-        name = name.Trim();
-
-        var path = Path.Combine(directory, name);
-        Directory.CreateDirectory(path);
-
-        var folder = new FileSystemItem
+        try
         {
-            Name = name,
-            Type = FileType.Folder,
-            Path = new(path, _storageService.StoragePath)
-        };
-        fileSystemItems.Add(folder.Path.Absolute, folder);
+            name = name.Trim();
 
-        FileCreated?.Invoke(this, new FileCreatedEventArgs
+            var path = Path.Combine(directory, name);
+            Directory.CreateDirectory(path);
+
+            var folder = new FileSystemItem
+            {
+                Name = name,
+                Type = FileType.Folder,
+                Path = new(path, _storageService.StoragePath)
+            };
+            fileSystemItems.Add(folder.Path.Absolute, folder);
+
+            FileCreated?.Invoke(this, new FileCreatedEventArgs
+            {
+                WidgetId = widgetId,
+                Name = name,
+                Type = FileType.Folder,
+                Path = new(path, _storageService.StoragePath)
+            });
+        }
+        catch (Exception ex)
         {
-            WidgetId = widgetId,
-            Name = name,
-            Type = FileType.Folder,
-            Path = new(path, _storageService.StoragePath)
-        });
+            throw new NotesException(ex);
+        }
     }
 
     public void RenameFolder(FileSystemItemPath path, string newName)
     {
-        newName = newName.Trim();
+        try
+        {
+            newName = newName.Trim();
 
-        var destinationPath = Path.Combine(path.Parent, newName);
-        Directory.Move(path.Absolute, destinationPath);
+            var destinationPath = Path.Combine(path.Parent, newName);
+            Directory.Move(path.Absolute, destinationPath);
 
-        fileSystemItems.Clear();
-        LoadFileSystemItems();
+            fileSystemItems.Clear();
+            LoadFileSystemItems();
 
-        var noteWidgets = _storageService.Widgets.Values.OfType<NoteWidget>().ToList();
-        SetSelectedNotes(noteWidgets);
+            var noteWidgets = _storageService.Widgets.Values.OfType<NoteWidget>().ToList();
+            SetSelectedNotes(noteWidgets);
 
-        ItemRenamed?.Invoke(this, EventArgs.Empty);
+            ItemRenamed?.Invoke(this, EventArgs.Empty);
+        }
+        catch (Exception ex)
+        {
+            throw new NotesException(ex);
+        }
     }
 
     public void DeleteFolder(FileSystemItemPath path)
     {
-        Directory.Delete(path.Absolute, true);
+        try
+        {
+            Directory.Delete(path.Absolute, true);
 
-        fileSystemItems.Clear();
-        LoadFileSystemItems();
+            fileSystemItems.Clear();
+            LoadFileSystemItems();
 
-        var noteWidgets = _storageService.Widgets.Values.OfType<NoteWidget>().ToList();
-        SetSelectedNotes(noteWidgets);
+            var noteWidgets = _storageService.Widgets.Values.OfType<NoteWidget>().ToList();
+            SetSelectedNotes(noteWidgets);
 
-        FileDeleted?.Invoke(this, new FileDeletedEventArgs { Path = path });
+            FileDeleted?.Invoke(this, new FileDeletedEventArgs { Path = path });
+        }
+        catch (Exception ex)
+        {
+            throw new NotesException(ex);
+        }
     }
 
     public void CreateNote(Guid widgetId, string directory, string name)
     {
-        name = name.Trim();
-
-        var path = Path.Combine(directory, $"{name}.md");
-        File.Create(path).Dispose();
-
-        var note = new FileSystemItem
+        try
         {
-            Name = name,
-            Type = FileType.Note,
-            Path = new(path, _storageService.StoragePath),
-            SelectedInWidgetId = widgetId
-        };
-        fileSystemItems.Add(note.Path.Absolute, note);
+            name = name.Trim();
 
-        FileCreated?.Invoke(this, new FileCreatedEventArgs
+            var path = Path.Combine(directory, $"{name}.md");
+            File.Create(path).Dispose();
+
+            var note = new FileSystemItem
+            {
+                Name = name,
+                Type = FileType.Note,
+                Path = new(path, _storageService.StoragePath),
+                SelectedInWidgetId = widgetId
+            };
+            fileSystemItems.Add(note.Path.Absolute, note);
+
+            FileCreated?.Invoke(this, new FileCreatedEventArgs
+            {
+                WidgetId = widgetId,
+                Name = name,
+                Type = FileType.Note,
+                Path = new(path, _storageService.StoragePath)
+            });
+        }
+        catch (Exception ex)
         {
-            WidgetId = widgetId,
-            Name = name,
-            Type = FileType.Note,
-            Path = new(path, _storageService.StoragePath)
-        });
+            throw new NotesException(ex);
+        }
     }
 
     public void RenameNote(FileSystemItemPath path, string newName)
     {
-        newName = newName.Trim();
-
-        var newPath = Path.Combine(path.Parent, $"{newName}.md");
-
-        if (_unsavedNotes.TryGetValue(path.Absolute, out string? content))
+        try
         {
-            _unsavedNotes.Remove(path.Absolute);
-            _unsavedNotes.Add(newPath, content);
+            newName = newName.Trim();
+
+            var newPath = Path.Combine(path.Parent, $"{newName}.md");
+
+            if (_unsavedNotes.TryGetValue(path.Absolute, out string? content))
+            {
+                _unsavedNotes.Remove(path.Absolute);
+                _unsavedNotes.Add(newPath, content);
+            }
+
+            File.Move(path.Absolute, newPath);
+
+            var item = fileSystemItems[path.Absolute];
+            item.Name = newName;
+            item.Path = new(newPath, _storageService.StoragePath);
+            fileSystemItems.Remove(path.Absolute);
+            fileSystemItems.Add(newPath, item);
+
+            ItemRenamed?.Invoke(this, EventArgs.Empty);
         }
-
-        File.Move(path.Absolute, newPath);
-
-        var item = fileSystemItems[path.Absolute];
-        item.Name = newName;
-        item.Path = new(newPath, _storageService.StoragePath);
-        fileSystemItems.Remove(path.Absolute);
-        fileSystemItems.Add(newPath, item);
-
-        ItemRenamed?.Invoke(this, EventArgs.Empty);
+        catch (Exception ex)
+        {
+            throw new NotesException(ex);
+        }
     }
 
     public void DeleteNote(FileSystemItemPath path)
     {
-        _unsavedNotes.Remove(path.Absolute);
+        try
+        {
+            _unsavedNotes.Remove(path.Absolute);
 
-        File.Delete(path.Absolute);
+            File.Delete(path.Absolute);
 
-        fileSystemItems.Remove(path.Absolute);
+            fileSystemItems.Remove(path.Absolute);
 
-        FileDeleted?.Invoke(this, new FileDeletedEventArgs { Path = path });
+            FileDeleted?.Invoke(this, new FileDeletedEventArgs { Path = path });
+        }
+        catch (Exception ex)
+        {
+            throw new NotesException(ex);
+        }
     }
 
     private async Task<IWidget> ReadNoteWidgetAsync(string widgetFilePath)

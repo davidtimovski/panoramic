@@ -18,9 +18,6 @@ namespace Panoramic.Services.Storage;
 /// <inheritdoc/>
 public sealed class StorageService : IStorageService
 {
-    private const string DefaultDirectoryName = "Panoramic";
-    private const string SystemDirectoryName = ".panoramic";
-
     /// <summary>
     /// Used to write changed sections widget data to disk.
     /// </summary>
@@ -30,6 +27,9 @@ public sealed class StorageService : IStorageService
     /// Holds the widgets that have been changed and need to be written to disk.
     /// </summary>
     private readonly HashSet<Guid> _unsavedWidgets = [];
+
+    public const string DefaultDirectoryName = "Panoramic";
+    public const string SystemDirectoryName = ".panoramic";
 
     public StorageService()
     {
@@ -65,103 +65,152 @@ public sealed class StorageService : IStorageService
 
     public async Task ReadWidgetsAsync(IReadOnlyList<IWidget> noteWidgets)
     {
-        foreach (var widget in noteWidgets)
+        try
         {
-            Widgets.Add(widget.Id, widget);
+            foreach (var widget in noteWidgets)
+            {
+                Widgets.Add(widget.Id, widget);
+            }
+
+            var widgetFilePaths = Directory.GetFiles(WidgetsFolderPath, "*.md");
+
+            var tasks = widgetFilePaths.Select(ReadWidgetAsync);
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
-
-        var widgetFilePaths = Directory.GetFiles(WidgetsFolderPath, "*.md");
-
-        var tasks = widgetFilePaths.Select(ReadWidgetAsync);
-
-        await Task.WhenAll(tasks).ConfigureAwait(false);
+        catch (Exception ex)
+        {
+            throw new StorageException(ex);
+        }
     }
 
     public async Task WriteUnsavedChangesAsync()
     {
-        _timer.Stop();
-
-        var tasks = new List<Task>(_unsavedWidgets.Count);
-
-        foreach (var id in _unsavedWidgets)
+        try
         {
-            tasks.Add(Widgets[id].WriteAsync());
+            _timer.Stop();
+
+            var tasks = new List<Task>(_unsavedWidgets.Count);
+
+            foreach (var id in _unsavedWidgets)
+            {
+                tasks.Add(Widgets[id].WriteAsync());
+            }
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            _unsavedWidgets.Clear();
         }
-
-        await Task.WhenAll(tasks).ConfigureAwait(false);
-
-        _unsavedWidgets.Clear();
+        catch (Exception ex)
+        {
+            throw new StorageException(ex);
+        }
     }
 
     /// <inheritdoc/>
     public void EnqueueWidgetWrite(Guid id, string change)
     {
-        DebugLogger.Log($"Enqueuing widget write: {id}. Reason: {change}.");
+        try
+        {
+            DebugLogger.Log($"Enqueuing widget write: {id}. Reason: {change}.");
 
-        _unsavedWidgets.Add(id);
+            _unsavedWidgets.Add(id);
 
-        _timer.Stop();
-        _timer.Start();
+            _timer.Stop();
+            _timer.Start();
+        }
+        catch (Exception ex)
+        {
+            throw new StorageException(ex);
+        }
     }
 
     public void DeleteWidget(IWidget widget)
     {
-        if (_unsavedWidgets.Contains(widget.Id))
+        try
         {
-            _unsavedWidgets.Remove(widget.Id);
+            if (_unsavedWidgets.Contains(widget.Id))
+            {
+                _unsavedWidgets.Remove(widget.Id);
+            }
+
+            widget.Delete();
+
+            Widgets.Remove(widget.Id);
+
+            WidgetDeleted?.Invoke(this, new WidgetDeletedEventArgs { Id = widget.Id });
         }
-
-        widget.Delete();
-
-        Widgets.Remove(widget.Id);
-
-        WidgetDeleted?.Invoke(this, new WidgetDeletedEventArgs { Id = widget.Id });
+        catch (Exception ex)
+        {
+            throw new StorageException(ex);
+        }
     }
 
     public async Task AddNewWidgetAsync(IWidget widget)
     {
-        await widget.WriteAsync();
-
-        if (!Widgets.TryAdd(widget.Id, widget))
+        try
         {
-            Widgets[widget.Id] = widget;
-        }
+            await widget.WriteAsync();
 
-        WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs { Id = widget.Id });
+            if (!Widgets.TryAdd(widget.Id, widget))
+            {
+                Widgets[widget.Id] = widget;
+            }
+
+            WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs { Id = widget.Id });
+        }
+        catch (Exception ex)
+        {
+            throw new StorageException(ex);
+        }
     }
 
     public async Task SaveWidgetAsync(IWidget widget)
     {
-        if (_unsavedWidgets.Contains(widget.Id))
+        try
         {
-            _unsavedWidgets.Remove(widget.Id);
+            if (_unsavedWidgets.Contains(widget.Id))
+            {
+                _unsavedWidgets.Remove(widget.Id);
+            }
+
+            await widget.WriteAsync();
+
+            WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs { Id = widget.Id });
         }
-
-        await widget.WriteAsync();
-
-        WidgetUpdated?.Invoke(this, new WidgetUpdatedEventArgs { Id = widget.Id });
+        catch (Exception ex)
+        {
+            throw new StorageException(ex);
+        }
     }
 
     public void ChangeStoragePath(string storagePath)
     {
-        if (string.Equals(StoragePath, storagePath, StringComparison.OrdinalIgnoreCase))
+        try
         {
-            return;
-        }
+            if (string.Equals(StoragePath, storagePath, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
 
-        if (Directory.Exists(storagePath))
+            if (Directory.Exists(storagePath))
+            {
+                Directory.Delete(storagePath, true);
+            }
+
+            Directory.Move(StoragePath, storagePath);
+
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+            localSettings.Values[nameof(StoragePath)] = storagePath;
+
+            StoragePath = storagePath;
+
+            StoragePathChanged?.Invoke(this, EventArgs.Empty);
+        }
+        catch (Exception ex)
         {
-            Directory.Delete(storagePath, true);
+            throw new StorageException(ex);
         }
-
-        Directory.Move(StoragePath, storagePath);
-
-        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        localSettings.Values[nameof(StoragePath)] = storagePath;
-
-        StoragePath = storagePath;
-
-        StoragePathChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private async Task ReadWidgetAsync(string filePath)

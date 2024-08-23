@@ -34,69 +34,97 @@ public sealed class DrawerService : IDrawerService
     /// <inheritdoc/>
     public async Task ReadLinkDrawersAsync()
     {
-        var drawerFilePaths = Directory.GetFiles(_linkDrawersFolderPath, "*.md");
-
-        var tasks = drawerFilePaths.Select(ReadLinkDrawerAsync);
-
-        var drawers = await Task.WhenAll(tasks).ConfigureAwait(false);
-
-        foreach (var drawer in drawers)
+        try
         {
-            _drawers.Add(drawer.Name, drawer);
-        }
+            var drawerFilePaths = Directory.GetFiles(_linkDrawersFolderPath, "*.md");
 
-        LinkDrawersLoaded?.Invoke(this, new LinkDrawersLoadedEventArgs { Drawers = drawers });
+            var tasks = drawerFilePaths.Select(ReadLinkDrawerAsync);
+
+            var drawers = await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            foreach (var drawer in drawers)
+            {
+                _drawers.Add(drawer.Name, drawer);
+            }
+
+            LinkDrawersLoaded?.Invoke(this, new LinkDrawersLoadedEventArgs { Drawers = drawers });
+        }
+        catch (Exception ex)
+        {
+            throw new DrawerException(ex);
+        }
     }
 
     /// <inheritdoc/>
     public bool LinkDrawerCanBeCreated(string name, string originalName)
     {
-        bool FileDoesNotExist(string name)
+        try
         {
-            var path = Path.Combine(_linkDrawersFolderPath, $"{name}.md");
-            return !File.Exists(path);
+            bool FileDoesNotExist(string name)
+            {
+                var path = Path.Combine(_linkDrawersFolderPath, $"{name}.md");
+                return !File.Exists(path);
+            }
+
+            var isNew = originalName == string.Empty;
+
+            if (isNew)
+            {
+                return FileDoesNotExist(name);
+            }
+            else if (!string.Equals(name, originalName, StringComparison.Ordinal))
+            {
+                return FileDoesNotExist(name);
+            }
+
+            return true;
         }
-
-        var isNew = originalName == string.Empty;
-
-        if (isNew)
+        catch (Exception ex)
         {
-            return FileDoesNotExist(name);
+            throw new DrawerException(ex);
         }
-        else if (!string.Equals(name, originalName, StringComparison.Ordinal))
-        {
-            return FileDoesNotExist(name);
-        }
-
-        return true;
     }
 
     public async Task SaveLinkDrawerAsync(LinkDrawerData data, string oldName)
     {
-        var builder = new StringBuilder();
-        data.ToMarkdown(builder);
-
-        await File.WriteAllTextAsync(Path.Combine(_linkDrawersFolderPath, $"{data.Name}.md"), builder.ToString());
-        if (!_drawers.TryAdd(data.Name, data))
+        try
         {
-            _drawers[data.Name] = data;
-        }
+            var builder = new StringBuilder();
+            data.ToMarkdown(builder);
 
-        if (oldName != string.Empty && !string.Equals(data.Name, oldName, StringComparison.Ordinal))
+            await File.WriteAllTextAsync(Path.Combine(_linkDrawersFolderPath, $"{data.Name}.md"), builder.ToString());
+            if (!_drawers.TryAdd(data.Name, data))
+            {
+                _drawers[data.Name] = data;
+            }
+
+            if (oldName != string.Empty && !string.Equals(data.Name, oldName, StringComparison.Ordinal))
+            {
+                File.Delete(Path.Combine(_linkDrawersFolderPath, $"{oldName}.md"));
+                _drawers.Remove(oldName);
+            }
+
+            LinkDrawersLoaded?.Invoke(this, new LinkDrawersLoadedEventArgs { Drawers = _drawers.Values });
+        }
+        catch (Exception ex)
         {
-            File.Delete(Path.Combine(_linkDrawersFolderPath, $"{oldName}.md"));
-            _drawers.Remove(oldName);
+            throw new DrawerException(ex);
         }
-
-        LinkDrawersLoaded?.Invoke(this, new LinkDrawersLoadedEventArgs { Drawers = _drawers.Values });
     }
 
     public void DeleteLinkDrawer(string name)
     {
-        File.Delete(Path.Combine(_linkDrawersFolderPath, $"{name}.md"));
-        _drawers.Remove(name);
+        try
+        {
+            File.Delete(Path.Combine(_linkDrawersFolderPath, $"{name}.md"));
+            _drawers.Remove(name);
 
-        LinkDrawersLoaded?.Invoke(this, new LinkDrawersLoadedEventArgs { Drawers = _drawers.Values });
+            LinkDrawersLoaded?.Invoke(this, new LinkDrawersLoadedEventArgs { Drawers = _drawers.Values });
+        }
+        catch (Exception ex)
+        {
+            throw new DrawerException(ex);
+        }
     }
 
     public bool HasDrawers() => _drawers.Count > 0;
@@ -104,18 +132,25 @@ public sealed class DrawerService : IDrawerService
     /// <inheritdoc/>
     public List<WeighedSearchResult<LinkDrawerLinkData>> SearchDrawers(string searchText)
     {
-        var result = new List<WeighedSearchResult<LinkDrawerLinkData>>();
-
-        foreach (var drawer in _drawers.Values)
+        try
         {
-            var matched = drawer.Links.Select(x => x.Matches(searchText, drawer.Name));
-            result.AddRange(matched);
-        }
+            var result = new List<WeighedSearchResult<LinkDrawerLinkData>>();
 
-        return result.Where(x => x.Weight > 0)
-            .OrderByDescending(x => x.Weight)
-            .ThenBy(x => x.Result.Title)
-            .ToList();
+            foreach (var drawer in _drawers.Values)
+            {
+                var matched = drawer.Links.Select(x => x.Matches(searchText, drawer.Name));
+                result.AddRange(matched);
+            }
+
+            return result.Where(x => x.Weight > 0)
+                .OrderByDescending(x => x.Weight)
+                .ThenBy(x => x.Result.Title)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            throw new DrawerException(ex);
+        }
     }
 
     private async Task<LinkDrawerData> ReadLinkDrawerAsync(string fileName)

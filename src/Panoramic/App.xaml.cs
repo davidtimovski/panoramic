@@ -13,6 +13,7 @@ using Panoramic.Services.Notes;
 using Panoramic.Services.Preferences;
 using Panoramic.Services.Search;
 using Panoramic.Services.Storage;
+using Panoramic.Utils;
 using Panoramic.ViewModels;
 using Windows.Storage;
 
@@ -27,6 +28,8 @@ public sealed partial class App : Application
         InitializeComponent();
 
         InitializeTheme();
+
+        UnhandledException += UnhandledExceptionOccurred;
 
         ServiceCollection services = [];
 
@@ -97,5 +100,14 @@ public sealed partial class App : Application
         }
 
         return true;
+    }
+
+    private void UnhandledExceptionOccurred(object _, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    {
+        FileLogger.WriteException(e.Exception);
+        e.Handled = true;
+        
+        // Close app
+        Process.GetCurrentProcess().Kill();
     }
 }
