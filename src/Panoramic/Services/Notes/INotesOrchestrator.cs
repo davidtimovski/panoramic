@@ -40,7 +40,7 @@ public interface INotesOrchestrator
 
     /// <summary>
     /// Schedules a note save to disk.
-    /// Will reset the auto-save timer if other note changes have been enqueued.
+    /// Will reset the auto-save timer if other note changes have been enqueued (but only if the first enqueued change is earlier than 1 minute ago).
     /// </summary>
     void EnqueueNoteWrite(FileSystemItemPath path, string text);
 

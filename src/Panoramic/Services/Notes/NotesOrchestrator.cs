@@ -16,6 +16,9 @@ namespace Panoramic.Services.Notes;
 /// <inheritdoc/>
 public sealed class NotesOrchestrator : INotesOrchestrator
 {
+    private static readonly TimeSpan AutoSaveMaxDelay = TimeSpan.FromMinutes(1);
+    private static DateTime AutoSaveFirstEnqueued = DateTime.Now;
+
     private readonly IStorageService _storageService;
 
     /// <summary>
@@ -133,15 +136,26 @@ public sealed class NotesOrchestrator : INotesOrchestrator
     {
         try
         {
-            DebugLogger.Log($"Enqueuing note content write: {path}");
+            DebugLogger.Log($"Enqueuing note content write: {path.Absolute}");
 
             if (!_unsavedNotes.TryAdd(path.Absolute, text))
             {
+                if (_unsavedNotes.Count == 0)
+                {
+                    // If this is the first change to be enqueued. Save the time.
+                    AutoSaveFirstEnqueued = DateTime.Now;
+                }
+
                 _unsavedNotes[path.Absolute] = text;
             }
 
-            _timer.Stop();
-            _timer.Start();
+            if (DateTime.Now - AutoSaveFirstEnqueued <= AutoSaveMaxDelay)
+            {
+                // Reset timer if less than AutoSaveMaxDelay passed
+                // between the first enqueued change and the current one
+                _timer.Stop();
+                _timer.Start();
+            }
         }
         catch (Exception ex)
         {
@@ -409,10 +423,10 @@ public sealed class NotesOrchestrator : INotesOrchestrator
         }
     }
 
-    private static async Task WriteNoteAsync(string path, string content)
+    private static async Task WriteNoteAsync(string absolutePath, string content)
     {
-        DebugLogger.Log($"Writing note content: {path}");
+        DebugLogger.Log($"Writing note content: {absolutePath}");
 
-        await File.WriteAllTextAsync(path, content);
+        await File.WriteAllTextAsync(absolutePath, content);
     }
 }
