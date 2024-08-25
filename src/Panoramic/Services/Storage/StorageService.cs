@@ -9,6 +9,7 @@ using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.Checklist;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Domain.RecentLinks;
+using Panoramic.Services.Preferences;
 using Panoramic.Services.Storage.Models;
 using Panoramic.Utils;
 using Windows.Storage;
@@ -18,8 +19,9 @@ namespace Panoramic.Services.Storage;
 /// <inheritdoc/>
 public sealed class StorageService : IStorageService
 {
-    private static readonly TimeSpan AutoSaveMaxDelay = TimeSpan.FromMinutes(1);
     private static DateTime AutoSaveFirstEnqueued = DateTime.Now;
+
+    private readonly IPreferencesService _preferencesService;
 
     /// <summary>
     /// Used to write changed sections widget data to disk.
@@ -34,8 +36,10 @@ public sealed class StorageService : IStorageService
     public const string DefaultDirectoryName = "Panoramic";
     public const string SystemDirectoryName = ".panoramic";
 
-    public StorageService()
+    public StorageService(IPreferencesService preferencesService)
     {
+        _preferencesService = preferencesService;
+
         StoragePath = InitializeStoragePath();
 
         if (!Directory.Exists(WidgetsFolderPath))
@@ -47,12 +51,23 @@ public sealed class StorageService : IStorageService
         var queue = queueController.DispatcherQueue;
 
         _timer = queue.CreateTimer();
-        _timer.Interval = TimeSpan.FromSeconds(15);
+        _timer.Interval = _preferencesService.AutoSaveInterval;
         _timer.Tick += async (timer, _) =>
         {
             DebugLogger.Log($"Running auto-save for {_unsavedWidgets.Count} widgets..");
 
             await WriteUnsavedChangesAsync();
+        };
+
+        _preferencesService.Changed += (_, e) =>
+        {
+            _timer.Interval = e.AutoSaveInterval;
+
+            if (_timer.IsRunning)
+            {
+                _timer.Stop();
+                _timer.Start();
+            }
         };
     }
 
@@ -125,10 +140,8 @@ public sealed class StorageService : IStorageService
 
             _unsavedWidgets.Add(id);
 
-            if (DateTime.Now - AutoSaveFirstEnqueued <= AutoSaveMaxDelay)
+            if (DateTime.Now - AutoSaveFirstEnqueued <= _preferencesService.AutoSaveMaxDelay)
             {
-                // Reset timer if less than AutoSaveMaxDelay passed
-                // between the first enqueued change and the current one
                 _timer.Stop();
                 _timer.Start();
             }

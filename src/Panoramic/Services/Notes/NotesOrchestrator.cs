@@ -7,6 +7,7 @@ using Microsoft.UI.Dispatching;
 using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Services.Notes.Models;
+using Panoramic.Services.Preferences;
 using Panoramic.Services.Storage;
 using Panoramic.Services.Storage.Models;
 using Panoramic.Utils;
@@ -16,9 +17,9 @@ namespace Panoramic.Services.Notes;
 /// <inheritdoc/>
 public sealed class NotesOrchestrator : INotesOrchestrator
 {
-    private static readonly TimeSpan AutoSaveMaxDelay = TimeSpan.FromMinutes(1);
     private static DateTime AutoSaveFirstEnqueued = DateTime.Now;
 
+    private readonly IPreferencesService _preferencesService;
     private readonly IStorageService _storageService;
 
     /// <summary>
@@ -31,20 +32,32 @@ public sealed class NotesOrchestrator : INotesOrchestrator
     /// </summary>
     private readonly Dictionary<string, string> _unsavedNotes = [];
 
-    public NotesOrchestrator(IStorageService storageService)
+    public NotesOrchestrator(IPreferencesService preferencesService, IStorageService storageService)
     {
+        _preferencesService = preferencesService;
         _storageService = storageService;
 
         var queueController = DispatcherQueueController.CreateOnDedicatedThread();
         var queue = queueController.DispatcherQueue;
 
         _timer = queue.CreateTimer();
-        _timer.Interval = TimeSpan.FromSeconds(15);
+        _timer.Interval = _preferencesService.AutoSaveInterval;
         _timer.Tick += async (timer, _) =>
         {
             DebugLogger.Log($"Running auto-save for {_unsavedNotes.Count} notes..");
 
             await WriteUnsavedChangesAsync();
+        };
+
+        _preferencesService.Changed += (_, e) =>
+        {
+            _timer.Interval = e.AutoSaveInterval;
+
+            if (_timer.IsRunning)
+            {
+                _timer.Stop();
+                _timer.Start();
+            }
         };
     }
 
@@ -138,21 +151,19 @@ public sealed class NotesOrchestrator : INotesOrchestrator
         {
             DebugLogger.Log($"Enqueuing note content write: {path.Absolute}");
 
+            if (_unsavedNotes.Count == 0)
+            {
+                // If this is the first change to be enqueued. Save the time.
+                AutoSaveFirstEnqueued = DateTime.Now;
+            }
+
             if (!_unsavedNotes.TryAdd(path.Absolute, text))
             {
-                if (_unsavedNotes.Count == 0)
-                {
-                    // If this is the first change to be enqueued. Save the time.
-                    AutoSaveFirstEnqueued = DateTime.Now;
-                }
-
                 _unsavedNotes[path.Absolute] = text;
             }
 
-            if (DateTime.Now - AutoSaveFirstEnqueued <= AutoSaveMaxDelay)
+            if (DateTime.Now - AutoSaveFirstEnqueued <= _preferencesService.AutoSaveMaxDelay)
             {
-                // Reset timer if less than AutoSaveMaxDelay passed
-                // between the first enqueued change and the current one
                 _timer.Stop();
                 _timer.Start();
             }
