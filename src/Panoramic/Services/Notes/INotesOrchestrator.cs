@@ -14,7 +14,6 @@ namespace Panoramic.Services.Notes;
 public interface INotesOrchestrator
 {
     event EventHandler<NoteSelectionChangedEventArgs>? NoteSelectionChanged;
-    event EventHandler<NoteContentChangedEventArgs>? NoteContentChanged;
     event EventHandler<FileCreatedEventArgs>? FileCreated;
     event EventHandler<FileDeletedEventArgs>? FileDeleted;
     event EventHandler<EventArgs>? ItemRenamed;
@@ -39,13 +38,17 @@ public interface INotesOrchestrator
     Task WriteUnsavedChangesAsync();
 
     /// <summary>
-    /// Schedules a note save to disk.
-    /// Will reset the auto-save timer if other note changes have been enqueued (but only if the first enqueued change is earlier than 1 minute ago).
+    /// Reads the content from memory or if it's not present then from the file system.
     /// </summary>
-    void EnqueueNoteWrite(FileSystemItemPath path, string text);
+    string GetContent(FileSystemItemPath path);
+
+    /// <summary>
+    /// Sets the note content in memory and schedules a note save to disk.
+    /// Will reset the auto-save timer if other note changes have been enqueued.
+    /// </summary>
+    void SetContent(FileSystemItemPath path, string content);
 
     void ChangeNoteSelection(Guid widgetId, FileSystemItemPath? previousFilePath, FileSystemItemPath? newFilePath);
-    void ChangeNoteContent(Guid widgetId, FileSystemItemPath path, string content);
 
     void CreateFolder(Guid widgetId, string directory, string name);
     void RenameFolder(FileSystemItemPath path, string newName);

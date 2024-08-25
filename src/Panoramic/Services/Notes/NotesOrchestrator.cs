@@ -30,7 +30,7 @@ public sealed class NotesOrchestrator : INotesOrchestrator
     /// <summary>
     /// Holds the notes that have been changed and need to be written to disk.
     /// </summary>
-    private readonly Dictionary<string, string> _unsavedNotes = [];
+    private readonly HashSet<string> _unsavedNotes = [];
 
     public NotesOrchestrator(IPreferencesService preferencesService, IStorageService storageService)
     {
@@ -62,7 +62,6 @@ public sealed class NotesOrchestrator : INotesOrchestrator
     }
 
     public event EventHandler<NoteSelectionChangedEventArgs>? NoteSelectionChanged;
-    public event EventHandler<NoteContentChangedEventArgs>? NoteContentChanged;
     public event EventHandler<FileCreatedEventArgs>? FileCreated;
     public event EventHandler<FileDeletedEventArgs>? FileDeleted;
     public event EventHandler<EventArgs>? ItemRenamed;
@@ -129,9 +128,10 @@ public sealed class NotesOrchestrator : INotesOrchestrator
 
             var tasks = new List<Task>(_unsavedNotes.Count);
 
-            foreach (var note in _unsavedNotes)
+            foreach (var notePath in _unsavedNotes)
             {
-                tasks.Add(WriteNoteAsync(note.Key, note.Value));
+                var content = fileSystemItems[notePath].Content!;
+                tasks.Add(WriteNoteAsync(notePath, content));
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
@@ -145,11 +145,22 @@ public sealed class NotesOrchestrator : INotesOrchestrator
     }
 
     /// <inheritdoc/>
-    public void EnqueueNoteWrite(FileSystemItemPath path, string text)
+    public string GetContent(FileSystemItemPath path)
+    {
+        var note = fileSystemItems[path.Absolute];
+        note.Content ??= File.ReadAllText(path.Absolute);
+
+        return note.Content;
+    }
+
+    /// <inheritdoc/>
+    public void SetContent(FileSystemItemPath path, string content)
     {
         try
         {
-            DebugLogger.Log($"Enqueuing note content write: {path.Absolute}");
+            DebugLogger.Log($"Updating note content and enqueuing note write: {path.Absolute}");
+
+            fileSystemItems[path.Absolute].Content = content;
 
             if (_unsavedNotes.Count == 0)
             {
@@ -157,10 +168,7 @@ public sealed class NotesOrchestrator : INotesOrchestrator
                 AutoSaveFirstEnqueued = DateTime.Now;
             }
 
-            if (!_unsavedNotes.TryAdd(path.Absolute, text))
-            {
-                _unsavedNotes[path.Absolute] = text;
-            }
+            _unsavedNotes.Add(path.Absolute);
 
             if (DateTime.Now - AutoSaveFirstEnqueued <= _preferencesService.AutoSaveMaxDelay)
             {
@@ -195,28 +203,6 @@ public sealed class NotesOrchestrator : INotesOrchestrator
                 WidgetId = widgetId,
                 PreviousFilePath = previousFilePath,
                 NewFilePath = newFilePath
-            });
-        }
-        catch (Exception ex)
-        {
-            throw new NotesException(ex);
-        }
-    }
-
-    public void ChangeNoteContent(Guid widgetId, FileSystemItemPath path, string content)
-    {
-        try
-        {
-            if (!fileSystemItems.ContainsKey(path.Absolute))
-            {
-                return;
-            }
-
-            NoteContentChanged?.Invoke(this, new NoteContentChangedEventArgs
-            {
-                WidgetId = widgetId,
-                Path = path,
-                Content = content
             });
         }
         catch (Exception ex)
@@ -342,7 +328,7 @@ public sealed class NotesOrchestrator : INotesOrchestrator
             if (_unsavedNotes.TryGetValue(path.Absolute, out string? content))
             {
                 _unsavedNotes.Remove(path.Absolute);
-                _unsavedNotes.Add(newPath, content);
+                _unsavedNotes.Add(newPath);
             }
 
             File.Move(path.Absolute, newPath);
@@ -350,6 +336,8 @@ public sealed class NotesOrchestrator : INotesOrchestrator
             var item = fileSystemItems[path.Absolute];
             item.Name = newName;
             item.Path = new(newPath, _storageService.StoragePath);
+            item.Content = fileSystemItems[path.Absolute].Content;
+
             fileSystemItems.Remove(path.Absolute);
             fileSystemItems.Add(newPath, item);
 

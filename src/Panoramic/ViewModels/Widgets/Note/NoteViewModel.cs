@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
@@ -31,13 +30,12 @@ public sealed partial class NoteViewModel : WidgetViewModel
         _notesOrchestrator.FileDeleted += FileDeleted;
         _notesOrchestrator.ItemRenamed += ItemRenamed;
         _notesOrchestrator.NoteSelectionChanged += NoteSelectionChanged;
-        _notesOrchestrator.NoteContentChanged += NoteContentChanged;
 
         _widget = widget;
 
         HeaderBackgroundBrush = ResourceUtil.HighlightBrushes[widget.HeaderHighlight];
 
-        ReloadFiles();
+        ReloadExplorerItems();
 
         fontFamily = FontFamilyHelper.Get(_widget.FontFamily);
         fontSize = _widget.FontSize;
@@ -75,9 +73,10 @@ public sealed partial class NoteViewModel : WidgetViewModel
             {
                 var previousPath = _widget.NotePath;
 
-                if (value is not null && value.Text is null)
+                if (value is not null)
                 {
-                    value.Text = File.ReadAllText(value.Path.Absolute);
+                    var content = _notesOrchestrator.GetContent(value.Path);
+                    value.InitializeText(content);
                 }
 
                 if (_initialized)
@@ -130,12 +129,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
 
     public string EditToggleTooltip => Editing ? "Preview" : "Edit";
 
-    public void DeselectNote()
-    {
-        _notesOrchestrator.ChangeNoteContent(_widget.Id, SelectedNote!.Path, SelectedNote!.Text!);
-
-        SelectedNote = null;
-    }
+    public void DeselectNote() => SelectedNote = null;
 
     public void AddFile(Guid widgetId, string name, FileType type, FileSystemItemPath path)
     {
@@ -201,7 +195,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
         return null;
     }
 
-    private void ReloadFiles()
+    private void ReloadExplorerItems()
     {
         ExplorerItems.Clear();
 
@@ -232,22 +226,6 @@ public sealed partial class NoteViewModel : WidgetViewModel
                 {
                     item.IsEnabled = true;
                 }
-            }
-        }
-    }
-
-    private static void UpdateNoteContent(ObservableCollection<ExplorerItem> items, FileSystemItemPath path, string content)
-    {
-        foreach (var item in items)
-        {
-            if (item.Type == FileType.Folder)
-            {
-                UpdateNoteContent(item.Children, path, content);
-            }
-            else if (item.Path.Equals(path))
-            {
-                item.Text = content;
-                return;
             }
         }
     }
@@ -318,16 +296,6 @@ public sealed partial class NoteViewModel : WidgetViewModel
         UpdateNoteSelection(ExplorerItems, e.PreviousFilePath, e.NewFilePath);
     }
 
-    private void NoteContentChanged(object? _, NoteContentChangedEventArgs e)
-    {
-        if (e.WidgetId == _widget.Id)
-        {
-            return;
-        }
-
-        UpdateNoteContent(ExplorerItems, e.Path, e.Content);
-    }
-
     private void FileDeleted(object? _, FileDeletedEventArgs e)
     {
         if (SelectedNote is not null && SelectedNote.Path.Equals(e.Path))
@@ -340,7 +308,7 @@ public sealed partial class NoteViewModel : WidgetViewModel
         TipVisibility = ExplorerItems.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
     }
 
-    private void ItemRenamed(object? _, EventArgs e) => ReloadFiles();
+    private void ItemRenamed(object? _, EventArgs e) => ReloadExplorerItems();
 
-    private void StoragePathChanged(object? _, EventArgs e) => ReloadFiles();
+    private void StoragePathChanged(object? _, EventArgs e) => ReloadExplorerItems();
 }

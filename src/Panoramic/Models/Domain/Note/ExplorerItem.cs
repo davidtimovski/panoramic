@@ -13,12 +13,10 @@ namespace Panoramic.Models.Domain.Note;
 
 public sealed partial class ExplorerItem : ObservableObject
 {
-    private static readonly TimeSpan TextChangeEnqueueDebounceInterval = TimeSpan.FromSeconds(3);
+    private static readonly TimeSpan TextChangeEnqueueDebounceInterval = TimeSpan.FromSeconds(2);
 
     private readonly DispatcherQueueTimer _debounceTimer;
     private readonly INotesOrchestrator _notesOrchestrator;
-
-    private bool initialized;
 
     public ExplorerItem(INotesOrchestrator notesOrchestrator, string name, FileType type, FileSystemItemPath path, IReadOnlyList<ExplorerItem> children)
     {
@@ -45,8 +43,8 @@ public sealed partial class ExplorerItem : ObservableObject
     public FileType Type { get; }
     public FileSystemItemPath Path { get; }
 
-    private string? text;
-    public string? Text
+    private string text = string.Empty;
+    public string Text
     {
         get => text;
         set
@@ -58,14 +56,7 @@ public sealed partial class ExplorerItem : ObservableObject
 
             OnPropertyChanged();
 
-            if (initialized)
-            {
-                _debounceTimer.Debounce(() => _notesOrchestrator.EnqueueNoteWrite(Path, value!), TextChangeEnqueueDebounceInterval);
-            }
-            else
-            {
-                initialized = true;
-            }
+            _debounceTimer.Debounce(() => _notesOrchestrator.SetContent(Path, value), TextChangeEnqueueDebounceInterval);
         }
     }
 
@@ -81,4 +72,13 @@ public sealed partial class ExplorerItem : ObservableObject
     public Visibility RenameDeleteVisible { get; }
 
     public double Opacity => IsEnabled ? 1 : 0.5;
+
+    /// <summary>
+    /// Set <see cref="Text"/> without enqueuing file save.
+    /// </summary>
+    public void InitializeText(string text)
+    {
+        this.text = text;
+        OnPropertyChanged();
+    }
 }

@@ -29,7 +29,7 @@ public interface IStorageService
 
     /// <summary>
     /// Schedules a widget save to disk.
-    /// Will reset the auto-save timer if other widget changes have been enqueued (but only if the first enqueued change is earlier than 1 minute ago).
+    /// Will reset the auto-save timer if other widget changes have been enqueued.
     /// </summary>
     void EnqueueWidgetWrite(Guid id, string change);
 
