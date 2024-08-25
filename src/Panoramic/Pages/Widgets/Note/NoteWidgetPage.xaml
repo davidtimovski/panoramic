@@ -113,10 +113,22 @@
                             </MenuBarItemFlyout>
                         </TreeViewItem.ContextFlyout>
 
-                        <StackPanel Orientation="Horizontal" Opacity="{x:Bind Opacity, Mode=OneWay}">
-                            <FontIcon Glyph="&#xE8A5;" Foreground="{StaticResource PanoramicBlueForeground}" />
-                            <TextBlock Text="{x:Bind Name}" Margin="10 0 0 0" />
-                        </StackPanel>
+                        <Grid Opacity="{x:Bind Opacity, Mode=OneWay}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                <FontIcon Glyph="&#xE8A5;" Foreground="{StaticResource PanoramicBlueForeground}" />
+                                <TextBlock Text="{x:Bind Name}" Margin="10 0 0 0" />
+                            </StackPanel>
+
+                            <FontIcon Grid.Column="1"
+                                      Visibility="{x:Bind AlreadyOpenIconVisibility, Mode=OneWay}"
+                                      Glyph="&#xE7B3;"
+                                      FontSize="14" />
+                        </Grid>
                     </TreeViewItem>
                 </DataTemplate>
 

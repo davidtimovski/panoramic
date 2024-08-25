@@ -64,6 +64,7 @@ public sealed partial class ExplorerItem : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Opacity))]
+    [NotifyPropertyChangedFor(nameof(AlreadyOpenIconVisibility))]
     private bool isEnabled = true;
 
     /// <summary>
@@ -71,7 +72,8 @@ public sealed partial class ExplorerItem : ObservableObject
     /// </summary>
     public Visibility RenameDeleteVisible { get; }
 
-    public double Opacity => IsEnabled ? 1 : 0.5;
+    public double Opacity => IsEnabled ? 1 : 0.6;
+    public Visibility AlreadyOpenIconVisibility => IsEnabled ? Visibility.Collapsed : Visibility.Visible;
 
     /// <summary>
     /// Set <see cref="Text"/> without enqueuing file save.
