@@ -123,7 +123,7 @@ public sealed partial class MainWindow : Window
 
     private void WidgetDeleted(object? _, WidgetDeletedEventArgs e)
     {
-        var widget = Grid.Children.OfType<Page>().FirstOrDefault(x => x.Name == e.Id.ToString("N"));
+        var widget = Grid.Children.OfType<Page>().FirstOrDefault(x => x.Name == e.Widget.Id.ToString("N"));
         Grid.Children.Remove(widget);
     }
 

@@ -10,6 +10,7 @@ using Panoramic.Models.Domain.Checklist;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Domain.RecentLinks;
 using Panoramic.Services.Preferences;
+using Panoramic.Services.Preferences.Models;
 using Panoramic.Services.Storage.Models;
 using Panoramic.Utils;
 using Windows.Storage;
@@ -59,16 +60,7 @@ public sealed class StorageService : IStorageService
             await WriteUnsavedChangesAsync();
         };
 
-        _preferencesService.Changed += (_, e) =>
-        {
-            _timer.Interval = e.AutoSaveInterval;
-
-            if (_timer.IsRunning)
-            {
-                _timer.Stop();
-                _timer.Start();
-            }
-        };
+        _preferencesService.Changed += PreferencesChanged;
     }
 
     public event EventHandler<WidgetUpdatedEventArgs>? WidgetUpdated;
@@ -165,7 +157,7 @@ public sealed class StorageService : IStorageService
 
             Widgets.Remove(widget.Id);
 
-            WidgetDeleted?.Invoke(this, new WidgetDeletedEventArgs { Id = widget.Id });
+            WidgetDeleted?.Invoke(this, new WidgetDeletedEventArgs { Widget = widget });
         }
         catch (Exception ex)
         {
@@ -288,5 +280,16 @@ public sealed class StorageService : IStorageService
         }
 
         return (string)storagePathValue;
+    }
+
+    private void PreferencesChanged(object? _, PreferencesChangedEventArgs e)
+    {
+        _timer.Interval = e.AutoSaveInterval;
+
+        if (_timer.IsRunning)
+        {
+            _timer.Stop();
+            _timer.Start();
+        }
     }
 }

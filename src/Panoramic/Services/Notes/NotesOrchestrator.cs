@@ -4,10 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
+using Panoramic.Models;
 using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Services.Notes.Models;
 using Panoramic.Services.Preferences;
+using Panoramic.Services.Preferences.Models;
 using Panoramic.Services.Storage;
 using Panoramic.Services.Storage.Models;
 using Panoramic.Utils;
@@ -36,6 +38,7 @@ public sealed class NotesOrchestrator : INotesOrchestrator
     {
         _preferencesService = preferencesService;
         _storageService = storageService;
+        _storageService.WidgetDeleted += WidgetDeleted;
 
         var queueController = DispatcherQueueController.CreateOnDedicatedThread();
         var queue = queueController.DispatcherQueue;
@@ -49,16 +52,7 @@ public sealed class NotesOrchestrator : INotesOrchestrator
             await WriteUnsavedChangesAsync();
         };
 
-        _preferencesService.Changed += (_, e) =>
-        {
-            _timer.Interval = e.AutoSaveInterval;
-
-            if (_timer.IsRunning)
-            {
-                _timer.Stop();
-                _timer.Start();
-            }
-        };
+        _preferencesService.Changed += PreferencesChanged;
     }
 
     public event EventHandler<NoteSelectionChangedEventArgs>? NoteSelectionChanged;
@@ -427,5 +421,39 @@ public sealed class NotesOrchestrator : INotesOrchestrator
         DebugLogger.Log($"Writing note content: {absolutePath}");
 
         await File.WriteAllTextAsync(absolutePath, content);
+    }
+
+    private void WidgetDeleted(object? _, WidgetDeletedEventArgs e)
+    {
+        if (e.Widget.Type != WidgetType.Note)
+        {
+            return;
+        }
+
+        var noteWidget = (NoteWidget)e.Widget;
+        if (noteWidget.NotePath is null)
+        {
+            return;
+        }
+
+        OpenNotes.Remove(noteWidget.NotePath);
+
+        NoteSelectionChanged?.Invoke(this, new NoteSelectionChangedEventArgs
+        {
+            WidgetId = e.Widget.Id,
+            PreviousFilePath = noteWidget.NotePath,
+            NewFilePath = null
+        });
+    }
+
+    private void PreferencesChanged(object? _, PreferencesChangedEventArgs e)
+    {
+        _timer.Interval = e.AutoSaveInterval;
+
+        if (_timer.IsRunning)
+        {
+            _timer.Stop();
+            _timer.Start();
+        }
     }
 }

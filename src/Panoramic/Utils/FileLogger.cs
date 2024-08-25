@@ -47,7 +47,12 @@ internal static class FileLogger
         writer.WriteLine($"{DateTime.Now} {exceptionType}");
         writer.WriteLine($"Message: {message}");
         writer.WriteLine("Stack trace:");
-        writer.WriteLine(ex.InnerException!.StackTrace);
+
+        var stackTrace = ex.InnerException is null
+            ? ex.StackTrace
+            : ex.InnerException.StackTrace;
+
+        writer.WriteLine(stackTrace);
         writer.WriteLine();
     }
 }
