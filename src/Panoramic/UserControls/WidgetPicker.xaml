@@ -11,6 +11,7 @@
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
+                <RowDefinition />
             </Grid.RowDefinitions>
 
             <ToggleButton Grid.Row="0" x:Name="NoteToggle" Command="{x:Bind WidgetClicked}" CommandParameter="Note" HorizontalAlignment="Stretch">
@@ -38,6 +39,13 @@
                 <StackPanel>
                     <TextBlock HorizontalAlignment="Center" FontWeight="Bold">Checklist</TextBlock>
                     <TextBlock HorizontalAlignment="Center" Margin="0 5 0 0">List of tasks</TextBlock>
+                </StackPanel>
+            </ToggleButton>
+
+            <ToggleButton Grid.Row="4" x:Name="WebViewToggle" Command="{x:Bind WidgetClicked}" CommandParameter="WebView" HorizontalAlignment="Stretch">
+                <StackPanel>
+                    <TextBlock HorizontalAlignment="Center" FontWeight="Bold">Web view</TextBlock>
+                    <TextBlock HorizontalAlignment="Center" Margin="0 5 0 0">Host a web page from a specified URI</TextBlock>
                 </StackPanel>
             </ToggleButton>
         </Grid>

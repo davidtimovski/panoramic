@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Panoramic.Pages.Widgets.WebView.WebViewWidgetPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:Panoramic.ViewModels.Widgets.WebView">
+    
+    <Grid Background="{x:Bind ViewModel.Background, Mode=OneWay}" CornerRadius="{StaticResource PanoramicWidgetCornerRadius}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{x:Bind ViewModel.HeaderBackgroundBrush}" Padding="15 8 8 8">
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="{x:Bind ViewModel.Title}" Foreground="{StaticResource PanoramicWidgetForegroundBrush}" FontSize="16" VerticalAlignment="Center" TextWrapping="Wrap" />
+
+                <DropDownButton Grid.Column="1" AutomationProperties.Name="Setting">
+                    <DropDownButton.Content>
+                        <FontIcon Glyph="&#xE712;" FontSize="14" />
+                    </DropDownButton.Content>
+                    <DropDownButton.Flyout>
+                        <MenuFlyout Placement="Bottom">
+                            <MenuFlyoutItem Click="{x:Bind ViewModel.Refresh}">Refresh</MenuFlyoutItem>
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Click="SettingsButton_Click">Settings</MenuFlyoutItem>
+                            <MenuFlyoutItem Click="DeleteButton_Click">Delete</MenuFlyoutItem>
+                        </MenuFlyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Padding="2 0 2 2" CornerRadius="0 0 10 10">
+            <WebView2 Source="{x:Bind ViewModel.Uri, Mode=OneWay}"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch" />
+        </Border>
+    </Grid>
+
+</Page>

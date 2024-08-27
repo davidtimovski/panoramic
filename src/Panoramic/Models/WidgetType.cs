@@ -6,4 +6,5 @@ public enum WidgetType
     LinkCollection,
     RecentLinks,
     Checklist,
+    WebView,
 }

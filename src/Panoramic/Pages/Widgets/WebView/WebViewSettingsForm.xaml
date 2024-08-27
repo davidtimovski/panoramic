@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Panoramic.Pages.Widgets.WebView.WebViewSettingsForm"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid RowSpacing="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBox Grid.Row="0"
+                 x:Name="TitleTextBox"
+                 Text="{x:Bind ViewModel.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 Header="Title"
+                 MaxLength="60" />
+
+        <ComboBox Grid.Row="1"
+                  SelectedItem="{x:Bind ViewModel.HeaderHighlight, Mode=TwoWay}"
+                  Width="150"
+                  Header="Header highlight">
+            <x:String>None</x:String>
+            <x:String>Blue</x:String>
+            <x:String>Red</x:String>
+            <x:String>Green</x:String>
+            <x:String>Yellow</x:String>
+            <x:String>Orange</x:String>
+            <x:String>Purple</x:String>
+            <x:String>Teal</x:String>
+        </ComboBox>
+
+        <TextBox Grid.Row="2"
+                 Text="{x:Bind ViewModel.Uri, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 Header="URI"
+                 MaxLength="1000" />
+    </Grid>
+
+</Page>

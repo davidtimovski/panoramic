@@ -10,6 +10,7 @@ using Panoramic.Pages.Widgets.Checklist;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
+using Panoramic.Pages.Widgets.WebView;
 using Panoramic.Services.Notes;
 using Panoramic.Services.Storage;
 using Panoramic.UserControls;
@@ -17,6 +18,7 @@ using Panoramic.ViewModels.Widgets.Checklist;
 using Panoramic.ViewModels.Widgets.LinkCollection;
 using Panoramic.ViewModels.Widgets.Note;
 using Panoramic.ViewModels.Widgets.RecentLinks;
+using Panoramic.ViewModels.Widgets.WebView;
 
 namespace Panoramic.Pages.Widgets;
 
@@ -149,6 +151,19 @@ public sealed partial class AddWidgetDialog : Page
 
                 widgetForm = checklistForm;
                 ContentFrame.Content = checklistForm;
+                break;
+            case WidgetType.WebView:
+                var webViewVm = new WebViewSettingsViewModel(_storageService, new WebViewData
+                {
+                    Id = Guid.Empty,
+                    Area = selectedArea!
+                });
+                webViewVm.AttachValidationHandler(Validated!);
+
+                var webViewForm = new WebViewSettingsForm(webViewVm);
+
+                widgetForm = webViewForm;
+                ContentFrame.Content = webViewForm;
                 break;
             default:
                 throw new InvalidOperationException("Unsupported widget type");

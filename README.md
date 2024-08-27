@@ -4,7 +4,7 @@ A productivity app that revolves around a high-level view of notes, links, and c
 
 Revolves around two concepts:
 
-1. [Widgets](#widgets) - different types of functionalities organized as a grid system, in a layout that you prefer
+1. [Widgets](#widgets) - different types of functionalities organized as a grid system, in a layout of your choosing
 2. [Link drawers](#link-drawers) - collections of links that are less frequently accessed, tucked away in a menu
 
 ![Preview (Dark)](design/preview-dark.webp)
@@ -15,7 +15,7 @@ Revolves around two concepts:
 
 ## Widgets
 
-Currently supports 4 types of widgets.
+Currently supports 5 types of widgets.
 
 ### Note
 
@@ -32,6 +32,10 @@ Links that were recently clicked within the app.
 ### Checklist
 
 A collection of tasks (to-dos).
+
+### Web view
+
+Host a web page from a specified URI.
 
 ## Link drawers
 

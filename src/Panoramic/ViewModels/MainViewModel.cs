@@ -6,7 +6,7 @@ using Panoramic.Services.Search;
 
 namespace Panoramic.ViewModels;
 
-public sealed class MainViewModel : ObservableObject
+public sealed partial class MainViewModel : ObservableObject
 {
     private static readonly TimeSpan SearchTextChangeDebounceInterval = TimeSpan.FromMilliseconds(250);
 
@@ -19,21 +19,11 @@ public sealed class MainViewModel : ObservableObject
         _debounceTimer = dispatcherQueue.CreateTimer();
     }
 
+    [ObservableProperty]
     private string searchText = string.Empty;
-    public string SearchText
+    partial void OnSearchTextChanged(string value)
     {
-        get => searchText;
-        set
-        {
-            if (!SetProperty(ref searchText, value))
-            {
-                return;
-            }
-
-            OnPropertyChanged();
-
-            var trimmed = value.Trim();
-            _debounceTimer.Debounce(() => _searchService.Search(trimmed), SearchTextChangeDebounceInterval);
-        }
+        var trimmed = value.Trim();
+        _debounceTimer.Debounce(() => _searchService.Search(trimmed), SearchTextChangeDebounceInterval);
     }
 }

@@ -3,13 +3,14 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Panoramic.Data;
 using Panoramic.Data.Widgets;
-using Panoramic.Models.Domain.Checklist;
+using Panoramic.Models.Domain.WebView;
 using Panoramic.Models.Events;
 using Panoramic.Services.Storage;
+using Panoramic.Utils;
 
-namespace Panoramic.ViewModels.Widgets.Checklist;
+namespace Panoramic.ViewModels.Widgets.WebView;
 
-public sealed partial class ChecklistSettingsViewModel(IStorageService storageService, ChecklistData data)
+public sealed partial class WebViewSettingsViewModel(IStorageService storageService, WebViewData data)
     : ObservableObject, ISettingsViewModel
 {
     private event EventHandler<ValidationEventArgs>? Validated;
@@ -27,7 +28,8 @@ public sealed partial class ChecklistSettingsViewModel(IStorageService storageSe
     private string headerHighlight = data.HeaderHighlight.ToString();
 
     [ObservableProperty]
-    private bool searchable = data.Searchable;
+    private string uri = data.Uri.ToString();
+    partial void OnUriChanged(string value) => ValidateAndEmit();
 
     public void AttachValidationHandler(EventHandler<ValidationEventArgs> handler)
     {
@@ -41,20 +43,24 @@ public sealed partial class ChecklistSettingsViewModel(IStorageService storageSe
 
         if (Id == Guid.Empty)
         {
-            var widget = new ChecklistWidget(storageService, Area, headerHighlight, Title.Trim(), Searchable);
+            var widget = new WebViewWidget(storageService, Area, headerHighlight, Title.Trim(), new Uri(Uri));
             await storageService.AddNewWidgetAsync(widget);
         }
         else
         {
-            var widget = (ChecklistWidget)storageService.Widgets[Id];
+            var widget = (WebViewWidget)storageService.Widgets[Id];
             widget.Area = Area;
             widget.HeaderHighlight = headerHighlight;
-            widget.Title = Title.Trim();
-            widget.Searchable = Searchable;
+            widget.Title = Title;
+            widget.Uri = new Uri(Uri);
 
             await storageService.SaveWidgetAsync(widget);
         }
     }
 
-    private void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = Title.Trim().Length > 0 });
+    private void ValidateAndEmit()
+    {
+        var valid = Title.Trim().Length > 0 && UriHelper.CreateOrDefault(Uri) is not null;
+        Validated?.Invoke(this, new ValidationEventArgs { Valid = valid });
+    }
 }

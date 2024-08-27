@@ -19,19 +19,9 @@ public sealed partial class RecentLinksSettingsViewModel(IStorageService storage
     [ObservableProperty]
     private Area area = data.Area;
 
+    [ObservableProperty]
     private string title = data.Title;
-    public string Title
-    {
-        get => title;
-        set
-        {
-            if (SetProperty(ref title, value))
-            {
-                OnPropertyChanged();
-                Validate();
-            }
-        }
-    }
+    partial void OnTitleChanged(string value) => ValidateAndEmit();
 
     [ObservableProperty]
     private string headerHighlight = data.HeaderHighlight.ToString();
@@ -48,7 +38,7 @@ public sealed partial class RecentLinksSettingsViewModel(IStorageService storage
     public void AttachValidationHandler(EventHandler<ValidationEventArgs> handler)
     {
         Validated += handler;
-        Validate();
+        ValidateAndEmit();
     }
 
     public async Task SubmitAsync()
@@ -74,5 +64,5 @@ public sealed partial class RecentLinksSettingsViewModel(IStorageService storage
         }
     }
 
-    private void Validate() => Validated?.Invoke(this, new ValidationEventArgs { Valid = Title.Trim().Length > 0 });
+    private void ValidateAndEmit() => Validated?.Invoke(this, new ValidationEventArgs { Valid = Title.Trim().Length > 0 });
 }

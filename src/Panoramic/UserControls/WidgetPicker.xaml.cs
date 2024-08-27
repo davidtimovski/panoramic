@@ -22,6 +22,7 @@ public sealed partial class WidgetPicker : UserControl
         _toggleLookup.Add(WidgetType.LinkCollection, LinkCollectionToggle);
         _toggleLookup.Add(WidgetType.RecentLinks, RecentLinksToggle);
         _toggleLookup.Add(WidgetType.Checklist, ChecklistToggle);
+        _toggleLookup.Add(WidgetType.WebView, WebViewToggle);
 
         if (widgetType is not null)
         {

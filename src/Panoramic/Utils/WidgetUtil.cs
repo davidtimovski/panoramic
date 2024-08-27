@@ -14,6 +14,7 @@ internal static class WidgetUtil
         { "linkcollection", WidgetType.LinkCollection },
         { "recentlinks", WidgetType.RecentLinks },
         { "checklist", WidgetType.Checklist },
+        { "webview", WidgetType.WebView },
     }.ToFrozenDictionary();
 
     internal static string CreateDataFileName(Guid id, WidgetType type)

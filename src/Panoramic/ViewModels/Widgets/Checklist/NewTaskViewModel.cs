@@ -7,36 +7,16 @@ namespace Panoramic.ViewModels.Widgets.Checklist;
 
 public sealed partial class NewTaskViewModel(ChecklistWidget widget) : ObservableObject
 {
+    [ObservableProperty]
     private string title = string.Empty;
-    public string Title
-    {
-        get => title;
-        set
-        {
-            if (SetProperty(ref title, value))
-            {
-                OnPropertyChanged();
-                ValidateAndEmit();
-            }
-        }
-    }
+    partial void OnTitleChanged(string value) => ValidateAndEmit();
 
     [ObservableProperty]
     private DateTimeOffset? dueDate;
 
+    [ObservableProperty]
     private string url = string.Empty;
-    public string Url
-    {
-        get => url;
-        set
-        {
-            if (SetProperty(ref url, value))
-            {
-                OnPropertyChanged();
-                ValidateAndEmit();
-            }
-        }
-    }
+    partial void OnUrlChanged(string value) => ValidateAndEmit();
 
     public event EventHandler<ValidationEventArgs>? Validated;
 

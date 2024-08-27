@@ -8,11 +8,13 @@ using Panoramic.Models.Domain.Checklist;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Domain.RecentLinks;
+using Panoramic.Models.Domain.WebView;
 using Panoramic.Models.Events;
 using Panoramic.Pages.Widgets.Checklist;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
+using Panoramic.Pages.Widgets.WebView;
 using Panoramic.Services.Notes;
 using Panoramic.Services.Storage;
 using Panoramic.UserControls;
@@ -21,6 +23,7 @@ using Panoramic.ViewModels.Widgets.Checklist;
 using Panoramic.ViewModels.Widgets.LinkCollection;
 using Panoramic.ViewModels.Widgets.Note;
 using Panoramic.ViewModels.Widgets.RecentLinks;
+using Panoramic.ViewModels.Widgets.WebView;
 
 namespace Panoramic.Pages.Widgets;
 
@@ -123,6 +126,14 @@ public sealed partial class EditWidgetDialog : Page
                 settingsVm = checklistVm;
                 widgetForm = checklistForm;
                 settingsContent = checklistForm;
+                break;
+            case WidgetType.WebView:
+                var webViewVm = new WebViewSettingsViewModel(_storageService, ((WebViewWidget)_widget).GetData());
+                var webViewForm = new WebViewSettingsForm(webViewVm);
+
+                settingsVm = webViewVm;
+                widgetForm = webViewForm;
+                settingsContent = webViewForm;
                 break;
             default:
                 throw new InvalidOperationException("Unsupported widget type");

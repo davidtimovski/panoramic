@@ -9,6 +9,7 @@ using Panoramic.Models.Domain;
 using Panoramic.Models.Domain.Checklist;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Domain.RecentLinks;
+using Panoramic.Models.Domain.WebView;
 using Panoramic.Services.Preferences;
 using Panoramic.Services.Preferences.Models;
 using Panoramic.Services.Storage.Models;
@@ -257,6 +258,10 @@ public sealed class StorageService : IStorageService
             case WidgetType.Checklist:
                 var checklistWidget = ChecklistWidget.Load(this, relativeFilePath, markdown);
                 Widgets.Add(checklistWidget.Id, checklistWidget);
+                break;
+            case WidgetType.WebView:
+                var webViewWidget = WebViewWidget.Load(this, relativeFilePath, markdown);
+                Widgets.Add(webViewWidget.Id, webViewWidget);
                 break;
             default:
                 throw new InvalidOperationException("Unsupported widget type");

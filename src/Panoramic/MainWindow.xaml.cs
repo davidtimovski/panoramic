@@ -14,6 +14,7 @@ using Panoramic.Models.Domain.Checklist;
 using Panoramic.Models.Domain.LinkCollection;
 using Panoramic.Models.Domain.Note;
 using Panoramic.Models.Domain.RecentLinks;
+using Panoramic.Models.Domain.WebView;
 using Panoramic.Pages;
 using Panoramic.Pages.LinkDrawers;
 using Panoramic.Pages.Widgets;
@@ -21,6 +22,7 @@ using Panoramic.Pages.Widgets.Checklist;
 using Panoramic.Pages.Widgets.LinkCollection;
 using Panoramic.Pages.Widgets.Note;
 using Panoramic.Pages.Widgets.RecentLinks;
+using Panoramic.Pages.Widgets.WebView;
 using Panoramic.Services;
 using Panoramic.Services.Drawers;
 using Panoramic.Services.Drawers.Models;
@@ -282,6 +284,7 @@ public sealed partial class MainWindow : Window
             WidgetType.LinkCollection => new LinkCollectionWidgetPage(_serviceProvider, (LinkCollectionWidget)widget),
             WidgetType.RecentLinks => new RecentLinksWidgetPage(_serviceProvider, (RecentLinksWidget)widget),
             WidgetType.Checklist => new ChecklistWidgetPage(_serviceProvider, (ChecklistWidget)widget),
+            WidgetType.WebView => new WebViewWidgetPage(_serviceProvider, (WebViewWidget)widget),
             _ => throw new InvalidOperationException("Unsupported widget type")
         };
 
