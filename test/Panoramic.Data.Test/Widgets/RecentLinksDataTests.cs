@@ -20,14 +20,14 @@ public class RecentLinksDataTests
             new RecentLinkData
             {
                 Title = "Quisque sollicitudin",
-                Uri = new Uri("https://www.google.com/search?q=somequeryhere1"),
+                Uri = new Uri("https://www.example.com/?q=1"),
                 Context = "My links",
                 Clicked = new DateTime(2024, 4, 4)
             },
             new RecentLinkData
             {
                 Title = "Vestibulum erat nulla",
-                Uri = new Uri("https://www.google.com/search?q=somequeryhere2"),
+                Uri = new Uri("https://www.example.com/?q=2"),
                 Context = "Other links",
                 Clicked = new DateTime(2024, 5, 5)
             }

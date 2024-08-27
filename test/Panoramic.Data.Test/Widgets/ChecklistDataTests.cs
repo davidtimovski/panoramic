@@ -19,14 +19,14 @@ public class ChecklistDataTests
             {
                 Title = "Integer iaculis ex quam",
                 DueDate = null,
-                Uri = new Uri("https://www.google.com/search?q=somequeryhere1"),
+                Uri = new Uri("https://www.example.com/?q=1"),
                 Created = new DateTime(2024, 4, 4)
             },
             new ChecklistTaskData
             {
                 Title = "Morbi imperdiet consectetur",
                 DueDate = DateOnly.FromDateTime(DateTime.Now.AddDays(3)),
-                Uri = new Uri("https://www.google.com/search?q=somequeryhere2"),
+                Uri = new Uri("https://www.example.com/?q=2"),
                 Created = new DateTime(2024, 5, 5)
             }
         ]

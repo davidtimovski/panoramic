@@ -13,14 +13,14 @@ public class LinkDrawerDataTests
             new LinkDrawerLinkData
             {
                 Title = "Quisque sollicitudin",
-                Uri = new Uri("https://www.google.com/search?q=somequeryhere1"),
+                Uri = new Uri("https://www.example.com/?q=1"),
                 Order = 0,
                 SearchTerms = ["term1", "term2"]
             },
             new LinkDrawerLinkData
             {
                 Title = "Vestibulum erat nulla",
-                Uri = new Uri("https://www.google.com/search?q=somequeryhere2"),
+                Uri = new Uri("https://www.example.com/?q=2"),
                 Order = 1,
                 SearchTerms = ["term3", "term4", "term5"]
             }
