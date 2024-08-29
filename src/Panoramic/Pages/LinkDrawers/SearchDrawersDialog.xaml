@@ -38,6 +38,12 @@
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Stretch">
 
+                    <Button.ContextFlyout>
+                        <MenuBarItemFlyout>
+                            <MenuFlyoutItem Click="{x:Bind Copy}">Copy</MenuFlyoutItem>
+                        </MenuBarItemFlyout>
+                    </Button.ContextFlyout>
+
                     <Grid RowSpacing="5" ColumnSpacing="8">
                         <Grid.RowDefinitions>
                             <RowDefinition />

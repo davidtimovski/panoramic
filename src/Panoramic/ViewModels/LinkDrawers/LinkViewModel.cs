@@ -1,5 +1,6 @@
 ﻿using System;
 using Panoramic.Services;
+using Windows.ApplicationModel.DataTransfer;
 
 namespace Panoramic.ViewModels.LinkDrawers;
 
@@ -28,5 +29,12 @@ public sealed class LinkViewModel
     {
         _eventHub.RaiseHyperlinkClicked(Title, Uri, _drawerName, DateTime.Now);
         Clicked?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void Copy()
+    {
+        var package = new DataPackage();
+        package.SetText(Uri.ToString());
+        Clipboard.SetContent(package);
     }
 }

@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Media;
 using Panoramic.Services;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 
 namespace Panoramic.ViewModels.LinkDrawers;
@@ -51,5 +52,12 @@ public sealed partial class SearchedLinkViewModel : ObservableObject
 
         _eventHub.RaiseHyperlinkClicked(Title, Uri, _drawerName, DateTime.Now);
         Clicked?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void Copy()
+    {
+        var package = new DataPackage();
+        package.SetText(Uri.ToString());
+        Clipboard.SetContent(package);
     }
 }
