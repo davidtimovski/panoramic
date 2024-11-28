@@ -53,7 +53,13 @@
                                  Click="{x:Bind Click}"
                                  ToolTipService.ToolTip="{x:Bind Tooltip}"
                                  HorizontalAlignment="Stretch"
-                                 HorizontalContentAlignment="Left" />
+                                 HorizontalContentAlignment="Left">
+                        <HyperlinkButton.ContextFlyout>
+                            <MenuBarItemFlyout>
+                                <MenuFlyoutItem Click="{x:Bind Copy}">Copy</MenuFlyoutItem>
+                            </MenuBarItemFlyout>
+                        </HyperlinkButton.ContextFlyout>
+                    </HyperlinkButton>
                 </DataTemplate>
             </Border.Resources>
 

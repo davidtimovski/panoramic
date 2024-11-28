@@ -17,7 +17,9 @@ namespace Panoramic.ViewModels.Widgets.Checklist;
 
 public sealed partial class ChecklistViewModel : WidgetViewModel
 {
-    private static readonly TimeSpan TaskRemovalDebounceInterval = TimeSpan.FromMilliseconds(600);
+    private const int DueDateRefreshIntervalMinutes = 5;
+
+    private static readonly TimeSpan TaskRemovalDebounceInterval = TimeSpan.FromMilliseconds(500);
 
     private readonly SolidColorBrush _titleDefaultForeground;
     private readonly SolidColorBrush _titleCompletedForeground;
@@ -53,7 +55,7 @@ public sealed partial class ChecklistViewModel : WidgetViewModel
         _debounceTimer = dispatcherQueue.CreateTimer();
 
         _dueDateRefreshTimer = dispatcherQueue.CreateTimer();
-        _dueDateRefreshTimer.Interval = TimeSpan.FromMinutes(5);
+        _dueDateRefreshTimer.Interval = TimeSpan.FromMinutes(DueDateRefreshIntervalMinutes);
         _dueDateRefreshTimer.Tick += RefreshDueDateLabels;
         _dueDateRefreshTimer.Start();
 
@@ -131,8 +133,7 @@ public sealed partial class ChecklistViewModel : WidgetViewModel
     {
         DebugLogger.Log("Running Checklist due date label refresh timer..");
 
-        var tasksWithDueDate = Tasks.Where(x => x.DueDate.HasValue).ToList();
-        foreach (var task in tasksWithDueDate)
+        foreach (var task in Tasks)
         {
             task.SetDueDateLabel();
         }

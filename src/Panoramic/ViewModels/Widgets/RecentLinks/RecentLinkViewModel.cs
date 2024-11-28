@@ -1,5 +1,6 @@
 ﻿using System;
 using Panoramic.Services;
+using Windows.ApplicationModel.DataTransfer;
 
 namespace Panoramic.ViewModels.Widgets.RecentLinks;
 
@@ -23,4 +24,11 @@ public sealed class RecentLinkViewModel
     public string Tooltip { get; }
 
     public void Click() => _eventHub.RaiseHyperlinkClicked(Title, Uri, Context, DateTime.Now);
+
+    public void Copy()
+    {
+        var package = new DataPackage();
+        package.SetText(Uri.ToString());
+        Clipboard.SetContent(package);
+    }
 }
