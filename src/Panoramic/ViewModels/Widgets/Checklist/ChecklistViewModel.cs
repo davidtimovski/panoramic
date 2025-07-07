@@ -76,7 +76,7 @@ public sealed partial class ChecklistViewModel : WidgetViewModel
     public readonly ObservableCollection<TaskViewModel> Tasks = [];
 
     [ObservableProperty]
-    private Visibility filterIconVisibility = Visibility.Collapsed;
+    public partial Visibility FilterIconVisibility { get; set; } = Visibility.Collapsed;
 
     private void SearchInvoked(object? _, EventArgs e) => _dispatcherQueue.TryEnqueue(SetViewModel);
 

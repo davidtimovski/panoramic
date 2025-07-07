@@ -106,7 +106,7 @@ public sealed partial class App : Application
     {
         FileLogger.WriteException(e.Exception);
         e.Handled = true;
-        
+
         // Close app
         Process.GetCurrentProcess().Kill();
     }

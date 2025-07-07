@@ -31,7 +31,7 @@ public sealed partial class SearchDrawersViewModel : ObservableObject
     public event EventHandler<EventArgs>? NavigatedToLink;
 
     [ObservableProperty]
-    private string searchText = string.Empty;
+    public partial string SearchText { get; set; } = string.Empty;
 
     partial void OnSearchTextChanged(string value) => SetLinks(value);
 
@@ -102,7 +102,7 @@ public sealed partial class SearchDrawersViewModel : ObservableObject
     {
         var searchTermsString = string.Join(LinkDrawerLinkData.SearchTermsSeparator, link.SearchTerms);
         var vm = new SearchedLinkViewModel(_eventHub, drawerName, _linkBackgroundBrush, _selectedLinkBorderBrush, link.Title, link.Uri, selected);
-        vm.Clicked += (object? _, EventArgs e) => { NavigatedToLink?.Invoke(this, EventArgs.Empty); };
+        vm.Clicked += (_, e) => { NavigatedToLink?.Invoke(this, EventArgs.Empty); };
 
         return vm;
     }

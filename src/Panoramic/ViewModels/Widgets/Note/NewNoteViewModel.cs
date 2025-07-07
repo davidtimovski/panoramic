@@ -25,11 +25,13 @@ public sealed partial class NewNoteViewModel : ObservableObject
     public event EventHandler<ValidationEventArgs>? Validated;
 
     [ObservableProperty]
-    private string name = string.Empty;
+    public partial string Name { get; set; } = string.Empty;
+
     partial void OnNameChanged(string value) => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
 
     [ObservableProperty]
-    private ExplorerFolder selectedFolder;
+    public partial ExplorerFolder SelectedFolder { get; set; }
+
     partial void OnSelectedFolderChanged(ExplorerFolder value) => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
 
     public IReadOnlyList<ExplorerFolder> ExplorerFolders { get; } = [];

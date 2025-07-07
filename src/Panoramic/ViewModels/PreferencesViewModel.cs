@@ -26,15 +26,11 @@ public sealed partial class PreferencesViewModel : ObservableObject
 
         _preferencesService = preferencesService;
         _storageService = storageService;
-
-        selectedTheme = _preferencesService.Theme.ToString();
+        SelectedTheme = _preferencesService.Theme.ToString();
         originalTheme = SelectedTheme;
-
-        storagePath = _storageService.StoragePath;
-
-        selectedAutoSaveInterval = $"{_preferencesService.AutoSaveInterval.TotalSeconds} seconds";
-
-        selectedAutoSaveMaxDelay = _preferencesService.AutoSaveMaxDelay.TotalSeconds switch
+        StoragePath = _storageService.StoragePath;
+        SelectedAutoSaveInterval = $"{_preferencesService.AutoSaveInterval.TotalSeconds} seconds";
+        SelectedAutoSaveMaxDelay = _preferencesService.AutoSaveMaxDelay.TotalSeconds switch
         {
             30 or 45 => $"{_preferencesService.AutoSaveMaxDelay.TotalSeconds} seconds",
             60 => "1 minute",
@@ -47,26 +43,26 @@ public sealed partial class PreferencesViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ThemeInfoLabelForeground))]
-    private string selectedTheme;
+    public partial string SelectedTheme { get; set; }
 
     public SolidColorBrush ThemeInfoLabelForeground => SelectedTheme != originalTheme
         ? _themeInfoLabelForegroundHighlighted
         : _themeInfoLabelForeground;
 
     [ObservableProperty]
-    private string storagePath;
+    public partial string StoragePath { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(InvalidFolder))]
-    private bool folderIsValid;
+    public partial bool FolderIsValid { get; set; }
 
     public bool InvalidFolder => !FolderIsValid;
 
     [ObservableProperty]
-    private string selectedAutoSaveInterval;
+    public partial string SelectedAutoSaveInterval { get; set; }
 
     [ObservableProperty]
-    private string selectedAutoSaveMaxDelay;
+    public partial string SelectedAutoSaveMaxDelay { get; set; }
 
     public void SetFolder(string path)
     {

@@ -28,7 +28,7 @@ public sealed partial class ViewDrawerViewModel : ObservableObject
     public string Name { get; }
 
     [ObservableProperty]
-    private string searchText = string.Empty;
+    public partial string SearchText { get; set; } = string.Empty;
 
     partial void OnSearchTextChanged(string value) => SetLinks(value);
 
@@ -62,7 +62,7 @@ public sealed partial class ViewDrawerViewModel : ObservableObject
     {
         var searchTermsString = string.Join(LinkDrawerLinkData.SearchTermsSeparator, link.SearchTerms);
         var vm = new LinkViewModel(_eventHub, _data.Name, link.Title, link.Uri);
-        vm.Clicked += (object? _, EventArgs e) => { LinkClicked?.Invoke(this, EventArgs.Empty); };
+        vm.Clicked += (_, e) => { LinkClicked?.Invoke(this, EventArgs.Empty); };
 
         return vm;
     }

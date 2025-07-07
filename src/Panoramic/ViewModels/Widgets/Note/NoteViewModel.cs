@@ -36,12 +36,11 @@ public sealed partial class NoteViewModel : WidgetViewModel
         HeaderBackgroundBrush = ResourceUtil.HighlightBrushes[widget.HeaderHighlight];
 
         ReloadExplorerItems();
-
-        fontFamily = FontFamilyHelper.Get(_widget.FontFamily);
-        fontSize = _widget.FontSize;
-        title = "Notes";
-        editing = _widget.Editing;
-        recentNotes = _widget.RecentNotes;
+        FontFamily = FontFamilyHelper.Get(_widget.FontFamily);
+        FontSize = _widget.FontSize;
+        Title = "Notes";
+        Editing = _widget.Editing;
+        RecentNotes = _widget.RecentNotes;
 
         SelectedNote = FindNoteRecursively(_widget.NotePath, ExplorerItems);
 
@@ -53,10 +52,10 @@ public sealed partial class NoteViewModel : WidgetViewModel
     public ObservableCollection<ExplorerItem> ExplorerItems { get; } = [];
 
     [ObservableProperty]
-    private FontFamily fontFamily;
+    public partial FontFamily FontFamily { get; set; }
 
     [ObservableProperty]
-    private double fontSize;
+    public partial double FontSize { get; set; }
 
     private ExplorerItem? selectedNote;
     public ExplorerItem? SelectedNote
@@ -97,19 +96,19 @@ public sealed partial class NoteViewModel : WidgetViewModel
     }
 
     [ObservableProperty]
-    private string title;
+    public partial string Title { get; set; }
 
     [ObservableProperty]
-    private bool explorerVisible;
+    public partial bool ExplorerVisible { get; set; }
 
     [ObservableProperty]
-    private bool noteVisible;
+    public partial bool NoteVisible { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EditorVisibility))]
     [NotifyPropertyChangedFor(nameof(PresenterVisibility))]
     [NotifyPropertyChangedFor(nameof(EditToggleTooltip))]
-    private bool editing;
+    public partial bool Editing { get; set; }
 
     partial void OnEditingChanged(bool value)
     {
@@ -118,10 +117,10 @@ public sealed partial class NoteViewModel : WidgetViewModel
     }
 
     [ObservableProperty]
-    private List<FileSystemItemPath> recentNotes = [];
+    public partial List<FileSystemItemPath> RecentNotes { get; set; } = [];
 
     [ObservableProperty]
-    private Visibility tipVisibility;
+    public partial Visibility TipVisibility { get; set; }
 
     public Visibility EditorVisibility => Editing ? Visibility.Visible : Visibility.Collapsed;
 

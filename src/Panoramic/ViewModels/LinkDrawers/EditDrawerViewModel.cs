@@ -50,7 +50,7 @@ public sealed partial class EditDrawerViewModel : ObservableObject
         {
             var searchTermsString = string.Join(LinkDrawerLinkData.SearchTermsSeparator, link.SearchTerms);
             var vm = new EditLinkViewModel(link.Title, link.Uri, searchTermsString, _fieldForegroundBrush, _fieldChangedForegroundBrush);
-            vm.Updated += (object? _, EventArgs e) => { ValidateAndEmit(); };
+            vm.Updated += (_, e) => { ValidateAndEmit(); };
 
             Links.Add(vm);
         }
@@ -62,29 +62,30 @@ public sealed partial class EditDrawerViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NameForegroundBrush))]
-    private string name = string.Empty;
+    public partial string Name { get; set; } = string.Empty;
+
     partial void OnNameChanged(string value) => ValidateAndEmit();
 
     public SolidColorBrush NameForegroundBrush => _isNew || Name.Trim().Equals(_originalName, StringComparison.Ordinal) ? _fieldForegroundBrush : _fieldChangedForegroundBrush;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NewLinkFormValid))]
-    private string newLinkTitle = string.Empty;
+    public partial string NewLinkTitle { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NewLinkFormValid))]
-    private string newLinkUrl = string.Empty;
+    public partial string NewLinkUrl { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NewLinkFormValid))]
-    private string newLinkSearchTerms = string.Empty;
+    public partial string NewLinkSearchTerms { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NewLinkTitlePlaceholder))]
-    private bool newLinkTitleIsReadOnly;
+    public partial bool NewLinkTitleIsReadOnly { get; set; }
 
     [ObservableProperty]
-    private string? duplicateLinkTitle;
+    public partial string? DuplicateLinkTitle { get; set; }
 
     public string NewLinkTitlePlaceholder => NewLinkTitleIsReadOnly ? "Loading.." : "Title";
 
@@ -119,7 +120,7 @@ public sealed partial class EditDrawerViewModel : ObservableObject
                 {
                     NewLinkTitle = pageTitle;
                 }
-                
+
                 NewLinkTitleIsReadOnly = false;
             });
         }

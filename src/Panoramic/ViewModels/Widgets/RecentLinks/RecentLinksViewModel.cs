@@ -56,7 +56,7 @@ public sealed partial class RecentLinksViewModel : WidgetViewModel
     public ObservableCollection<RecentLinkViewModel> Recent { get; } = [];
 
     [ObservableProperty]
-    private Visibility filterIconVisibility = Visibility.Collapsed;
+    public partial Visibility FilterIconVisibility { get; set; } = Visibility.Collapsed;
 
     public void ClearRecent()
     {

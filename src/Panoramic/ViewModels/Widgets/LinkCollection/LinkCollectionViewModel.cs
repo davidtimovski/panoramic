@@ -46,7 +46,7 @@ public sealed partial class LinkCollectionViewModel : WidgetViewModel
     public readonly ObservableCollection<LinkViewModel> Links = [];
 
     [ObservableProperty]
-    private Visibility filterIconVisibility = Visibility.Collapsed;
+    public partial Visibility FilterIconVisibility { get; set; } = Visibility.Collapsed;
 
     private void SearchInvoked(object? _, EventArgs e) => _dispatcherQueue.TryEnqueue(SetViewModel);
 

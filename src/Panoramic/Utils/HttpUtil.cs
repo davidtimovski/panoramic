@@ -26,8 +26,17 @@ internal static class HttpUtil
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(html);
 
-        var htmlBody = htmlDoc.DocumentNode.SelectSingleNode("//head");
-        var node = htmlBody.Element("title");
+        var htmlHead = htmlDoc.DocumentNode.SelectSingleNode("//head");
+        if (htmlHead is null)
+        {
+            return null;
+        }
+
+        var node = htmlHead.Element("title");
+        if (node is null)
+        {
+            return null;
+        }
 
         return node.InnerText;
     }

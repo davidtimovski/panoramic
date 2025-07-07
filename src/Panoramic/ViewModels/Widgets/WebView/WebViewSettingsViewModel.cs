@@ -18,17 +18,19 @@ public sealed partial class WebViewSettingsViewModel(IStorageService storageServ
     public Guid Id { get; } = data.Id;
 
     [ObservableProperty]
-    private Area area = data.Area;
+    public partial Area Area { get; set; } = data.Area;
 
     [ObservableProperty]
-    private string title = data.Title;
+    public partial string Title { get; set; } = data.Title;
+
     partial void OnTitleChanged(string value) => ValidateAndEmit();
 
     [ObservableProperty]
-    private string headerHighlight = data.HeaderHighlight.ToString();
+    public partial string HeaderHighlight { get; set; } = data.HeaderHighlight.ToString();
 
     [ObservableProperty]
-    private string uri = data.Uri.ToString();
+    public partial string Uri { get; set; } = data.Uri.ToString();
+
     partial void OnUriChanged(string value) => ValidateAndEmit();
 
     public void AttachValidationHandler(EventHandler<ValidationEventArgs> handler)

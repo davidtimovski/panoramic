@@ -64,14 +64,14 @@ public sealed partial class TaskViewModel : ObservableObject
     public string? Tooltip { get; }
 
     [ObservableProperty]
-    private string dueDateLabel = string.Empty;
+    public partial string DueDateLabel { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private SolidColorBrush dueDateBackground;
+    public partial SolidColorBrush DueDateBackground { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TitleForeground))]
-    private bool isEnabled = true;
+    public partial bool IsEnabled { get; set; } = true;
 
     public DateTime LastRefresh = DateTime.Now;
 

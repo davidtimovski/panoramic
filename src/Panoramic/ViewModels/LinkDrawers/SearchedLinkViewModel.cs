@@ -42,7 +42,7 @@ public sealed partial class SearchedLinkViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(BorderBrush))]
-    private bool selected;
+    public partial bool Selected { get; set; }
 
     public SolidColorBrush BorderBrush => Selected ? _selectedLinkBorderBrush : _linkBackgroundBrush;
 

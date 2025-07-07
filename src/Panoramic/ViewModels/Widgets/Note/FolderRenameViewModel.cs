@@ -13,11 +13,12 @@ public sealed partial class FolderRenameViewModel : ObservableObject
     public FolderRenameViewModel(string absolutePath)
     {
         _directory = Path.GetDirectoryName(absolutePath)!;
-        name = Path.GetFileName(absolutePath);
+        Name = Path.GetFileName(absolutePath);
     }
 
     [ObservableProperty]
-    private string name;
+    public partial string Name { get; set; }
+
     partial void OnNameChanged(string value) => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
 
     public event EventHandler<ValidationEventArgs>? Validated;

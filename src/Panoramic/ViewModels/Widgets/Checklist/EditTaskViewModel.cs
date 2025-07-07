@@ -47,7 +47,8 @@ public sealed partial class EditTaskViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TitleForegroundBrush))]
-    private string title = string.Empty;
+    public partial string Title { get; set; } = string.Empty;
+
     partial void OnTitleChanged(string value) => Updated?.Invoke(this, EventArgs.Empty);
 
     public SolidColorBrush TitleForegroundBrush => Title.Trim().Equals(_originalTitle, StringComparison.Ordinal) && DueDateHasNotChanged()
@@ -59,13 +60,14 @@ public sealed partial class EditTaskViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TitleForegroundBrush))]
     [NotifyPropertyChangedFor(nameof(UrlForegroundBrush))]
-    private DateTimeOffset? dueDate;
+    public partial DateTimeOffset? DueDate { get; set; }
 
     private readonly string _originalUrl;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(UrlForegroundBrush))]
-    private string url = string.Empty;
+    public partial string Url { get; set; } = string.Empty;
+
     partial void OnUrlChanged(string value)
     {
         Uri = Url.Trim().Length > 0 && Uri.TryCreate(Url.Trim(), UriKind.Absolute, out var createdUri) ? createdUri : null;
@@ -81,10 +83,10 @@ public sealed partial class EditTaskViewModel : ObservableObject
     public DateTime Created { get; }
 
     [ObservableProperty]
-    private Uri? uri;
+    public partial Uri? Uri { get; set; }
 
     [ObservableProperty]
-    private bool navigationIsEnabled;
+    public partial bool NavigationIsEnabled { get; set; }
 
     public bool IsValid() => Title.Trim().Length > 0
         && (Url.Trim().Length == 0 || Uri.TryCreate(Url.Trim(), UriKind.Absolute, out var _));

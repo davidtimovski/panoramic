@@ -33,7 +33,7 @@ public sealed partial class EditViewModel : ObservableObject
         {
             var dueDate = task.DueDate.HasValue ? (DateTimeOffset?)task.DueDate.Value.ToDateTime(TimeOnly.MinValue) : null;
             var vm = new EditTaskViewModel(task.Title, dueDate, task.Uri, task.Created, _fieldForegroundBrush, _fieldChangedForegroundBrush);
-            vm.Updated += (object? _, EventArgs e) => { ValidateAndEmit(); };
+            vm.Updated += (_, e) => { ValidateAndEmit(); };
 
             Tasks.Add(vm);
         }
@@ -43,14 +43,14 @@ public sealed partial class EditViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NewTaskFormValid))]
-    private string newTaskTitle = string.Empty;
+    public partial string NewTaskTitle { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private DateTimeOffset? newTaskDueDate;
+    public partial DateTimeOffset? NewTaskDueDate { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NewTaskFormValid))]
-    private string newTaskUrl = string.Empty;
+    public partial string NewTaskUrl { get; set; } = string.Empty;
 
     public bool NewTaskFormValid =>
         NewTaskTitle.Trim().Length > 0 &&

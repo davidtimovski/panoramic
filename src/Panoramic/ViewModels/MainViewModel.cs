@@ -20,7 +20,8 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    private string searchText = string.Empty;
+    public partial string SearchText { get; set; } = string.Empty;
+
     partial void OnSearchTextChanged(string value)
     {
         var trimmed = value.Trim();

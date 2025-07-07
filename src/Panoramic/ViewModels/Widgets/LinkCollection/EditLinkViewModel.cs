@@ -30,7 +30,8 @@ public sealed partial class EditLinkViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TitleForegroundBrush))]
-    private string title = string.Empty;
+    public partial string Title { get; set; } = string.Empty;
+
     partial void OnTitleChanged(string value) => Updated?.Invoke(this, EventArgs.Empty);
 
     public SolidColorBrush TitleForegroundBrush => Title.Trim().Equals(_originalTitle, StringComparison.Ordinal) ? _fieldForegroundBrush : _fieldChangedForegroundBrush;
@@ -39,7 +40,7 @@ public sealed partial class EditLinkViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(UrlForegroundBrush))]
-    private string url = string.Empty;
+    public partial string Url { get; set; } = string.Empty;
 
     partial void OnUrlChanged(string value)
     {
@@ -52,10 +53,10 @@ public sealed partial class EditLinkViewModel : ObservableObject
     public SolidColorBrush UrlForegroundBrush => Url.Trim().Equals(_originalUrl, StringComparison.Ordinal) ? _fieldForegroundBrush : _fieldChangedForegroundBrush;
 
     [ObservableProperty]
-    private Uri? uri;
+    public partial Uri? Uri { get; set; }
 
     [ObservableProperty]
-    private bool navigationIsEnabled;
+    public partial bool NavigationIsEnabled { get; set; }
 
     public bool IsValid() => Title.Trim().Length > 0 && Url.Trim().Length > 0 && Uri.TryCreate(Url.Trim(), UriKind.Absolute, out var _);
 }

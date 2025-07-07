@@ -5,7 +5,7 @@ using Panoramic.Services.Notes.Models;
 
 namespace Panoramic.ViewModels.Widgets.Note;
 
-public sealed class ExplorerItemTemplateSelector : DataTemplateSelector
+public sealed partial class ExplorerItemTemplateSelector : DataTemplateSelector
 {
     public DataTemplate? FolderTemplate { get; set; }
     public DataTemplate? FileTemplate { get; set; }

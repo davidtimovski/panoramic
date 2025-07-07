@@ -35,8 +35,6 @@ public sealed partial class ExplorerItem : ObservableObject
         {
             Children.Add(item);
         }
-
-        IsEnabled = isEnabled;
     }
 
     public string Name { get; }
@@ -65,7 +63,7 @@ public sealed partial class ExplorerItem : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Opacity))]
     [NotifyPropertyChangedFor(nameof(AlreadyOpenIconVisibility))]
-    private bool isEnabled = true;
+    public partial bool IsEnabled { get; set; } = true;
 
     /// <summary>
     /// Disable Rename and Delete context actions if item is root folder.

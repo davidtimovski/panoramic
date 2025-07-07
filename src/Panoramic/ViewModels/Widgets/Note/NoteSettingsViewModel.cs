@@ -32,31 +32,30 @@ public sealed partial class NoteSettingsViewModel : ObservableObject, ISettingsV
         }
 
         Id = data.Id;
-        area = data.Area;
-        headerHighlight = data.HeaderHighlight.ToString();
-        fontFamily = data.FontFamily;
-        fontSize = data.FontSize.ToString(CultureInfo.InvariantCulture);
-        recentNotesCapacity = data.RecentNotesCapacity;
+        Area = data.Area;
+        HeaderHighlight = data.HeaderHighlight.ToString();
+        FontFamily = data.FontFamily;
+        FontSize = data.FontSize.ToString(CultureInfo.InvariantCulture);
+        RecentNotesCapacity = data.RecentNotesCapacity;
     }
 
     public Guid Id { get; }
 
     [ObservableProperty]
-    private Area area;
+    public partial Area Area { get; set; }
 
     [ObservableProperty]
-    private string headerHighlight;
-
+    public partial string HeaderHighlight { get; set; }
     public ObservableCollection<string> FontFamilyOptions { get; } = [];
 
     [ObservableProperty]
-    private string fontFamily;
+    public partial string FontFamily { get; set; }
 
     [ObservableProperty]
-    private string fontSize;
+    public partial string FontSize { get; set; }
 
     [ObservableProperty]
-    private int recentNotesCapacity;
+    public partial int RecentNotesCapacity { get; set; }
 
     public void AttachValidationHandler(EventHandler<ValidationEventArgs> handler)
     {

@@ -11,5 +11,5 @@ public sealed partial class ExplorerFolder(string name, FileSystemItemPath path,
     public IReadOnlyList<ExplorerFolder> Subfolders { get; } = subfolders;
 
     [ObservableProperty]
-    private bool isSelected = isSelected;
+    public partial bool IsSelected { get; set; } = isSelected;
 }

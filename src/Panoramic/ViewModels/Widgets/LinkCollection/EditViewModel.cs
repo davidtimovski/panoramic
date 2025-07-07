@@ -41,7 +41,7 @@ public sealed partial class EditViewModel : ObservableObject
         foreach (var link in widget.Links)
         {
             var vm = new EditLinkViewModel(link.Title, link.Uri, _fieldForegroundBrush, _fieldChangedForegroundBrush);
-            vm.Updated += (object? _, EventArgs e) => { ValidateAndEmit(); };
+            vm.Updated += (_, e) => { ValidateAndEmit(); };
 
             Links.Add(vm);
         }
@@ -51,18 +51,18 @@ public sealed partial class EditViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NewLinkFormValid))]
-    private string newLinkTitle = string.Empty;
+    public partial string NewLinkTitle { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NewLinkFormValid))]
-    private string newLinkUrl = string.Empty;
+    public partial string NewLinkUrl { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NewLinkTitlePlaceholder))]
-    private bool newLinkTitleIsReadOnly;
+    public partial bool NewLinkTitleIsReadOnly { get; set; }
 
     [ObservableProperty]
-    private string? duplicateLinkTitle;
+    public partial string? DuplicateLinkTitle { get; set; }
 
     public string NewLinkTitlePlaceholder => NewLinkTitleIsReadOnly ? "Loading.." : "Title";
 
@@ -109,7 +109,7 @@ public sealed partial class EditViewModel : ObservableObject
 
     public bool UrlExists()
     {
-        var existing = Links.FirstOrDefault(x => 
+        var existing = Links.FirstOrDefault(x =>
             string.Equals(x.Title.Trim(), NewLinkTitle.Trim(), StringComparison.OrdinalIgnoreCase)
             || string.Equals(x.Url.Trim(), NewLinkUrl.Trim(), StringComparison.Ordinal));
 

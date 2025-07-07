@@ -17,23 +17,22 @@ public sealed partial class RecentLinksSettingsViewModel(IStorageService storage
     public Guid Id { get; } = data.Id;
 
     [ObservableProperty]
-    private Area area = data.Area;
+    public partial Area Area { get; set; } = data.Area;
 
     [ObservableProperty]
-    private string title = data.Title;
+    public partial string Title { get; set; } = data.Title;
+
     partial void OnTitleChanged(string value) => ValidateAndEmit();
 
     [ObservableProperty]
-    private string headerHighlight = data.HeaderHighlight.ToString();
+    public partial string HeaderHighlight { get; set; } = data.HeaderHighlight.ToString();
+    [ObservableProperty]
+    public partial int Capacity { get; set; } = data.Capacity;
+    [ObservableProperty]
+    public partial bool OnlyFromToday { get; set; } = data.OnlyFromToday;
 
     [ObservableProperty]
-    private int capacity = data.Capacity;
-
-    [ObservableProperty]
-    private bool onlyFromToday = data.OnlyFromToday;
-
-    [ObservableProperty]
-    private bool searchable = data.Searchable;
+    public partial bool Searchable { get; set; } = data.Searchable;
 
     public void AttachValidationHandler(EventHandler<ValidationEventArgs> handler)
     {

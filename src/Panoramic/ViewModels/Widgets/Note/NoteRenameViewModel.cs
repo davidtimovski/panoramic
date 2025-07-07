@@ -13,11 +13,12 @@ public sealed partial class NoteRenameViewModel : ObservableObject
     public NoteRenameViewModel(string absolutePath)
     {
         _directory = Path.GetDirectoryName(absolutePath)!;
-        name = Path.GetFileNameWithoutExtension(absolutePath);
+        Name = Path.GetFileNameWithoutExtension(absolutePath);
     }
 
     [ObservableProperty]
-    private string name;
+    public partial string Name { get; set; }
+
     partial void OnNameChanged(string value) => Validated?.Invoke(this, new ValidationEventArgs { Valid = CanBeCreated() });
 
     public event EventHandler<ValidationEventArgs>? Validated;

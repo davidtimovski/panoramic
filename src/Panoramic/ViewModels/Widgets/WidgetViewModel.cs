@@ -17,7 +17,7 @@ public partial class WidgetViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Background))]
-    private bool highlighted;
+    public partial bool Highlighted { get; set; }
 
     public SolidColorBrush Background => Highlighted ? _backgroundHighlightedBrush : _backgroundBrush;
 }
