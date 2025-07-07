@@ -1,9 +1,16 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Panoramic.Data;
 
-internal static class MarkdownUtil
+public static partial class MarkdownUtil
 {
+    /// <summary>
+    /// Regex to capture markdown links.
+    /// </summary>
+    [GeneratedRegex(@"(?:__|[*#])|\[(.*?)\]\((.*?)\)", RegexOptions.Singleline)]
+    public static partial Regex HyperlinkMarkdownRegex();
+
     /// <summary>
     /// Creates a markdown table with two columns which are of equal width.
     /// </summary>

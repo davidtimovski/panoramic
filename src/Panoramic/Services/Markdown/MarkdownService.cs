@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Documents;
+using Panoramic.Data;
 
 namespace Panoramic.Services.Markdown;
 
@@ -232,7 +232,7 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
     {
         var result = new Queue<StringSegment>();
 
-        var match = HyperlinkMarkdownRegex().Match(text);
+        var match = MarkdownUtil.HyperlinkMarkdownRegex().Match(text);
         while (match.Success)
         {
             var uriGroup = match.Groups[2];
@@ -293,9 +293,6 @@ public sealed partial class MarkdownService(IEventHub eventHub) : IMarkdownServi
             paragraph.Inlines.Add(run);
         }
     }
-
-    [GeneratedRegex(@"\[([^\[\]]*)\]\((.*?)\)")]
-    private static partial Regex HyperlinkMarkdownRegex();
 
     private sealed class StringSegment
     {

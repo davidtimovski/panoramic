@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Text.RegularExpressions;
 using Panoramic.Data.Exceptions;
 
 namespace Panoramic.Data.Widgets;
@@ -20,7 +19,7 @@ public sealed partial class RecentLinksData : IWidgetData
     public static RecentLinksData FromMarkdown(string relativeFilePath, string markdown)
     {
         var lineIndex = 0;
-        var lines = markdown.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+        var lines = markdown.Split([Environment.NewLine], StringSplitOptions.None);
 
         try
         {
@@ -35,7 +34,7 @@ public sealed partial class RecentLinksData : IWidgetData
                 var linkLineParts = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
                 var hyperlinkMarkdown = linkLineParts[0];
-                var match = HyperlinkMarkdownRegex().Match(hyperlinkMarkdown);
+                var match = MarkdownUtil.HyperlinkMarkdownRegex().Match(hyperlinkMarkdown);
                 if (!match.Success)
                 {
                     throw new ApplicationException($"Cannot parse hyperlink markdown: {hyperlinkMarkdown}");
@@ -129,9 +128,6 @@ public sealed partial class RecentLinksData : IWidgetData
         builder.AppendLine();
         builder.Append($"> Version: {Version}");
     }
-
-    [GeneratedRegex(@"\[([^\[\]]*)\]\((.*?)\)", RegexOptions.Singleline)]
-    private static partial Regex HyperlinkMarkdownRegex();
 }
 
 public sealed class RecentLinkData

@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Text.RegularExpressions;
 using Panoramic.Data.Exceptions;
 
 namespace Panoramic.Data;
@@ -12,7 +11,7 @@ public sealed partial class LinkDrawerData
     public static LinkDrawerData FromMarkdown(string relativeFilePath, string markdown)
     {
         var lineIndex = 2;
-        var lines = markdown.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+        var lines = markdown.Split([Environment.NewLine], StringSplitOptions.None);
 
         try
         {
@@ -23,7 +22,7 @@ public sealed partial class LinkDrawerData
                 var linkLineParts = lines[lineIndex].Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
                 var hyperlinkMarkdown = linkLineParts[0];
-                var match = HyperlinkMarkdownRegex().Match(hyperlinkMarkdown);
+                var match = MarkdownUtil.HyperlinkMarkdownRegex().Match(hyperlinkMarkdown);
                 if (!match.Success)
                 {
                     throw new ApplicationException($"Cannot parse hyperlink markdown: {hyperlinkMarkdown}");
@@ -66,9 +65,6 @@ public sealed partial class LinkDrawerData
 
         MarkdownUtil.CreateTwoColumnTable(builder, headers, data);
     }
-
-    [GeneratedRegex(@"\[([^\[\]]*)\]\((.*?)\)", RegexOptions.Singleline)]
-    private static partial Regex HyperlinkMarkdownRegex();
 }
 
 public sealed class LinkDrawerLinkData
